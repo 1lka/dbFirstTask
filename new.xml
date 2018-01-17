@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <students attr1="1" attr2="2" attr3="3">
     <student id="001">
         <name value="tom"/>
