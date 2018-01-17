@@ -7,11 +7,10 @@ public class App {
         String input = "test.xml"; //required
         String output = "new.xml";
         String searchMode = "W";
-        String forSearch = "student"; //K,V or tagName
-        String searchType = "all";    //first or all
+        String forSearch = "gender"; //K,V or tagName
 
-        String forSearch2 = "id";
-        String seachType2 = "002";
+        String key = "id";
+        String value = "001";
 
         SerializationManager manager = new SerializationManager();
         manager.setStrategy(new XMLStrategyImpl());
@@ -19,12 +18,20 @@ public class App {
         Node root = manager.deserializeFile(input);
         manager.serialize(root, output);
 
-        Node n = findElementW(forSearch);
+        Node deepSearchElement = root.deepSearch(forSearch);
+        Node deepSearchKV = root.deepSearch(key, value);
+        System.out.println(deepSearchElement);
+        System.out.println(deepSearchKV);
+
+        Node wideSearchElement = root.wideSearch(forSearch);
+        Node wideSearchKV = root.wideSearch(key, value);
+        System.out.println(wideSearchElement);
+        System.out.println(wideSearchKV);
+
+        System.out.println(deepSearchElement == wideSearchElement);
+        System.out.println(deepSearchKV == wideSearchKV);
 
     }
 
-    private static Node findElementW(String forSearch) {
-        return null;
-    }
 
 }

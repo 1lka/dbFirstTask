@@ -1,7 +1,6 @@
 package com.dbbest.kirilenko;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Node {
 
@@ -41,6 +40,62 @@ public class Node {
     public void setParrent(Node parrent) {
         this.parrent = parrent;
     }
+
+    public Node wideSearch(String element) {
+        Queue<Node> nodes = new LinkedList<>();
+        nodes.add(this);
+
+        do {
+            Node last = nodes.remove();
+            if (last.getName().equals(element)) {
+                return last;
+            } else nodes.addAll(last.getChildren());
+        } while (nodes.size() != 0);
+
+        return null;
+    }
+
+    public Node wideSearch(String key, String value) {
+        Queue<Node> nodes = new LinkedList<>();
+        nodes.add(this);
+
+        do {
+            Node last = nodes.remove();
+            if (value.equals(last.getAttrs().get(key))) {
+                return last;
+            } else nodes.addAll(last.getChildren());
+        } while (nodes.size() != 0);
+        return null;
+    }
+
+    public Node deepSearch(String element) {
+        if (name.equals(element)) {
+            return this;
+        } else {
+            for (Node child : children) {
+                Node last = child.deepSearch(element);
+                if (last != null) {
+                    return last;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Node deepSearch(String key, String value) {
+        if (Objects.equals(attrs.get(key), value)) {
+            return this;
+        } else {
+            for (Node child : children) {
+                Node last = child.deepSearch(key, value);
+                if (last != null) {
+                    return last;
+                }
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public String toString() {
