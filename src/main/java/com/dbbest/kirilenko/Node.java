@@ -7,7 +7,7 @@ public class Node {
     private String name;
     private Map<String, String> attrs;
     private List<Node> children;
-    private Node parrent;
+    private Node parent;
 
     public String getName() {
         return name;
@@ -33,12 +33,12 @@ public class Node {
         this.children = children;
     }
 
-    public Node getParrent() {
-        return parrent;
+    public Node getParent() {
+        return parent;
     }
 
-    public void setParrent(Node parrent) {
-        this.parrent = parrent;
+    public void setParent(Node parent) {
+        this.parent = parent;
     }
 
     public Node wideSearch(String element) {
@@ -96,12 +96,11 @@ public class Node {
         return null;
     }
 
-
     @Override
     public String toString() {
         String parentsName = null;
-        if (parrent != null) {
-            parentsName = parrent.getName();
+        if (parent != null) {
+            parentsName = parent.getName();
         }
         return "Node name=" + name + ", attrs=" + attrs + ", children=" + children + ", parrent's name=" + parentsName;
     }

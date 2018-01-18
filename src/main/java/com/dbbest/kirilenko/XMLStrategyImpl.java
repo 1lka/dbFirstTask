@@ -26,12 +26,12 @@ public class XMLStrategyImpl implements SerializationStrategy {
 
             appendNode(document, root, null);
 
-
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(new File(fileName));
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(source, result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,7 +60,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
     private Node nodeCreate(Element element, Node parent) {
         Node node = new Node();
         node.setName(element.getTagName());
-        node.setParrent(parent);
+        node.setParent(parent);
 
         NamedNodeMap attrs = element.getAttributes();
         if (attrs.getLength() > 0) {
@@ -99,7 +99,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
             currentElement.setAttributeNode(attr);
         }
 
-        if (node.getParrent() == null) {
+        if (node.getParent() == null) {
             document.appendChild(currentElement);
             List<Node> children = node.getChildren();
             for (int i = 0; i < children.size(); i++) {

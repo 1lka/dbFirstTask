@@ -6,7 +6,7 @@
     </student>
     <student id="002">
         <name value="Jerry"/>
-        <gender value="male"/>\
+        <gender value="male"/>
         <qwe value="32"/>
     </student>
 </students>
