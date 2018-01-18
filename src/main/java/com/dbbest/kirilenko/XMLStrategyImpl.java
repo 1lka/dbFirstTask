@@ -18,7 +18,7 @@ import java.util.Map;
 public class XMLStrategyImpl implements SerializationStrategy {
 
     @Override
-    public void serialize(Node root,String fileName) {
+    public void serialize(Node root, String fileName) {
         try {
             DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = df.newDocumentBuilder();
@@ -49,7 +49,6 @@ public class XMLStrategyImpl implements SerializationStrategy {
             builder = df.newDocumentBuilder();
             document = builder.parse(fileName);
             Element rootElement = document.getDocumentElement();
-
             return nodeCreate(rootElement, null);
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,7 +74,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
         }
 
         NodeList children = element.getChildNodes();
-        List<Node> childrenList = new ArrayList<>();
+        List<Node> childrenList = new ChildrenList();
         for (int i = 0; i < children.getLength(); i++) {
             org.w3c.dom.Node childNode = children.item(i);
             if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
@@ -102,15 +101,15 @@ public class XMLStrategyImpl implements SerializationStrategy {
         if (node.getParent() == null) {
             document.appendChild(currentElement);
             List<Node> children = node.getChildren();
-            for (int i = 0; i < children.size(); i++) {
-                Element el = appendNode(document, children.get(i), currentElement);
+            for (Node aChildren : children) {
+                Element el = appendNode(document, aChildren, currentElement);
                 System.out.println(el.getTagName());
                 currentElement.appendChild(el);
             }
         } else {
             List<Node> children = node.getChildren();
-            for (int i = 0; i < children.size(); i++) {
-                Element el = appendNode(document, children.get(i), currentElement);
+            for (Node aChildren : children) {
+                Element el = appendNode(document, aChildren, currentElement);
                 currentElement.appendChild(el);
             }
         }

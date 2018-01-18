@@ -96,6 +96,15 @@ public class Node {
         return null;
     }
 
+    //todo
+    public void addChild(Node child) {
+
+    }
+    //todo
+    public void addChildren(Collection<Node> ch) {
+
+    }
+
     @Override
     public String toString() {
         String parentsName = null;
