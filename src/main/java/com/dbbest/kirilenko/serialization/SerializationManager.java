@@ -1,4 +1,7 @@
-package com.dbbest.kirilenko;
+package com.dbbest.kirilenko.serialization;
+
+import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
 
 public class SerializationManager {
 

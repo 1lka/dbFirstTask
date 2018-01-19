@@ -1,4 +1,6 @@
-package com.dbbest.kirilenko;
+package com.dbbest.kirilenko.serialization.strategy;
+
+import com.dbbest.kirilenko.Tree.Node;
 
 public interface SerializationStrategy {
 

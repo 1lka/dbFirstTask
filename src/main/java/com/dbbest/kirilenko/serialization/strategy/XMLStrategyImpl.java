@@ -1,4 +1,4 @@
-package com.dbbest.kirilenko;
+package com.dbbest.kirilenko.serialization.strategy;
 
 import org.w3c.dom.*;
 
@@ -10,7 +10,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class XMLStrategyImpl implements SerializationStrategy {
 
     @Override
-    public void serialize(Node root, String fileName) {
+    public void serialize(com.dbbest.kirilenko.Tree.Node root, String fileName) {
         try {
             DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = df.newDocumentBuilder();
@@ -39,7 +38,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
     }
 
     @Override
-    public Node deserialize(String fileName) {
+    public com.dbbest.kirilenko.Tree.Node deserialize(String fileName) {
         DocumentBuilderFactory df;
         DocumentBuilder builder;
         Document document;
@@ -49,17 +48,15 @@ public class XMLStrategyImpl implements SerializationStrategy {
             builder = df.newDocumentBuilder();
             document = builder.parse(fileName);
             Element rootElement = document.getDocumentElement();
-            return nodeCreate(rootElement, null);
+            return nodeCreate(rootElement);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private Node nodeCreate(Element element, Node parent) {
-        Node node = new Node();
-        node.setName(element.getTagName());
-        node.setParent(parent);
+    private com.dbbest.kirilenko.Tree.Node nodeCreate(Element element) {
+        com.dbbest.kirilenko.Tree.Node node = new com.dbbest.kirilenko.Tree.Node(element.getTagName());
 
         NamedNodeMap attrs = element.getAttributes();
         if (attrs.getLength() > 0) {
@@ -74,19 +71,17 @@ public class XMLStrategyImpl implements SerializationStrategy {
         }
 
         NodeList children = element.getChildNodes();
-        List<Node> childrenList = new ChildrenList();
         for (int i = 0; i < children.getLength(); i++) {
             org.w3c.dom.Node childNode = children.item(i);
             if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-                Node child = nodeCreate((Element) childNode, node);
-                childrenList.add(child);
+                com.dbbest.kirilenko.Tree.Node child = nodeCreate((Element) childNode);
+                node.addChild(child);
             }
         }
-        node.setChildren(childrenList);
         return node;
     }
 
-    private Element appendNode(Document document, Node node, Element parent) {
+    private Element appendNode(Document document, com.dbbest.kirilenko.Tree.Node node, Element parent) {
         Element currentElement = document.createElement(node.getName());
 
         Map<String, String> attrs = node.getAttrs();
@@ -100,15 +95,15 @@ public class XMLStrategyImpl implements SerializationStrategy {
 
         if (node.getParent() == null) {
             document.appendChild(currentElement);
-            List<Node> children = node.getChildren();
-            for (Node aChildren : children) {
+            List<com.dbbest.kirilenko.Tree.Node> children = node.getChildren();
+            for (com.dbbest.kirilenko.Tree.Node aChildren : children) {
                 Element el = appendNode(document, aChildren, currentElement);
                 System.out.println(el.getTagName());
                 currentElement.appendChild(el);
             }
         } else {
-            List<Node> children = node.getChildren();
-            for (Node aChildren : children) {
+            List<com.dbbest.kirilenko.Tree.Node> children = node.getChildren();
+            for (com.dbbest.kirilenko.Tree.Node aChildren : children) {
                 Element el = appendNode(document, aChildren, currentElement);
                 currentElement.appendChild(el);
             }

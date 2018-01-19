@@ -1,4 +1,4 @@
-package com.dbbest.kirilenko;
+package com.dbbest.kirilenko.Tree;
 
 import java.util.*;
 
@@ -8,6 +8,15 @@ public class Node {
     private Map<String, String> attrs;
     private List<Node> children;
     private Node parent;
+
+    public Node() {
+        this.children = new ChildrenList<>(this);
+    }
+
+    public Node(String name) {
+        this.name = name;
+        this.children = new ChildrenList<>(this);
+    }
 
     public String getName() {
         return name;
@@ -96,13 +105,14 @@ public class Node {
         return null;
     }
 
-    //todo
     public void addChild(Node child) {
-
+        child.setParent(this);
+        this.children.add(child);
     }
-    //todo
-    public void addChildren(Collection<Node> ch) {
 
+    //todo
+    public void addChildren(Collection<Node> children) {
+        this.children.addAll(children);
     }
 
     @Override
@@ -112,5 +122,27 @@ public class Node {
             parentsName = parent.getName();
         }
         return "Node name=" + name + ", attrs=" + attrs + ", children=" + children + ", parrent's name=" + parentsName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node node = (Node) o;
+
+        if (name != null ? !name.equals(node.name) : node.name != null) return false;
+        if (attrs != null ? !attrs.equals(node.attrs) : node.attrs != null) return false;
+        if (children != null ? !children.equals(node.children) : node.children != null) return false;
+        return parent != null ? parent.equals(node.parent) : node.parent == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (attrs != null ? attrs.hashCode() : 0);
+        result = 31 * result + (children != null ? children.hashCode() : 0);
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        return result;
     }
 }
