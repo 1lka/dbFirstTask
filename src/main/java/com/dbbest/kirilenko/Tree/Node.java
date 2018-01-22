@@ -53,15 +53,15 @@ public class Node {
 
     public Node wideSearch(String element) {
         Predicate<Node> predicate = (n) -> n.getName().equals(element);
-        return searchWithPredicate(predicate);
+        return wideSearchWithPredicate(predicate);
     }
 
     public Node wideSearch(String key, String value) {
         Predicate<Node> predicate = (n) -> value.equals(n.getAttrs().get(key));
-        return searchWithPredicate(predicate);
+        return wideSearchWithPredicate(predicate);
     }
 
-    private Node searchWithPredicate(Predicate<Node> nodePredicate) {
+    private Node wideSearchWithPredicate(Predicate<Node> nodePredicate) {
         Queue<Node> nodes = new LinkedList<>();
         nodes.add(this);
         do {
@@ -74,25 +74,21 @@ public class Node {
     }
 
     public Node deepSearch(String element) {
-        if (name.equals(element)) {
-            return this;
-        } else {
-            for (Node child : children) {
-                Node last = child.deepSearch(element);
-                if (last != null) {
-                    return last;
-                }
-            }
-        }
-        return null;
+        Predicate<Node> predicate = (n) -> n.getName().equals(element);
+        return deepSearchWithPredicate(predicate);
     }
 
     public Node deepSearch(String key, String value) {
-        if (Objects.equals(attrs.get(key), value)) {
+        Predicate<Node> predicate = (n) -> value.equals(n.attrs.get(key));
+        return deepSearchWithPredicate(predicate);
+    }
+
+    private Node deepSearchWithPredicate(Predicate<Node> nodePredicate) {
+        if (nodePredicate.test(this)) {
             return this;
         } else {
             for (Node child : children) {
-                Node last = child.deepSearch(key, value);
+                Node last = child.deepSearchWithPredicate(nodePredicate);
                 if (last != null) {
                     return last;
                 }
