@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.Tree;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class Node {
 
@@ -51,26 +52,21 @@ public class Node {
     }
 
     public Node wideSearch(String element) {
-        Queue<Node> nodes = new LinkedList<>();
-        nodes.add(this);
-
-        do {
-            Node last = nodes.remove();
-            if (last.getName().equals(element)) {
-                return last;
-            } else nodes.addAll(last.getChildren());
-        } while (nodes.size() != 0);
-
-        return null;
+        Predicate<Node> predicate = (n) -> n.getName().equals(element);
+        return searchWithPredicate(predicate);
     }
 
     public Node wideSearch(String key, String value) {
+        Predicate<Node> predicate = (n) -> value.equals(n.getAttrs().get(key));
+        return searchWithPredicate(predicate);
+    }
+
+    private Node searchWithPredicate(Predicate<Node> nodePredicate) {
         Queue<Node> nodes = new LinkedList<>();
         nodes.add(this);
-
         do {
             Node last = nodes.remove();
-            if (value.equals(last.getAttrs().get(key))) {
+            if (nodePredicate.test(last)) {
                 return last;
             } else nodes.addAll(last.getChildren());
         } while (nodes.size() != 0);
