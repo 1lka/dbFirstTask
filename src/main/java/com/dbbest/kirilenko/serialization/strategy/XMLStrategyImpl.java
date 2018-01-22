@@ -14,16 +14,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.dbbest.kirilenko.Tree.Node;
+
 public class XMLStrategyImpl implements SerializationStrategy {
 
     @Override
-    public void serialize(com.dbbest.kirilenko.Tree.Node root, String fileName) {
+    public void serialize(Node root, String fileName) {
         try {
             DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = df.newDocumentBuilder();
             Document document = builder.newDocument();
 
-            appendNode(document, root, null);
+            appendNode(document, root);
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
@@ -38,7 +40,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
     }
 
     @Override
-    public com.dbbest.kirilenko.Tree.Node deserialize(String fileName) {
+    public Node deserialize(String fileName) {
         DocumentBuilderFactory df;
         DocumentBuilder builder;
         Document document;
@@ -55,8 +57,8 @@ public class XMLStrategyImpl implements SerializationStrategy {
         return null;
     }
 
-    private com.dbbest.kirilenko.Tree.Node nodeCreate(Element element) {
-        com.dbbest.kirilenko.Tree.Node node = new com.dbbest.kirilenko.Tree.Node(element.getTagName());
+    private Node nodeCreate(Element element) {
+        Node node = new Node(element.getTagName());
 
         NamedNodeMap attrs = element.getAttributes();
         if (attrs.getLength() > 0) {
@@ -74,14 +76,14 @@ public class XMLStrategyImpl implements SerializationStrategy {
         for (int i = 0; i < children.getLength(); i++) {
             org.w3c.dom.Node childNode = children.item(i);
             if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-                com.dbbest.kirilenko.Tree.Node child = nodeCreate((Element) childNode);
+                Node child = nodeCreate((Element) childNode);
                 node.addChild(child);
             }
         }
         return node;
     }
 
-    private Element appendNode(Document document, com.dbbest.kirilenko.Tree.Node node, Element parent) {
+    private Element appendNode(Document document, Node node) {
         Element currentElement = document.createElement(node.getName());
 
         Map<String, String> attrs = node.getAttrs();
@@ -92,23 +94,20 @@ public class XMLStrategyImpl implements SerializationStrategy {
             attr.setValue(value);
             currentElement.setAttributeNode(attr);
         }
-
         if (node.getParent() == null) {
             document.appendChild(currentElement);
-            List<com.dbbest.kirilenko.Tree.Node> children = node.getChildren();
-            for (com.dbbest.kirilenko.Tree.Node aChildren : children) {
-                Element el = appendNode(document, aChildren, currentElement);
-                System.out.println(el.getTagName());
-                currentElement.appendChild(el);
-            }
+            appendChildren(document,node,currentElement);
         } else {
-            List<com.dbbest.kirilenko.Tree.Node> children = node.getChildren();
-            for (com.dbbest.kirilenko.Tree.Node aChildren : children) {
-                Element el = appendNode(document, aChildren, currentElement);
-                currentElement.appendChild(el);
-            }
+            appendChildren(document,node,currentElement);
         }
-
         return currentElement;
+    }
+
+    private void appendChildren(Document document, Node node, Element currentElement) {
+        List<Node> children = node.getChildren();
+        for (Node child : children) {
+            Element el = appendNode(document, child);
+            currentElement.appendChild(el);
+        }
     }
 }
