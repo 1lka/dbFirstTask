@@ -1,5 +1,7 @@
 package com.dbbest.kirilenko.Tree;
 
+import com.dbbest.kirilenko.exceptions.NodeExeption;
+
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -11,12 +13,12 @@ public class Node {
     private Node parent;
 
     public Node() {
-        this.children = new ChildrenList<>(this);
+        this.children = new ChildrenList<>();
     }
 
     public Node(String name) {
         this.name = name;
-        this.children = new ChildrenList<>(this);
+        this.children = new ChildrenList<>();
     }
 
     public String getName() {
@@ -49,6 +51,10 @@ public class Node {
 
     public void setParent(Node parent) {
         this.parent = parent;
+    }
+
+    public boolean isParentExist() {
+        return parent != null;
     }
 
     public Node wideSearch(String element) {
@@ -97,14 +103,16 @@ public class Node {
         return null;
     }
 
-    public void addChild(Node child) {
-        child.setParent(this);
-        this.children.add(child);
+    public void addChild(Node node) {
+        children.add(node);
+        node.setParent(this);
     }
 
-    //todo
-    public void addChildren(Collection<Node> children) {
-        this.children.addAll(children);
+    public void addChildren(Collection<Node> nodes) {
+        children.addAll(nodes);
+        for (Node node : nodes) {
+            node.setParent(this);
+        }
     }
 
     @Override
