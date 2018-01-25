@@ -4,6 +4,8 @@ import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.argsParser.chainParser.AbstractChainParser;
 import com.dbbest.kirilenko.argsParser.chainParser.InputFileChainParser;
 import com.dbbest.kirilenko.argsParser.chainParser.OutputFileChainParser;
+import com.dbbest.kirilenko.argsParser.chainParser.SearchChainParser;
+import org.apache.commons.cli.Options;
 
 public class ArgsParserManager {
 
@@ -11,6 +13,30 @@ public class ArgsParserManager {
     private String input;
     private String output;
     private String[] args;
+    private Options options;
+    private AbstractChainParser firstUnit;
+
+    public ArgsParserManager(String[] args) {
+        this.args = args;
+        options = new Options();
+
+        AbstractChainParser inputUnit = new InputFileChainParser(this);
+        AbstractChainParser outputUnit = new OutputFileChainParser(this);
+        AbstractChainParser searchUnit = new SearchChainParser(this);
+
+        inputUnit.setNextUnit(outputUnit);
+        outputUnit.setNextUnit(searchUnit);
+
+        this.firstUnit = inputUnit;
+    }
+
+    public Options getOptions() {
+        return options;
+    }
+
+    public void setOptions(Options options) {
+        this.options = options;
+    }
 
     public Node getRoot() {
         return root;
@@ -44,12 +70,15 @@ public class ArgsParserManager {
         this.args = args;
     }
 
-    public ArgsParserManager(String[] args) {
-        this.args = args;
-        AbstractChainParser unit1 = new InputFileChainParser(this);
-        AbstractChainParser unit2 = new OutputFileChainParser(this);
-
-        unit1.setNextUnit(unit2);
+    public AbstractChainParser getFirstUnit() {
+        return firstUnit;
     }
 
+    public void setFirstUnit(AbstractChainParser firstUnit) {
+        this.firstUnit = firstUnit;
+    }
+
+    public void execute() {
+        firstUnit.doWork();
+    }
 }
