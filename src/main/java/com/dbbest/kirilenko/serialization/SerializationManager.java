@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.serialization;
 
 import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.exceptions.SerializationExeption;
 import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 
@@ -35,7 +36,7 @@ public class SerializationManager {
         throw new RuntimeException("no such strategy");
     }
 
-    public Node deserializeFile(String input) {
+    public Node deserializeFile(String input) throws SerializationExeption {
         return strategy.deserialize(input);
     }
 

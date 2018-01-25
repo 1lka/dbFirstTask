@@ -1,12 +1,13 @@
 package com.dbbest.kirilenko.serialization.strategy;
 
+import com.dbbest.kirilenko.exceptions.SerializationExeption;
+import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
@@ -18,29 +19,35 @@ import com.dbbest.kirilenko.Tree.Node;
 
 public class XMLStrategyImpl implements SerializationStrategy {
 
+    private static final Logger logger = Logger.getLogger(XMLStrategyImpl.class);
+
     @Override
     public void serialize(Node root, String fileName) {
+
+        DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = null;
         try {
-            DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = df.newDocumentBuilder();
+            builder = df.newDocumentBuilder();
+
             Document document = builder.newDocument();
 
             appendNode(document, root);
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
+
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(new File(fileName));
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ParserConfigurationException | TransformerException e) {
+            logger.error("problems with XML serialization occurred", e);
         }
     }
 
     @Override
-    public Node deserialize(String fileName) {
+    public Node deserialize(String fileName) throws SerializationExeption {
         DocumentBuilderFactory df;
         DocumentBuilder builder;
         Document document;
@@ -52,9 +59,9 @@ public class XMLStrategyImpl implements SerializationStrategy {
             Element rootElement = document.getDocumentElement();
             return nodeCreate(rootElement);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("problems with deserialization", e);
+            throw new SerializationExeption(e);
         }
-        return null;
     }
 
     private Node nodeCreate(Element element) {
@@ -96,9 +103,9 @@ public class XMLStrategyImpl implements SerializationStrategy {
         }
         if (node.getParent() == null) {
             document.appendChild(currentElement);
-            appendChildren(document,node,currentElement);
+            appendChildren(document, node, currentElement);
         } else {
-            appendChildren(document,node,currentElement);
+            appendChildren(document, node, currentElement);
         }
         return currentElement;
     }

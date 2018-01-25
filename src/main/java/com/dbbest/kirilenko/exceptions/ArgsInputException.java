@@ -8,5 +8,7 @@ public class ArgsInputException extends RuntimeException {
 
     public ArgsInputException(String message, Throwable cause) {
         super(message, cause);
+
     }
+
 }

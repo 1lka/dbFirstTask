@@ -29,9 +29,6 @@ public class DeepSearchChainParser extends AbstractChainParser {
             }
             System.out.println(manager.getRoot().deepSearch(params));
         }
-        if (nextUnit != null) {
-            nextUnit.doWork();
-        }
-
+        next();
     }
 }

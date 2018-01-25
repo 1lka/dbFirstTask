@@ -4,15 +4,17 @@ import com.dbbest.kirilenko.argsParser.ArgsParserManager;
 import com.dbbest.kirilenko.exceptions.ArgsInputException;
 import com.dbbest.kirilenko.serialization.SerializationManager;
 import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
 
 public class OutputFileChainParser extends AbstractChainParser{
+
+    private final static Logger logger = Logger.getLogger(OutputFileChainParser.class);
 
     public OutputFileChainParser(ArgsParserManager manager) {
         super(manager);
         Options options = manager.getOptions();
         Option outputOption = new Option("output", true, "input file name");
         options.addOption(outputOption);
-
     }
 
     @Override
@@ -25,11 +27,8 @@ public class OutputFileChainParser extends AbstractChainParser{
             System.out.println(outputFileName);
             serializationManager.setStrategy(outputFileName);
             serializationManager.serialize(manager.getRoot(), outputFileName);
-            System.out.println("success");
+            logger.debug("serialization completed successfully");
         }
-
-        if (nextUnit != null) {
-            nextUnit.doWork();
-        }
+        next();
     }
 }

@@ -6,7 +6,7 @@ public abstract class AbstractChainParser {
 
     protected ArgsParserManager manager;
 
-    public AbstractChainParser(ArgsParserManager manager) {
+    protected AbstractChainParser(ArgsParserManager manager) {
         this.manager = manager;
     }
 
@@ -17,5 +17,11 @@ public abstract class AbstractChainParser {
     }
 
     public abstract void doWork();
+
+    protected void next() {
+        if (nextUnit != null) {
+            nextUnit.doWork();
+        }
+    }
 
 }

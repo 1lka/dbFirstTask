@@ -29,8 +29,6 @@ public class WideSearchChainParser extends AbstractChainParser {
             }
             System.out.println(manager.getRoot().wideSearch(params));
         }
-        if (nextUnit != null) {
-            nextUnit.doWork();
-        }
+        next();
     }
 }

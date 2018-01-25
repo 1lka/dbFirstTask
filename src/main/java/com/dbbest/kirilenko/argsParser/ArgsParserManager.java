@@ -4,8 +4,12 @@ import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.argsParser.chainParser.*;
 import com.dbbest.kirilenko.exceptions.ArgsInputException;
 import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
 
 public class ArgsParserManager {
+
+    private final static Logger logger = Logger.getLogger(ArgsParserManager.class);
+
 
     private Node root;
     private String input;
@@ -24,11 +28,22 @@ public class ArgsParserManager {
         AbstractChainParser wSearchUnit = new WideSearchChainParser(this);
         AbstractChainParser dSearchUnit = new DeepSearchChainParser(this);
 
+        CommandLineParser parser = new DefaultParser();
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            logger.error("wrong args",e);
+            throw new ArgsInputException("wrong args", e);
+        }
+
         inputUnit.setNextUnit(outputUnit);
         outputUnit.setNextUnit(wSearchUnit);
         wSearchUnit.setNextUnit(dSearchUnit);
 
         this.firstUnit = inputUnit;
+
+        logger.debug("chain initialized correctly");
+
     }
 
     public Options getOptions() {
@@ -79,20 +94,11 @@ public class ArgsParserManager {
         this.firstUnit = firstUnit;
     }
 
-    public void execute() {
-        firstUnit.doWork();
+    public CommandLine getCL() {
+        return cmd;
     }
 
-    public CommandLine getCL() {
-        if (cmd != null) {
-            return cmd;
-        }
-        CommandLineParser parser = new DefaultParser();
-        try {
-            cmd = parser.parse(options, args);
-            return cmd;
-        } catch (ParseException e) {
-            throw new ArgsInputException("wrong args", e);
-        }
+    public void execute() {
+        firstUnit.doWork();
     }
 }
