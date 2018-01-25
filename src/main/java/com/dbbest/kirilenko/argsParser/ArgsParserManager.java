@@ -1,11 +1,9 @@
 package com.dbbest.kirilenko.argsParser;
 
 import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.argsParser.chainParser.AbstractChainParser;
-import com.dbbest.kirilenko.argsParser.chainParser.InputFileChainParser;
-import com.dbbest.kirilenko.argsParser.chainParser.OutputFileChainParser;
-import com.dbbest.kirilenko.argsParser.chainParser.SearchChainParser;
-import org.apache.commons.cli.Options;
+import com.dbbest.kirilenko.argsParser.chainParser.*;
+import com.dbbest.kirilenko.exceptions.ArgsInputException;
+import org.apache.commons.cli.*;
 
 public class ArgsParserManager {
 
@@ -15,6 +13,7 @@ public class ArgsParserManager {
     private String[] args;
     private Options options;
     private AbstractChainParser firstUnit;
+    private CommandLine cmd;
 
     public ArgsParserManager(String[] args) {
         this.args = args;
@@ -22,10 +21,12 @@ public class ArgsParserManager {
 
         AbstractChainParser inputUnit = new InputFileChainParser(this);
         AbstractChainParser outputUnit = new OutputFileChainParser(this);
-        AbstractChainParser searchUnit = new SearchChainParser(this);
+        AbstractChainParser wSearchUnit = new WideSearchChainParser(this);
+        AbstractChainParser dSearchUnit = new DeepSearchChainParser(this);
 
         inputUnit.setNextUnit(outputUnit);
-        outputUnit.setNextUnit(searchUnit);
+        outputUnit.setNextUnit(wSearchUnit);
+        wSearchUnit.setNextUnit(dSearchUnit);
 
         this.firstUnit = inputUnit;
     }
@@ -80,5 +81,18 @@ public class ArgsParserManager {
 
     public void execute() {
         firstUnit.doWork();
+    }
+
+    public CommandLine getCL() {
+        if (cmd != null) {
+            return cmd;
+        }
+        CommandLineParser parser = new DefaultParser();
+        try {
+            cmd = parser.parse(options, args);
+            return cmd;
+        } catch (ParseException e) {
+            throw new ArgsInputException("wrong args", e);
+        }
     }
 }

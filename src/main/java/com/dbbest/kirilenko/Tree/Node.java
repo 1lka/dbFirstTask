@@ -1,5 +1,7 @@
 package com.dbbest.kirilenko.Tree;
 
+import com.dbbest.kirilenko.exceptions.NodeExeption;
+
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -55,14 +57,26 @@ public class Node {
         return parent != null;
     }
 
-    public Node wideSearch(String element) {
-        Predicate<Node> predicate = (n) -> n.getName().equals(element);
+    public Node wideSearch(String... elements) {
+        Predicate<Node> predicate = obtainPredicate(elements);
         return wideSearchWithPredicate(predicate);
     }
 
-    public Node wideSearch(String key, String value) {
-        Predicate<Node> predicate = (n) -> value.equals(n.getAttrs().get(key));
-        return wideSearchWithPredicate(predicate);
+    public Node deepSearch(String... elements) {
+        Predicate<Node> predicate = obtainPredicate(elements);
+        return deepSearchWithPredicate(predicate);
+    }
+
+    private Predicate<Node> obtainPredicate(String[] elements) {
+        int i = elements.length;
+        switch (i) {
+            case 1:
+                return  (n) -> n.getName().equals(elements[0]);
+            case 2:
+                return  (n) -> elements[1].equals(n.getAttrs().get(elements[0]));
+            default:
+                throw new NodeExeption("search params should be in the range 1 - 2");
+        }
     }
 
     private Node wideSearchWithPredicate(Predicate<Node> nodePredicate) {
@@ -75,16 +89,6 @@ public class Node {
             } else nodes.addAll(last.getChildren());
         } while (nodes.size() != 0);
         return null;
-    }
-
-    public Node deepSearch(String element) {
-        Predicate<Node> predicate = (n) -> n.getName().equals(element);
-        return deepSearchWithPredicate(predicate);
-    }
-
-    public Node deepSearch(String key, String value) {
-        Predicate<Node> predicate = (n) -> value.equals(n.attrs.get(key));
-        return deepSearchWithPredicate(predicate);
     }
 
     private Node deepSearchWithPredicate(Predicate<Node> nodePredicate) {

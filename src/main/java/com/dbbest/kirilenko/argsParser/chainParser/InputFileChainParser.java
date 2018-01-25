@@ -17,19 +17,8 @@ public class InputFileChainParser extends AbstractChainParser {
 
     @Override
     public void doWork() {
-        String[] args = manager.getArgs();
-
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = null;
-
-        try {
-            cmd = parser.parse(manager.getOptions(), args);
-        } catch (ParseException e) {
-            throw new ArgsInputException("wrong args", e);
-        }
-
+        CommandLine cmd = manager.getCL();
         Node rootNode;
-
         if (cmd.hasOption("input")) {
             SerializationManager manager = new SerializationManager();
             String inputFileName = cmd.getOptionValue("input");
@@ -38,9 +27,7 @@ public class InputFileChainParser extends AbstractChainParser {
         } else {
             throw new ArgsInputException("input file required");
         }
-
         manager.setRoot(rootNode);
-
         if (nextUnit != null) {
             nextUnit.doWork();
         }

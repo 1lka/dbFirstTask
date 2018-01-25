@@ -17,16 +17,7 @@ public class OutputFileChainParser extends AbstractChainParser{
 
     @Override
     public void doWork() {
-        String[] args = manager.getArgs();
-
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = null;
-
-        try {
-            cmd = parser.parse(manager.getOptions(), args);
-        } catch (ParseException e) {
-            throw new ArgsInputException("wrong args", e);
-        }
+        CommandLine cmd = manager.getCL();
 
         if (cmd.hasOption("output")) {
             SerializationManager serializationManager = new SerializationManager();
