@@ -1,7 +1,6 @@
-package com.dbbest.kirilenko.chainParser;
+package com.dbbest.kirilenko.argsParser.chainParser;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.exceptions.ArgsInputException;
+import com.dbbest.kirilenko.argsParser.ArgsParserManager;
 import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 
@@ -10,15 +9,27 @@ import java.util.regex.Pattern;
 
 public abstract class AbstractChainParser {
 
+    private ArgsParserManager manager;
+
     protected AbstractChainParser nextUnit;
 
-    protected Node root;
+    public AbstractChainParser(ArgsParserManager manager) {
+        this.manager = manager;
+    }
+
+    public ArgsParserManager getManager() {
+        return manager;
+    }
+
+    public void setManager(ArgsParserManager manager) {
+        this.manager = manager;
+    }
 
     public void setNextUnit(AbstractChainParser nextUnit) {
         this.nextUnit = nextUnit;
     }
 
-    public abstract void doWork(String[] args, Node root);
+    abstract void doWork();
 
     protected static String getFileName(String pattern, String[] args) {
         for (int i = 0; i < args.length - 1; i++) {
