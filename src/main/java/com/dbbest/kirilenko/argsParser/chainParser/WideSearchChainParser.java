@@ -7,7 +7,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
-
 public class WideSearchChainParser extends AbstractChainParser {
 
     private static final Logger logger = Logger.getLogger(WideSearchChainParser.class);

@@ -1,67 +1,152 @@
 package com.dbbest.kirilenko.Tree;
 
-import com.dbbest.kirilenko.exceptions.NodeExeption;
+import com.dbbest.kirilenko.exceptions.NodeException;
 
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * Class serves for storing tree of nodes
+ */
 public class Node {
 
+    /**
+     * the name of the node
+     */
     private String name;
+
+    /**
+     * the Map of argument values
+     */
     private Map<String, String> attrs;
+
+    /**
+     * the List of chil nodes
+     */
     private List<Node> children;
+
+    /**
+     * parent node
+     */
     private Node parent;
 
+    /**
+     * creates new node object with empty ChildrenList
+     *
+     * @see ChildrenList
+     */
     public Node() {
         this.children = new ChildrenList<>();
     }
 
+    /**
+     * creates new node object with empty ChildrenList and initialize it's name
+     */
     public Node(String name) {
         this();
         this.name = name;
     }
 
+    /**
+     * Returns the node's name.
+     *
+     * @return the {@code String} value of node's name or null if there is no name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of this node.
+     *
+     * @param name of this node.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the Map of node's attributes.
+     *
+     * @return Map of node's attributes or null if there is no attributes.
+     */
     public Map<String, String> getAttrs() {
         return attrs;
     }
 
+    /**
+     * Sets the Map of attributes of this node.
+     *
+     * @param attrs of this node.
+     */
     public void setAttrs(Map<String, String> attrs) {
         this.attrs = attrs;
     }
 
+    /**
+     * Returns List of child nodes
+     *
+     * @return List of child nodes or empty List if there is no child nodes
+     */
     public List<Node> getChildren() {
         return children;
     }
 
+    /**
+     * Sets the List of children
+     *
+     * @param children list of new children
+     */
     public void setChildren(List<Node> children) {
         this.children = children;
     }
 
+    /**
+     * Return parent node.
+     *
+     * @return Node of parent or null if this is root node.
+     */
     public Node getParent() {
         return parent;
     }
 
+    /**
+     * Sets the parent for this node.
+     *
+     * @param parent value for this node.
+     */
     public void setParent(Node parent) {
         this.parent = parent;
     }
 
+    /**
+     * Query to see if this node has a parent
+     *
+     * @return boolean flag indicating existence of a parent
+     */
     public boolean isParentExist() {
         return parent != null;
     }
 
+    /**
+     * Does the wide search by elements in the node.
+     *
+     * @param elements the array of values for search
+     * @return node if found or null if there are no nodes satisfy params
+     * @throws NodeException if the arguments less than one or bigger than two
+     */
     public Node wideSearch(String... elements) {
         Predicate<Node> predicate = obtainPredicate(elements);
         return wideSearchWithPredicate(predicate);
     }
 
+    /**
+     * Does the deep search by elements in the node.
+     *
+     * @param elements the array of values for search
+     * @return node if found or null if there are no nodes satisfy params
+     * @throws NodeException if the arguments less than one or bigger than two
+     */
     public Node deepSearch(String... elements) {
         Predicate<Node> predicate = obtainPredicate(elements);
         return deepSearchWithPredicate(predicate);
@@ -71,11 +156,11 @@ public class Node {
         int i = elements.length;
         switch (i) {
             case 1:
-                return  (n) -> n.getName().equals(elements[0]);
+                return (n) -> n.getName().equals(elements[0]);
             case 2:
-                return  (n) -> elements[1].equals(n.getAttrs().get(elements[0]));
+                return (n) -> elements[1].equals(n.getAttrs().get(elements[0]));
             default:
-                throw new NodeExeption("search params should be in the range 1 - 2");
+                throw new NodeException("search params should be in the range 1 - 2");
         }
     }
 
@@ -105,11 +190,23 @@ public class Node {
         return null;
     }
 
+    /**
+     * Adds node in children
+     *
+     * @param node the new child node
+     * @throws NodeException if added node already has a parent
+     */
     public void addChild(Node node) {
         children.add(node);
         node.setParent(this);
     }
 
+    /**
+     * Adds collection of child nodes to children
+     *
+     * @param nodes new child nodes
+     * @throws NodeException if collection contains a node with parent
+     */
     public void addChildren(Collection<Node> nodes) {
         children.addAll(nodes);
         for (Node node : nodes) {
