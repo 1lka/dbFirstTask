@@ -40,7 +40,7 @@ public class SerializationManager {
         return strategy.deserialize(input);
     }
 
-    public void serialize(Node root, String output) {
+    public void serialize(Node root, String output) throws SerializationExeption {
         strategy.serialize(root, output);
     }
 

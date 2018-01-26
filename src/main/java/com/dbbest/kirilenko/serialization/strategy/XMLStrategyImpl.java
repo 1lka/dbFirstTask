@@ -22,7 +22,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
     private static final Logger logger = Logger.getLogger(XMLStrategyImpl.class);
 
     @Override
-    public void serialize(Node root, String fileName) {
+    public void serialize(Node root, String fileName) throws SerializationExeption {
 
         DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
@@ -43,6 +43,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
             transformer.transform(source, result);
         } catch (ParserConfigurationException | TransformerException e) {
             logger.error("problems with XML serialization occurred", e);
+            throw new SerializationExeption(e);
         }
     }
 

@@ -1,12 +1,16 @@
 package com.dbbest.kirilenko.argsParser.chainParser;
 
+import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.argsParser.ArgsParserManager;
 import com.dbbest.kirilenko.exceptions.ArgsInputException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.log4j.Logger;
 
 public class WideSearchChainParser extends AbstractChainParser {
+
+    private static final Logger logger = Logger.getLogger(WideSearchChainParser.class);
 
     public WideSearchChainParser(ArgsParserManager manager) {
         super(manager);
@@ -25,9 +29,11 @@ public class WideSearchChainParser extends AbstractChainParser {
         if (cmd.hasOption("ws")) {
             String[] params = cmd.getOptionValues("ws");
             if (params == null) {
+                logger.error("search params required");
                 throw new ArgsInputException("search params required");
             }
-            System.out.println(manager.getRoot().wideSearch(params));
+            Node found = manager.getRoot().wideSearch(params);
+            logger.debug("found node: " + found);
         }
         next();
     }

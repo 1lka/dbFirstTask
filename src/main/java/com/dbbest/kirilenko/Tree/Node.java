@@ -17,8 +17,8 @@ public class Node {
     }
 
     public Node(String name) {
+        this();
         this.name = name;
-        this.children = new ChildrenList<>();
     }
 
     public String getName() {
