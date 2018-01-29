@@ -21,7 +21,7 @@ public class Node {
     private Map<String, String> attrs;
 
     /**
-     * the List of chil nodes
+     * the List of child nodes
      */
     private List<Node> children;
 
@@ -222,7 +222,7 @@ public class Node {
         if (parent != null) {
             parentsName = parent.getName();
         }
-        return "Node name=" + name + ", attrs=" + attrs + ", children=" + children + ", parrent's name=" + parentsName;
+        return "Node name=" + name + ", attrs=" + attrs + ", children=" + children + ", parent's name=" + parentsName;
     }
 
     @Override
