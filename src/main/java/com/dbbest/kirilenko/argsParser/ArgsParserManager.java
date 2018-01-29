@@ -10,15 +10,47 @@ public class ArgsParserManager {
 
     private final static Logger logger = Logger.getLogger(ArgsParserManager.class);
 
-
+    /**
+     * The root node of tree
+     */
     private Node root;
+
+    /**
+     * Input file location for deserialization.
+     */
     private String input;
+
+    /**
+     * Output file location for deserialization.
+     */
     private String output;
+
+    /**
+     * Program arguments
+     */
     private String[] args;
+
+    /**
+     * Contain options for search.
+     */
     private Options options;
+
+    /**
+     * First element of chain of responsibility
+     */
     private AbstractChainParser firstUnit;
+
+    /**
+     * Represents list of arguments parsed against a options descriptor.
+     */
     private CommandLine cmd;
 
+    /**
+     * Instantiate elements of the chain and create the chain for parsing args.
+     *
+     * @param args Program arguments.
+     * @throws ArgsInputException if there is  invalid args.
+     */
     public ArgsParserManager(String[] args) {
         this.args = args;
         options = new Options();
@@ -32,7 +64,7 @@ public class ArgsParserManager {
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            logger.error("wrong args",e);
+            logger.error("wrong args", e);
             throw new ArgsInputException("wrong args", e);
         }
 
@@ -43,7 +75,6 @@ public class ArgsParserManager {
         this.firstUnit = inputUnit;
 
         logger.debug("chain initialized correctly");
-
     }
 
     public Options getOptions() {
@@ -98,6 +129,9 @@ public class ArgsParserManager {
         return cmd;
     }
 
+    /**
+     * Start execution of the chain.
+     */
     public void execute() {
         firstUnit.doWork();
     }

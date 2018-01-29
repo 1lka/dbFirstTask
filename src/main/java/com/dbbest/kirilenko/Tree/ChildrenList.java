@@ -7,6 +7,13 @@ import java.util.Collection;
 
 public class ChildrenList<E> extends ArrayList<Node> {
 
+    /**
+     * Add Node in ChildrenList.
+     *
+     * @param node new child.
+     * @return true if node added successfully.
+     * @throws NodeException if node already has a parent.
+     */
     @Override
     public boolean add(Node node) {
         if (node.isParentExist()) {
@@ -16,6 +23,11 @@ public class ChildrenList<E> extends ArrayList<Node> {
         }
     }
 
+    /**
+     * Add collection of children in ChildrenList.
+     * @param c collection of nodes.
+     * @return true if collection added successfully.
+     */
     @Override
     public boolean addAll(Collection<? extends Node> c) {
         for (Node node : c) {

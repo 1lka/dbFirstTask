@@ -7,10 +7,16 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
+
 public class WideSearchChainParser extends AbstractChainParser {
 
     private static final Logger logger = Logger.getLogger(WideSearchChainParser.class);
 
+    /**
+     * Instantiate a WideSearchChainParser object
+     *
+     * @param manager object of ArgsParserManager for this chain
+     */
     public WideSearchChainParser(ArgsParserManager manager) {
         super(manager);
         Option wOption = new Option("ws", true, "wide search using");
@@ -21,6 +27,12 @@ public class WideSearchChainParser extends AbstractChainParser {
         options.addOption(wOption);
     }
 
+    /**
+     * Obtain command for wide search in tree, if command exists
+     * obtain parameters for search.
+     *
+     * @throws ArgsInputException if no params for search.
+     */
     @Override
     public void doWork() {
         CommandLine cmd = manager.getCL();

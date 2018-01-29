@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko.serialization.strategy;
 
-import com.dbbest.kirilenko.exceptions.SerializationExeption;
+import com.dbbest.kirilenko.exceptions.SerializationException;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 
@@ -22,7 +22,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
     private static final Logger logger = Logger.getLogger(XMLStrategyImpl.class);
 
     @Override
-    public void serialize(Node root, String fileName) throws SerializationExeption {
+    public void serialize(Node root, String fileName) throws SerializationException {
 
         DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
@@ -43,12 +43,12 @@ public class XMLStrategyImpl implements SerializationStrategy {
             transformer.transform(source, result);
         } catch (ParserConfigurationException | TransformerException e) {
             logger.error("problems with XML serialization occurred", e);
-            throw new SerializationExeption(e);
+            throw new SerializationException(e);
         }
     }
 
     @Override
-    public Node deserialize(String fileName) throws SerializationExeption {
+    public Node deserialize(String fileName) throws SerializationException {
         DocumentBuilderFactory df;
         DocumentBuilder builder;
         Document document;
@@ -61,7 +61,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
             return nodeCreate(rootElement);
         } catch (Exception e) {
             logger.error("problems with deserialization", e);
-            throw new SerializationExeption(e);
+            throw new SerializationException(e);
         }
     }
 

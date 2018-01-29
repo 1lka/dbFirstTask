@@ -12,6 +12,11 @@ public class DeepSearchChainParser extends AbstractChainParser {
 
     private static final Logger logger = Logger.getLogger(DeepSearchChainParser.class);
 
+    /**
+     * Instantiate a DeepSearchChainParser object
+     *
+     * @param manager object of ArgsParserManager for this chain
+     */
     public DeepSearchChainParser(ArgsParserManager manager) {
         super(manager);
         Option dOption = new Option("ds", true, "deep search using");
@@ -22,6 +27,12 @@ public class DeepSearchChainParser extends AbstractChainParser {
         options.addOption(dOption);
     }
 
+    /**
+     * Obtain command for deep search in tree, if command exists
+     * obtain parameters for search.
+     *
+     * @throws ArgsInputException if no params for search.
+     */
     @Override
     public void doWork() {
         CommandLine cmd = manager.getCL();

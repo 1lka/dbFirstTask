@@ -41,6 +41,8 @@ public class Node {
 
     /**
      * creates new node object with empty ChildrenList and initialize it's name
+     *
+     * @param name of this node
      */
     public Node(String name) {
         this();
