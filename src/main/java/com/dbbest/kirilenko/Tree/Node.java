@@ -37,6 +37,7 @@ public class Node {
      */
     public Node() {
         this.children = new ChildrenList<>();
+        this.attrs = new HashMap<>();
     }
 
     /**
@@ -141,6 +142,10 @@ public class Node {
         Predicate<Node> predicate = obtainPredicate(elements);
         return wideSearchWithPredicate(predicate);
     }
+
+//    public Node wideSearchElement(String element) {
+//        Predicate<Node> predicate = this.getName().equals(ele);
+//    }
 
     /**
      * Does the deep search by elements in the node.
