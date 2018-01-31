@@ -8,6 +8,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.log4j.Logger;
 
+import java.util.Arrays;
+
 public class DeepSearchChainParser extends AbstractChainParser {
 
     private static final Logger logger = Logger.getLogger(DeepSearchChainParser.class);
@@ -39,12 +41,20 @@ public class DeepSearchChainParser extends AbstractChainParser {
 
         if (cmd.hasOption("ds")) {
             String[] params = cmd.getOptionValues("ds");
-            if (params == null) {
-                logger.error("search params required");
-                throw new ArgsInputException("search params required");
+            Node found;
+            switch (params.length) {
+                case 1:
+                    found = manager.getRoot().deepSearch(params[0]);
+                    logger.debug("found node: " + found);
+                    break;
+                case 2:
+                    found = manager.getRoot().deepSearch(params[0], params[1]);
+                    logger.debug("found node: " + found);
+                    break;
+                default:
+                    logger.error("wrong params for search: " + Arrays.toString(params));
+                    throw new ArgsInputException("wrong params");
             }
-            Node found = manager.getRoot().deepSearch(params);
-            logger.debug("found node: " + found);
         }
         next();
     }

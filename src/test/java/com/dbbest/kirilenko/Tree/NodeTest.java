@@ -120,8 +120,7 @@ public class NodeTest {
 
         sChild.setAttrs(attrs);
 
-        root.wideSearch();
-        root.deepSearch();
+
     }
 
     @Test

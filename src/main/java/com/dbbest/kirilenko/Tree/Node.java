@@ -131,44 +131,14 @@ public class Node {
         return parent != null;
     }
 
-    /**
-     * Does the wide search by elements in the node.
-     *
-     * @param elements the array of values for search
-     * @return node if found or null if there are no nodes satisfy params
-     * @throws NodeException if the arguments less than one or bigger than two
-     */
-    public Node wideSearch(String... elements) {
-        Predicate<Node> predicate = obtainPredicate(elements);
+    public Node wideSearch(String element) {
+        Predicate<Node> predicate = (n) -> n.getName().equals(element);
         return wideSearchWithPredicate(predicate);
     }
 
-//    public Node wideSearchElement(String element) {
-//        Predicate<Node> predicate = this.getName().equals(ele);
-//    }
-
-    /**
-     * Does the deep search by elements in the node.
-     *
-     * @param elements the array of values for search
-     * @return node if found or null if there are no nodes satisfy params
-     * @throws NodeException if the arguments less than one or bigger than two
-     */
-    public Node deepSearch(String... elements) {
-        Predicate<Node> predicate = obtainPredicate(elements);
-        return deepSearchWithPredicate(predicate);
-    }
-
-    private Predicate<Node> obtainPredicate(String[] elements) {
-        int i = elements.length;
-        switch (i) {
-            case 1:
-                return (n) -> n.getName().equals(elements[0]);
-            case 2:
-                return (n) -> elements[1].equals(n.getAttrs().get(elements[0]));
-            default:
-                throw new NodeException("search params should be in the range 1 - 2");
-        }
+    public Node wideSearch(String key, String value) {
+        Predicate<Node> predicate = (n) -> value.equals(n.getAttrs().get(key));
+        return wideSearchWithPredicate(predicate);
     }
 
     private Node wideSearchWithPredicate(Predicate<Node> nodePredicate) {
@@ -181,6 +151,16 @@ public class Node {
             } else nodes.addAll(last.getChildren());
         } while (nodes.size() != 0);
         return null;
+    }
+
+    public Node deepSearch(String element) {
+        Predicate<Node> predicate = (n) -> n.getName().equals(element);
+        return deepSearchWithPredicate(predicate);
+    }
+
+    public Node deepSearch(String key, String value) {
+        Predicate<Node> predicate = (n) -> value.equals(n.attrs.get(key));
+        return deepSearchWithPredicate(predicate);
     }
 
     private Node deepSearchWithPredicate(Predicate<Node> nodePredicate) {
@@ -196,6 +176,72 @@ public class Node {
         }
         return null;
     }
+
+//    /**
+//     * Does the wide search by elements in the node.
+//     *
+//     * @param elements the array of values for search
+//     * @return node if found or null if there are no nodes satisfy params
+//     * @throws NodeException if the arguments less than one or bigger than two
+//     */
+//    public Node wideSearch(String... elements) {
+//        Predicate<Node> predicate = obtainPredicate(elements);
+//        return wideSearchWithPredicate(predicate);
+//    }
+//
+////    public Node wideSearchElement(String element) {
+////        Predicate<Node> predicate = this.getName().equals(ele);
+////    }
+//
+//    /**
+//     * Does the deep search by elements in the node.
+//     *
+//     * @param elements the array of values for search
+//     * @return node if found or null if there are no nodes satisfy params
+//     * @throws NodeException if the arguments less than one or bigger than two
+//     */
+//    public Node deepSearch(String... elements) {
+//        Predicate<Node> predicate = obtainPredicate(elements);
+//        return deepSearchWithPredicate(predicate);
+//    }
+//
+//    private Predicate<Node> obtainPredicate(String[] elements) {
+//        int i = elements.length;
+//        switch (i) {
+//            case 1:
+//                return (n) -> n.getName().equals(elements[0]);
+//            case 2:
+//                return (n) -> elements[1].equals(n.getAttrs().get(elements[0]));
+//            default:
+//                throw new NodeException("search params should be in the range 1 - 2");
+//        }
+//    }
+//
+//    private Node wideSearchWithPredicate(Predicate<Node> nodePredicate) {
+//        Queue<Node> nodes = new LinkedList<>();
+//        nodes.add(this);
+//        do {
+//            Node last = nodes.remove();
+//            if (nodePredicate.test(last)) {
+//                return last;
+//            } else nodes.addAll(last.getChildren());
+//        } while (nodes.size() != 0);
+//        return null;
+//    }
+//
+//    private Node deepSearchWithPredicate(Predicate<Node> nodePredicate) {
+//        if (nodePredicate.test(this)) {
+//            return this;
+//        } else {
+//            for (Node child : children) {
+//                Node last = child.deepSearchWithPredicate(nodePredicate);
+//                if (last != null) {
+//                    return last;
+//                }
+//            }
+//        }
+//        return null;
+//    }
 
     /**
      * Adds node in children
