@@ -42,6 +42,10 @@ public class WideSearchChainParser extends AbstractChainParser {
         if (cmd.hasOption("ws")) {
             String[] params = cmd.getOptionValues("ws");
             Node found;
+            if (params == null) {
+                logger.error("wrong params for search");
+                throw new ArgsInputException("wrong params");
+            }
             switch (params.length) {
                 case 1:
                     found = manager.getRoot().wideSearch(params[0]);
@@ -51,9 +55,6 @@ public class WideSearchChainParser extends AbstractChainParser {
                     found = manager.getRoot().wideSearch(params[0], params[1]);
                     logger.debug("found node: " + found);
                     break;
-                default:
-                    logger.error("wrong params for search: " + Arrays.toString(params));
-                    throw new ArgsInputException("wrong params");
             }
         }
         next();

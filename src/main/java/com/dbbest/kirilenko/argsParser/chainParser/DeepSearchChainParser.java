@@ -41,6 +41,12 @@ public class DeepSearchChainParser extends AbstractChainParser {
 
         if (cmd.hasOption("ds")) {
             String[] params = cmd.getOptionValues("ds");
+
+            if (params == null) {
+                logger.error("wrong params for search");
+                throw new ArgsInputException("wrong params");
+            }
+
             Node found;
             switch (params.length) {
                 case 1:
@@ -51,9 +57,6 @@ public class DeepSearchChainParser extends AbstractChainParser {
                     found = manager.getRoot().deepSearch(params[0], params[1]);
                     logger.debug("found node: " + found);
                     break;
-                default:
-                    logger.error("wrong params for search: " + Arrays.toString(params));
-                    throw new ArgsInputException("wrong params");
             }
         }
         next();

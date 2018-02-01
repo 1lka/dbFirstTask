@@ -51,7 +51,7 @@ public class ArgsParserManager {
      * @param args Program arguments.
      * @throws ArgsInputException if there is  invalid args.
      */
-    public ArgsParserManager(String[] args) {
+    public ArgsParserManager(String[] args) throws ParseException {
         this.args = args;
         options = new Options();
 
@@ -61,12 +61,7 @@ public class ArgsParserManager {
         AbstractChainParser dSearchUnit = new DeepSearchChainParser(this);
 
         CommandLineParser parser = new DefaultParser();
-        try {
-            cmd = parser.parse(options, args);
-        } catch (ParseException e) {
-            logger.error("wrong args", e);
-            throw new ArgsInputException("wrong args", e);
-        }
+        cmd = parser.parse(options, args);
 
         inputUnit.setNextUnit(outputUnit);
         outputUnit.setNextUnit(wSearchUnit);
@@ -115,14 +110,6 @@ public class ArgsParserManager {
 
     public void setArgs(String[] args) {
         this.args = args;
-    }
-
-    public AbstractChainParser getFirstUnit() {
-        return firstUnit;
-    }
-
-    public void setFirstUnit(AbstractChainParser firstUnit) {
-        this.firstUnit = firstUnit;
     }
 
     public CommandLine getCL() {

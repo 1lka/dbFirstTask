@@ -33,21 +33,17 @@ public class InputFileChainParser extends AbstractChainParser {
     public void doWork() {
         CommandLine cmd = manager.getCL();
         Node rootNode;
-        if (cmd.hasOption("input")) {
-            SerializationManager manager = new SerializationManager();
-            String inputFileName = cmd.getOptionValue("input");
-            manager.setStrategy(inputFileName);
-            try {
-                rootNode = manager.deserializeFile(inputFileName);
-            } catch (SerializationException e) {
-                logger.warn("problems with deserialization", e);
-                //todo System.exit(0) ??
-                throw new RuntimeException();
-            }
-        } else {
-            logger.error("input file required");
-            throw new ArgsInputException("input file required");
+
+        SerializationManager serManager = new SerializationManager();
+        String inputFileName = cmd.getOptionValue("input");
+        serManager.setStrategy(inputFileName);
+        try {
+            rootNode = serManager.deserializeFile(inputFileName);
+        } catch (SerializationException e) {
+            logger.warn("problems with deserialization", e);
+            throw new RuntimeException();
         }
+
         manager.setRoot(rootNode);
         next();
     }

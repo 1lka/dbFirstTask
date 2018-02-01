@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.serialization.strategy;
 
+import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
@@ -7,15 +8,17 @@ import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.dbbest.kirilenko.Tree.Node;
 
 public class XMLStrategyImpl implements SerializationStrategy {
 
@@ -28,7 +31,6 @@ public class XMLStrategyImpl implements SerializationStrategy {
         DocumentBuilder builder = null;
         try {
             builder = df.newDocumentBuilder();
-
             Document document = builder.newDocument();
 
             appendNode(document, root);
@@ -39,7 +41,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(new File(fileName));
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, result);
         } catch (ParserConfigurationException | TransformerException e) {
             logger.error("problems with XML serialization occurred", e);
@@ -57,6 +59,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
             df = DocumentBuilderFactory.newInstance();
             builder = df.newDocumentBuilder();
             document = builder.parse(fileName);
+            document.getDocumentElement().normalize();
             Element rootElement = document.getDocumentElement();
             return nodeCreate(rootElement);
         } catch (Exception e) {
@@ -83,6 +86,9 @@ public class XMLStrategyImpl implements SerializationStrategy {
         NodeList children = element.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             org.w3c.dom.Node childNode = children.item(i);
+            if (childNode.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE) {
+                node.setValue(childNode.getNodeValue());
+            }
             if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
                 Node child = nodeCreate((Element) childNode);
                 node.addChild(child);
@@ -102,6 +108,12 @@ public class XMLStrategyImpl implements SerializationStrategy {
             attr.setValue(value);
             currentElement.setAttributeNode(attr);
         }
+
+        if (node.getValue() != null) {
+            CDATASection cdata = document.createCDATASection(node.getValue());
+            currentElement.appendChild(cdata);
+        }
+
         if (node.getParent() == null) {
             document.appendChild(currentElement);
             appendChildren(document, node, currentElement);
