@@ -1,9 +1,18 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
+import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 
-@Load(element = DBElement.PROCEDURE)
-public class Procedure extends Loader {
+import java.sql.Connection;
+
+@Load(element = DBElement.VIEW)
+public class ViewLoader extends Loader {
+
+
+    @Override
+    public Node load(Connection connection) {
+        return null;
+    }
 }

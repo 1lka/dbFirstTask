@@ -59,7 +59,6 @@ public class LoadersInitializer {
         }
     }
 
-
     private void findClasses() throws ClassNotFoundException, IOException {
         String pack = this.getClass().getPackage().getName();
         String[] directories = pack.split("\\.");

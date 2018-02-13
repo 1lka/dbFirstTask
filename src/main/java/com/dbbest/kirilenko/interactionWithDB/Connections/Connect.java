@@ -11,5 +11,5 @@ public abstract class Connect {
         return connection;
     }
 
-    public abstract void initConnection(String dbName, String login, String password) throws SQLException;
+    public abstract void initConnection(String dbURL, String login, String password) throws SQLException;
 }
