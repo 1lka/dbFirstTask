@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko;
 
 import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.LoaderManager;
 
@@ -14,7 +15,7 @@ public class JDBCTest {
         String pass = "root";
 
         LoaderManager manager = new LoaderManager(type, url, login, pass);
-        Node n = manager.loadRoot();
+        Node n = manager.lazyLoad();
         System.out.println(n);
     }
 

@@ -8,5 +8,5 @@ import java.sql.SQLException;
 public abstract class Loader {
 
 
-    public abstract Node load(Connection connection) throws SQLException;
+    public abstract Node lazyLoad(Connection connection) throws SQLException;
 }

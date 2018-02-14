@@ -14,19 +14,11 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public class LoaderManager {
-    private DBType type;
-    private String dbURL;
-    private String login;
-    private String pass;
+
     private Connection connection;
     private LoadersInitializer initializer;
 
     public LoaderManager(DBType type, String dbURL, String login, String pass) {
-        this.type = type;
-        this.dbURL = dbURL;
-        this.login = login;
-        this.pass = pass;
-
         try {
             initializer = new LoadersInitializer(type);
         } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
@@ -42,11 +34,11 @@ public class LoaderManager {
         }
     }
 
-    public Node loadRoot() {
+    public Node lazyLoad() {
         Map<DBElement, Loader> loaders = initializer.getLoaders();
         Loader schemaLoader = loaders.get(DBElement.SCHEMA);
         try {
-            return schemaLoader.load(connection);
+            return schemaLoader.lazyLoad(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
