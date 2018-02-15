@@ -1,9 +1,8 @@
 package com.dbbest.kirilenko;
 
 import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
-import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.LoaderManager;
+import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 
 public class JDBCTest {
 

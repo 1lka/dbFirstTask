@@ -7,5 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Load {
-    DBElement element();
+    String element();
+
+    String parent() default "";
+
 }

@@ -1,6 +1,5 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders;
 
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 
 import java.io.File;
@@ -11,10 +10,10 @@ import java.util.*;
 
 public class LoadersInitializer {
 
-    private Map<DBElement, Loader> loaders = new HashMap<>();
+    private Map<String, Loader> loaders = new HashMap<>();
     private ArrayList<Class> classes = new ArrayList<>();
 
-    public Map<DBElement, Loader> getLoaders() {
+    public Map<String, Loader> getLoaders() {
         return loaders;
     }
 
@@ -52,8 +51,13 @@ public class LoadersInitializer {
             Annotation annotation = c.getAnnotation(Load.class);
             if (annotation != null) {
                 Load load = (Load) annotation;
-                DBElement element = load.element();
+                String element = load.element();
+                String parent = load.parent();
                 Loader loader = (Loader) c.newInstance();
+                loader.setName(element);
+                if (!parent.equals("")) {
+                    loader.setParent(parent);
+                }
                 loaders.put(element, loader);
             }
         }

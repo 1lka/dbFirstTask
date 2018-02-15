@@ -12,18 +12,17 @@ import java.util.Map;
 public class SchemaLoader extends Loader {
 
     private static final String SQL_QUERY =
-            "SELECT * " +
-                    "FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?";
+            "SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?";
 
     @Override
-    public final Node lazyLoad(Connection connection) throws SQLException {
+    public final void lazyLoad(Node node, Connection connection) throws SQLException {
         String schema = connection.getCatalog();
         PreparedStatement statement = connection.prepareStatement(SQL_QUERY);
         statement.setString(1, schema);
         ResultSet rs = statement.executeQuery();
 
         rs.next();
-        Node node = new Node(DBElement.SCHEMA.toString());
+        node.setName(DBElement.SCHEMA);
         Map<String, String> attrs = node.getAttrs();
 
         ResultSetMetaData rsmd = rs.getMetaData();
@@ -33,8 +32,6 @@ public class SchemaLoader extends Loader {
             String value = (String) rs.getObject(i);
             attrs.put(key, value);
         }
-
         rs.close();
-        return node;
     }
 }
