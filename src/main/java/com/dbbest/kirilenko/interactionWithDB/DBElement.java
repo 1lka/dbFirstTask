@@ -11,4 +11,6 @@ public class DBElement {
     public final static String FUNCTIONS = "functions";
     public final static String PROCEDURE = "procedure";
     public final static String PROCEDURES = "procedures";
+    public final static String COLUMN = "column";
+    public final static String COLUMNS = "columns";
 }

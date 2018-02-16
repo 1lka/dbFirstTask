@@ -37,7 +37,7 @@ public class SchemaLoader extends Loader {
 
     @Override
     public void fullLoadOnLazy(Node node, Connection connection) throws SQLException {
-
+        System.out.println("nothing to load in SchemaLoader");
     }
 
     @Override

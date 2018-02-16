@@ -62,18 +62,12 @@ public class LoaderManager {
     }
 
     public void fullLoadOnLazy(Node node) {
-        Loader rootLoader = null;
         for (Map.Entry<String, Loader> set : loaders.entrySet()) {
-            if (set.getValue().isRoot()) {
-                rootLoader = set.getValue();
-                break;
+            try {
+                set.getValue().fullLoadOnLazy(node, connection);
+            } catch (SQLException e) {
+                throw new RuntimeException("problems with full loading ...", e);
             }
-        }
-        try {
-            assert rootLoader != null;
-            rootLoader.fullLoadOnLazy(node,connection);
-        } catch (SQLException e) {
-            throw new RuntimeException("problems with full loading");
         }
     }
 

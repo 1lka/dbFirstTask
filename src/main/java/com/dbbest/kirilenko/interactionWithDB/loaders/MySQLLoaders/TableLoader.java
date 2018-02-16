@@ -13,7 +13,9 @@ public class TableLoader extends Loader {
 
     private static final String SQL_QUERY =
             "SELECT * FROM INFORMATION_SCHEMA.TABLES " +
-                    "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE'";
+                    "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' order by TABLE_NAME";
+
+    private static final String TABLE_NAME = "TABLE_NAME";
 
     @Override
     public void lazyLoad(Node node, Connection connection) throws SQLException {
@@ -39,7 +41,9 @@ public class TableLoader extends Loader {
 
     @Override
     public void fullLoadOnLazy(Node node, Connection connection) throws SQLException {
-
+        Node tables = node.wideSearch(DBElement.TABLES);
+        ColumnLoader columnLoader = new ColumnLoader();
+        columnLoader.loadColumns(tables, connection);
     }
 
     @Override
