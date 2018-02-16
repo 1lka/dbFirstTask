@@ -9,6 +9,6 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Load {
     String element();
 
-    String parent() default "";
+    Class<? extends Loader> parent() default Loader.class;
 
 }

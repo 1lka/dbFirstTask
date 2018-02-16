@@ -34,4 +34,14 @@ public class SchemaLoader extends Loader {
         }
         rs.close();
     }
+
+    @Override
+    public void fullLoadOnLazy(Node node, Connection connection) throws SQLException {
+
+    }
+
+    @Override
+    public Node fullLoad(Connection connection) throws SQLException {
+        return null;
+    }
 }

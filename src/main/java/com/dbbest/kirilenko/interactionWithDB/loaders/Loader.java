@@ -7,23 +7,13 @@ import java.sql.SQLException;
 
 public abstract class Loader {
 
-    private String parent;
+    private Class parent;
 
-    private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getParent() {
+    public Class getParent() {
         return parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(Class parent) {
         this.parent = parent;
     }
 
@@ -31,5 +21,9 @@ public abstract class Loader {
         return parent == null;
     }
 
-    public abstract void lazyLoad(Node node,Connection connection) throws SQLException;
+    public abstract void lazyLoad(Node node, Connection connection) throws SQLException;
+
+    public abstract void fullLoadOnLazy(Node node, Connection connection) throws SQLException;
+
+    public abstract Node fullLoad(Connection connection) throws SQLException;
 }

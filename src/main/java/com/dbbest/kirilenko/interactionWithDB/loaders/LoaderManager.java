@@ -3,10 +3,7 @@ package com.dbbest.kirilenko.interactionWithDB.loaders;
 import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.Connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.Connections.ConnectFactory;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
-import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.interactionWithDB.loaders.LoadersInitializer;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -56,11 +53,27 @@ public class LoaderManager {
 
     private void loadChildren(Node root, Loader parentLoader) throws SQLException {
         for (Map.Entry<String, Loader> set : loaders.entrySet()) {
-            String parent = set.getValue().getParent();
-            if (parentLoader.getName().equals(parent)) {
+            Class parent = set.getValue().getParent();
+            if (parentLoader.getClass().equals(parent)) {
                 Loader loader = set.getValue();
                 loader.lazyLoad(root, connection);
             }
+        }
+    }
+
+    public void fullLoadOnLazy(Node node) {
+        Loader rootLoader = null;
+        for (Map.Entry<String, Loader> set : loaders.entrySet()) {
+            if (set.getValue().isRoot()) {
+                rootLoader = set.getValue();
+                break;
+            }
+        }
+        try {
+            assert rootLoader != null;
+            rootLoader.fullLoadOnLazy(node,connection);
+        } catch (SQLException e) {
+            throw new RuntimeException("problems with full loading");
         }
     }
 

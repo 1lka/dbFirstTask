@@ -88,8 +88,7 @@ public class XMLStrategyImpl implements SerializationStrategy {
             org.w3c.dom.Node childNode = children.item(i);
             if (childNode.getNodeType() == org.w3c.dom.Node.CDATA_SECTION_NODE) {
                 node.setValue(childNode.getNodeValue());
-            }
-            if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+            } else if (childNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
                 Node child = nodeCreate((Element) childNode);
                 node.addChild(child);
             }

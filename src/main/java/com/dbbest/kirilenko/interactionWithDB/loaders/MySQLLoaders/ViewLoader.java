@@ -8,32 +8,32 @@ import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import java.sql.*;
 import java.util.Map;
 
-@Load(element = DBElement.TABLE, parent = SchemaLoader.class)
-public class TableLoader extends Loader {
+@Load(element = DBElement.VIEW,parent = SchemaLoader.class)
+public class ViewLoader extends Loader{
 
     private static final String SQL_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.TABLES " +
-                    "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE'";
+            "SELECT * FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA = ?";
 
     @Override
     public void lazyLoad(Node node, Connection connection) throws SQLException {
-        Node tables = new Node(DBElement.TABLES);
-        node.addChild(tables);
+        Node views = new Node(DBElement.VIEWS);
+        node.addChild(views);
 
-        PreparedStatement ps = connection.prepareStatement(SQL_QUERY);
-        ps.setString(1, connection.getCatalog());
-        ResultSet rs = ps.executeQuery();
+        String schema = connection.getCatalog();
+        PreparedStatement statement = connection.prepareStatement(SQL_QUERY);
+        statement.setString(1, schema);
+        ResultSet rs = statement.executeQuery();
         ResultSetMetaData rsmd = rs.getMetaData();
         int columnsCount = rsmd.getColumnCount();
         while (rs.next()) {
-            Node table = new Node(DBElement.TABLE);
-            Map<String, String> attrs = table.getAttrs();
+            Node view = new Node(DBElement.VIEW);
+            Map<String, String> attrs = view.getAttrs();
             for (int i = 1; i <= columnsCount; i++) {
                 String key = rsmd.getColumnName(i);
                 String value = String.valueOf(rs.getObject(i));
                 attrs.put(key, value);
             }
-            tables.addChild(table);
+            views.addChild(view);
         }
     }
 
