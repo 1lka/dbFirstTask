@@ -4,6 +4,8 @@ import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.AdditionalLoader;
+import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.ProcedureParamsLoader;
 
 import java.sql.*;
 import java.util.Map;
@@ -12,16 +14,19 @@ import java.util.Map;
 public class RoutineLoader extends Loader {
 
     private static final String SQL_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ?";
+            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? order by SPECIFIC_NAME";
+
     private static final String ROUTINE_TYPE = "ROUTINE_TYPE";
 
 
     @Override
     public void lazyLoad(Node node, Connection connection) throws SQLException {
+        Node routines = new Node(DBElement.ROUTINES);
         Node procedures = new Node(DBElement.PROCEDURES);
         Node functions = new Node(DBElement.FUNCTIONS);
-        node.addChild(procedures);
-        node.addChild(functions);
+        routines.addChild(procedures);
+        routines.addChild(functions);
+        node.addChild(routines);
 
         String schema = connection.getCatalog();
         PreparedStatement statement = connection.prepareStatement(SQL_QUERY);
@@ -59,7 +64,10 @@ public class RoutineLoader extends Loader {
 
     @Override
     public void fullLoadOnLazy(Node node, Connection connection) throws SQLException {
+        Node routines = node.wideSearch(DBElement.ROUTINES);
 
+        AdditionalLoader proc = new ProcedureParamsLoader();
+        proc.load(routines, connection);
     }
 
     @Override

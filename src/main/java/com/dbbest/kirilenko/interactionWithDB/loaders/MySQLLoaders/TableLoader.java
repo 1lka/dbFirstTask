@@ -4,6 +4,7 @@ import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.*;
 
 import java.sql.*;
 import java.util.Map;
@@ -14,8 +15,6 @@ public class TableLoader extends Loader {
     private static final String SQL_QUERY =
             "SELECT * FROM INFORMATION_SCHEMA.TABLES " +
                     "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' order by TABLE_NAME";
-
-    private static final String TABLE_NAME = "TABLE_NAME";
 
     @Override
     public void lazyLoad(Node node, Connection connection) throws SQLException {
@@ -42,8 +41,21 @@ public class TableLoader extends Loader {
     @Override
     public void fullLoadOnLazy(Node node, Connection connection) throws SQLException {
         Node tables = node.wideSearch(DBElement.TABLES);
-        ColumnLoader columnLoader = new ColumnLoader();
-        columnLoader.loadColumns(tables, connection);
+
+        AdditionalLoader columnLoader = new ColumnLoader();
+        columnLoader.load(tables, connection);
+
+        AdditionalLoader indexLoader = new IndexLoader();
+        indexLoader.load(tables, connection);
+
+        AdditionalLoader primaryKeyLoader = new PrimaryKeyLoader();
+        primaryKeyLoader.load(tables, connection);
+
+        AdditionalLoader foreignKeyLoader = new ForeignKeyLoader();
+        foreignKeyLoader.load(tables,connection);
+
+        AdditionalLoader triggerLoader = new TriggerLoader();
+        triggerLoader.load(tables,connection);
     }
 
     @Override
