@@ -13,6 +13,7 @@ import java.util.Map;
 public class LoaderManager {
 
     private Connection connection;
+
     private final Map<String, Loader> loaders;
 
     public LoaderManager(DBType type, String dbURL, String login, String pass) {
@@ -28,47 +29,35 @@ public class LoaderManager {
             connect.initConnection(dbURL, login, pass);
             connection = connect.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException("can't obtain connection for " + dbURL + " database", e);
+            throw new RuntimeException("can't connect to " + dbURL + " database", e);
         }
     }
 
-    public Node lazyLoad() {
-        Loader rootLoader = null;
+    public Node lazyDBLoad(String schema) {
+        Loader root = null;
         for (Map.Entry<String, Loader> set : loaders.entrySet()) {
-            if (set.getValue().isRoot()) {
-                rootLoader = set.getValue();
+            if (set.getValue().getParent() == null) {
+                root = set.getValue();
+                root.setConnection(connection);
                 break;
             }
         }
-        Node root = new Node();
         try {
-            assert rootLoader != null;
-            rootLoader.lazyLoad(root, connection);
-            loadChildren(root, rootLoader);
+            assert root != null;
+            Node schemaNode = root.lazyLoad(schema);
+            for (Map.Entry<String, Loader> set : loaders.entrySet()) {
+                Loader childLoader = set.getValue();
+                if (childLoader.getClass() != root.getClass()) {
+                    childLoader.setConnection(connection);
+                    Node childNode = childLoader.lazyLoad(schema);
+                    schemaNode.addChild(childNode);
+                }
+            }
+            return schemaNode;
         } catch (SQLException e) {
-            throw new RuntimeException("can't load tree", e);
-        }
-        return root;
-    }
-
-    private void loadChildren(Node root, Loader parentLoader) throws SQLException {
-        for (Map.Entry<String, Loader> set : loaders.entrySet()) {
-            Class parent = set.getValue().getParent();
-            if (parentLoader.getClass().equals(parent)) {
-                Loader loader = set.getValue();
-                loader.lazyLoad(root, connection);
-            }
+            throw new RuntimeException("problems with loader ", e);
         }
     }
 
-    public void fullLoadOnLazy(Node node) {
-        for (Map.Entry<String, Loader> set : loaders.entrySet()) {
-            try {
-                set.getValue().fullLoadOnLazy(node, connection);
-            } catch (SQLException e) {
-                throw new RuntimeException("problems with full loading ...", e);
-            }
-        }
-    }
 
 }

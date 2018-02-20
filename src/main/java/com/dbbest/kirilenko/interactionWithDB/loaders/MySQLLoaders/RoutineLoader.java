@@ -20,58 +20,30 @@ public class RoutineLoader extends Loader {
 
 
     @Override
-    public void lazyLoad(Node node, Connection connection) throws SQLException {
+    public Node lazyLoad(String schema) throws SQLException {
         Node routines = new Node(DBElement.ROUTINES);
         Node procedures = new Node(DBElement.PROCEDURES);
         Node functions = new Node(DBElement.FUNCTIONS);
         routines.addChild(procedures);
         routines.addChild(functions);
-        node.addChild(routines);
 
-        String schema = connection.getCatalog();
-        PreparedStatement statement = connection.prepareStatement(SQL_QUERY);
-        statement.setString(1, schema);
-        ResultSet rs = statement.executeQuery();
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int columnsCount = rsmd.getColumnCount();
-        Map<String, String> attrs;
-        while (rs.next()) {
-            String routineType = rs.getString(ROUTINE_TYPE).toLowerCase();
+        ResultSet resultSet = executeQuery(SQL_QUERY, schema);
+        while (resultSet.next()) {
+            String routineType = resultSet.getString(ROUTINE_TYPE).toLowerCase();
             switch (routineType) {
                 case DBElement.FUNCTION:
                     Node function = new Node(DBElement.FUNCTION);
-                    attrs = function.getAttrs();
-                    for (int i = 1; i <= columnsCount; i++) {
-                        String key = rsmd.getColumnName(i);
-                        String value = String.valueOf(rs.getObject(i));
-                        attrs.put(key, value);
-                    }
+                    function.setAttrs(fillAttributes(resultSet));
                     functions.addChild(function);
                     break;
                 case DBElement.PROCEDURE:
                     Node procedure = new Node(DBElement.PROCEDURE);
-                    attrs = procedure.getAttrs();
-                    for (int i = 1; i <= columnsCount; i++) {
-                        String key = rsmd.getColumnName(i);
-                        String value = String.valueOf(rs.getObject(i));
-                        attrs.put(key, value);
-                    }
+                    procedure.setAttrs(fillAttributes(resultSet));
                     procedures.addChild(procedure);
                     break;
             }
         }
+        return routines;
     }
 
-    @Override
-    public void fullLoadOnLazy(Node node, Connection connection) throws SQLException {
-        Node routines = node.wideSearch(DBElement.ROUTINES);
-
-        AdditionalLoader proc = new ProcedureParamsLoader();
-        proc.load(routines, connection);
-    }
-
-    @Override
-    public Node fullLoad(Connection connection) throws SQLException {
-        return null;
-    }
 }

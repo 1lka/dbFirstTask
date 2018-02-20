@@ -11,6 +11,7 @@ import java.util.*;
 public class LoadersInitializer {
 
     private Map<String, Loader> loaders = new HashMap<>();
+
     private ArrayList<Class> classes = new ArrayList<>();
 
     public Map<String, Loader> getLoaders() {

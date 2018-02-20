@@ -11,16 +11,17 @@ public class JDBCTest {
     public static void main(String[] args) throws SerializationException {
 
         DBType type = DBType.MYSQL;
-        String url = "jdbc:mysql://localhost/sakila?useSSL=false";
+        String url = "jdbc:mysql://localhost/?useSSL=false";
         String login = "root";
         String pass = "root";
+        String schema = "sakila";
 
         LoaderManager manager = new LoaderManager(type, url, login, pass);
-        Node n = manager.lazyLoad();
-        manager.fullLoadOnLazy(n);
+        Node n = manager.lazyDBLoad(schema);
+        System.out.println(n);
+
         XMLStrategyImpl x = new XMLStrategyImpl();
         x.serialize(n,"tmp.xml");
-//        System.out.println(n);
     }
 
 

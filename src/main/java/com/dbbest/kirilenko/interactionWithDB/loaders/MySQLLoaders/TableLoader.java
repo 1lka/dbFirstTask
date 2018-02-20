@@ -4,10 +4,11 @@ import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.*;
 
-import java.sql.*;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Load(element = DBElement.TABLE, parent = SchemaLoader.class)
 public class TableLoader extends Loader {
@@ -17,49 +18,16 @@ public class TableLoader extends Loader {
                     "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' order by TABLE_NAME";
 
     @Override
-    public void lazyLoad(Node node, Connection connection) throws SQLException {
+    public Node lazyLoad(String schema) throws SQLException {
         Node tables = new Node(DBElement.TABLES);
-        node.addChild(tables);
 
-        PreparedStatement ps = connection.prepareStatement(SQL_QUERY);
-        ps.setString(1, connection.getCatalog());
-        ResultSet rs = ps.executeQuery();
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int columnsCount = rsmd.getColumnCount();
-        while (rs.next()) {
+        ResultSet resultSet = executeQuery(SQL_QUERY, schema);
+        while (resultSet.next()) {
             Node table = new Node(DBElement.TABLE);
-            Map<String, String> attrs = table.getAttrs();
-            for (int i = 1; i <= columnsCount; i++) {
-                String key = rsmd.getColumnName(i);
-                String value = String.valueOf(rs.getObject(i));
-                attrs.put(key, value);
-            }
+            table.setAttrs(fillAttributes(resultSet));
             tables.addChild(table);
         }
+        return tables;
     }
 
-    @Override
-    public void fullLoadOnLazy(Node node, Connection connection) throws SQLException {
-        Node tables = node.wideSearch(DBElement.TABLES);
-
-        AdditionalLoader columnLoader = new ColumnLoader();
-        columnLoader.load(tables, connection);
-
-        AdditionalLoader indexLoader = new IndexLoader();
-        indexLoader.load(tables, connection);
-
-        AdditionalLoader primaryKeyLoader = new PrimaryKeyLoader();
-        primaryKeyLoader.load(tables, connection);
-
-        AdditionalLoader foreignKeyLoader = new ForeignKeyLoader();
-        foreignKeyLoader.load(tables,connection);
-
-        AdditionalLoader triggerLoader = new TriggerLoader();
-        triggerLoader.load(tables,connection);
-    }
-
-    @Override
-    public Node fullLoad(Connection connection) throws SQLException {
-        return null;
-    }
 }
