@@ -20,7 +20,7 @@ public class RoutineLoader extends Loader {
 
 
     @Override
-    public Node lazyLoad(String schema) throws SQLException {
+    public Node lazyLoadWithChildren(String schema) throws SQLException {
         Node routines = new Node(DBElement.ROUTINES);
         Node procedures = new Node(DBElement.PROCEDURES);
         Node functions = new Node(DBElement.FUNCTIONS);

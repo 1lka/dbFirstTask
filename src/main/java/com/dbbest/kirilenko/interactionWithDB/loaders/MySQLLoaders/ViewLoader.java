@@ -15,7 +15,7 @@ public class ViewLoader extends Loader{
             "SELECT * FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA = ?";
 
     @Override
-    public Node lazyLoad(String schema) throws SQLException {
+    public Node lazyLoadWithChildren(String schema) throws SQLException {
         Node views = new Node(DBElement.VIEWS);
 
         ResultSet resultSet = executeQuery(SQL_QUERY, schema);

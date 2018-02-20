@@ -3,6 +3,7 @@ package com.dbbest.kirilenko.interactionWithDB.loaders;
 import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.Connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.Connections.ConnectFactory;
+import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 public class LoaderManager {
 
-    private Connection connection;
+    private Node root;
 
     private final Map<String, Loader> loaders;
 
@@ -23,40 +24,30 @@ public class LoaderManager {
         } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException("can't initialize loaders: ", e);
         }
-
         Connect connect = ConnectFactory.getConnect(type);
         try {
             connect.initConnection(dbURL, login, pass);
-            connection = connect.getConnection();
+            Connection connection = connect.getConnection();
+            for (Map.Entry<String, Loader> set : loaders.entrySet()) {
+                set.getValue().setConnection(connection);
+            }
         } catch (SQLException e) {
             throw new RuntimeException("can't connect to " + dbURL + " database", e);
         }
+        switch (type) {
+            case MYSQL:
+                root = new Node(DBElement.SCHEMA);
+        }
     }
 
-    public Node lazyDBLoad(String schema) {
-        Loader root = null;
-        for (Map.Entry<String, Loader> set : loaders.entrySet()) {
-            if (set.getValue().getParent() == null) {
-                root = set.getValue();
-                root.setConnection(connection);
-                break;
-            }
-        }
+    public Node lazyDBLoad(String dataBase) {
+        Loader loader = loaders.get(root.getName());
         try {
-            assert root != null;
-            Node schemaNode = root.lazyLoad(schema);
-            for (Map.Entry<String, Loader> set : loaders.entrySet()) {
-                Loader childLoader = set.getValue();
-                if (childLoader.getClass() != root.getClass()) {
-                    childLoader.setConnection(connection);
-                    Node childNode = childLoader.lazyLoad(schema);
-                    schemaNode.addChild(childNode);
-                }
-            }
-            return schemaNode;
+            root = loader.lazyLoadWithChildren(dataBase);
         } catch (SQLException e) {
-            throw new RuntimeException("problems with loader ", e);
+            throw new RuntimeException("something went wrong", e);
         }
+        return root;
     }
 
 

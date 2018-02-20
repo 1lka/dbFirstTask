@@ -34,7 +34,9 @@ public abstract class Loader {
     }
 
 
-    public abstract Node lazyLoad(String schema) throws SQLException;
+    public abstract Node lazyLoadWithChildren(String schema) throws SQLException;
+
+
 
     protected Map<String, String> fillAttributes(ResultSet resultSet) throws SQLException {
         Map<String, String> attrs = new HashMap<>();

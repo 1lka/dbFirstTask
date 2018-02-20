@@ -16,7 +16,7 @@ public class SchemaLoader extends Loader {
             "SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?";
 
     @Override
-    public Node lazyLoad(String schema) throws SQLException {
+    public Node lazyLoadWithChildren(String schema) throws SQLException {
         ResultSet resultSet = executeQuery(SQL_QUERY, schema);
         if (resultSet.next()) {
             Node schemaNode = new Node(DBElement.SCHEMA);

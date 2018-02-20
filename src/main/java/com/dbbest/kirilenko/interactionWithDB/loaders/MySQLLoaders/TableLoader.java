@@ -18,7 +18,7 @@ public class TableLoader extends Loader {
                     "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' order by TABLE_NAME";
 
     @Override
-    public Node lazyLoad(String schema) throws SQLException {
+    public Node lazyLoadWithChildren(String schema) throws SQLException {
         Node tables = new Node(DBElement.TABLES);
 
         ResultSet resultSet = executeQuery(SQL_QUERY, schema);
