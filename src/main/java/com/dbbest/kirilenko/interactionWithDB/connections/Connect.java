@@ -1,4 +1,4 @@
-package com.dbbest.kirilenko.interactionWithDB.Connections;
+package com.dbbest.kirilenko.interactionWithDB.connections;
 
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,6 +1,8 @@
-package com.dbbest.kirilenko.interactionWithDB.loaders;
+package com.dbbest.kirilenko.interactionWithDB.reflectionUtil;
 
 import com.dbbest.kirilenko.interactionWithDB.DBType;
+import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,24 +12,30 @@ import java.util.*;
 
 public class LoadersInitializer {
 
+    private ArrayList<Class> classes = new ArrayList<>();
+
     private Map<String, Loader> loaders = new HashMap<>();
 
-    private ArrayList<Class> classes = new ArrayList<>();
+    private Map<String, Loader> printers = new HashMap<>();
 
     public Map<String, Loader> getLoaders() {
         return loaders;
     }
 
-    public LoadersInitializer(DBType type) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public Map<String, Loader> getPrinters() {
+        return printers;
+    }
+
+    public LoadersInitializer(DBType type, Class clazz) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         findClasses();
 
         String packInfo = "package-info";
 
         for (Class c : classes) {
             if (packInfo.equals(c.getSimpleName())) {
-                Annotation ann = c.getAnnotation(PackageLoad.class);
+                Annotation ann = c.getAnnotation(PackageAnnotation.class);
                 if (ann != null) {
-                    PackageLoad pl = (PackageLoad) ann;
+                    PackageAnnotation pl = (PackageAnnotation) ann;
                     if (pl.type() == type) {
                         int lastPoint = c.getName().lastIndexOf(".");
                         String path = c.getName().substring(0, lastPoint);

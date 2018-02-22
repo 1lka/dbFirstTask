@@ -1,4 +1,4 @@
-package com.dbbest.kirilenko.interactionWithDB.Connections;
+package com.dbbest.kirilenko.interactionWithDB.connections;
 
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 

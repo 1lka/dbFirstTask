@@ -1,4 +1,4 @@
-package com.dbbest.kirilenko.interactionWithDB.loaders;
+package com.dbbest.kirilenko.interactionWithDB.reflectionUtil;
 
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 
@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PACKAGE)
-public @interface PackageLoad {
+public @interface PackageAnnotation {
     DBType type();
+    Class clazz();
 }

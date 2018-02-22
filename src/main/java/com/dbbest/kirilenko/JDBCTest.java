@@ -32,6 +32,4 @@ public class JDBCTest {
         XMLStrategyImpl x = new XMLStrategyImpl();
         x.serialize(n,"tmp.xml");
     }
-
-
 }

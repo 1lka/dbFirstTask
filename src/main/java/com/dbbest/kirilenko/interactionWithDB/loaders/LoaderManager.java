@@ -1,10 +1,11 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders;
 
 import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.Connections.Connect;
-import com.dbbest.kirilenko.interactionWithDB.Connections.ConnectFactory;
+import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
+import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
+import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.LoadersInitializer;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -19,7 +20,7 @@ public class LoaderManager {
 
     public LoaderManager(DBType type, String dbURL, String login, String pass) {
         try {
-            LoadersInitializer initializer = new LoadersInitializer(type);
+            LoadersInitializer initializer = new LoadersInitializer(type, Loader.class);
             loaders = initializer.getLoaders();
         } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException("can't initialize loaders: ", e);
