@@ -5,7 +5,7 @@ import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
-import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.LoadersInitializer;
+import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.ReflectionUtil;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -19,12 +19,8 @@ public class LoaderManager {
     private final Map<String, Loader> loaders;
 
     public LoaderManager(DBType type, String dbURL, String login, String pass) {
-        try {
-            LoadersInitializer initializer = new LoadersInitializer(type, Loader.class);
-            loaders = initializer.getLoaders();
-        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("can't initialize loaders: ", e);
-        }
+        loaders = ReflectionUtil.obtain(type, Loader.class);
+
         Connect connect = ConnectFactory.getConnect(type);
         try {
             connect.initConnection(dbURL, login, pass);
@@ -59,6 +55,4 @@ public class LoaderManager {
             throw new RuntimeException("can't load element: " + node);
         }
     }
-
-
 }

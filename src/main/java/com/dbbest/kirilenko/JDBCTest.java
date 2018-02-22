@@ -4,6 +4,7 @@ import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
+import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 
 public class JDBCTest {
@@ -31,5 +32,6 @@ public class JDBCTest {
 
         XMLStrategyImpl x = new XMLStrategyImpl();
         x.serialize(n,"tmp.xml");
+        PrinterManager m = new PrinterManager();
     }
 }
