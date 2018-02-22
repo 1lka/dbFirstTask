@@ -1,5 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.printers;
 
-public abstract class Printer {
+import com.dbbest.kirilenko.Tree.Node;
 
+public abstract class Printer {
+    public abstract void printElement(Node node);
 }

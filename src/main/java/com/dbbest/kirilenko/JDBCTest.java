@@ -4,6 +4,7 @@ import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
+import com.dbbest.kirilenko.interactionWithDB.printers.Print;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 
@@ -15,23 +16,25 @@ public class JDBCTest {
         String url = "jdbc:mysql://localhost/?useSSL=false";
         String login = "root";
         String pass = "root";
-        String schema = "sakila";
+        String schema = "puzzles";
 
-        LoaderManager manager = new LoaderManager(type, url, login, pass);
-        Node n = manager.lazyDBLoad(schema);
+//        LoaderManager manager = new LoaderManager(type, url, login, pass);
+//        Node n = manager.lazyDBLoad(schema);
+//
+//        Node table = n.deepSearch("table");
+//        manager.loadElement(table);
 
-        Node table = n.deepSearch("TABLE_NAME", "film");
-        manager.loadElement(table);
+        PrinterManager m = new PrinterManager(type);
 
-        Node procedure = n.wideSearch("procedure");
-        manager.loadElement(procedure);
+//
+//        Node procedure = n.wideSearch("procedure");
+//        manager.loadElement(procedure);
+//
+//        Node function = n.wideSearch("function");
+//        manager.loadElement(function);
 
-        Node function = n.wideSearch("function");
-        manager.loadElement(function);
 
-
-        XMLStrategyImpl x = new XMLStrategyImpl();
-        x.serialize(n,"tmp.xml");
-        PrinterManager m = new PrinterManager();
+//        XMLStrategyImpl x = new XMLStrategyImpl();
+//        x.serialize(n,"tmp.xml");
     }
 }
