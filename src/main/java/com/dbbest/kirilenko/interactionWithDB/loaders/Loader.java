@@ -9,9 +9,14 @@ import java.util.Map;
 
 public abstract class Loader {
 
-    private Class parent;
-
     private Connection connection;
+
+    public Loader() {
+    }
+
+    public Loader(Connection connection) {
+        this.connection = connection;
+    }
 
     public Connection getConnection() {
         return connection;
@@ -21,22 +26,9 @@ public abstract class Loader {
         this.connection = connection;
     }
 
-    public Class getParent() {
-        return parent;
-    }
+    public abstract Node lazyLoad(String schema) throws SQLException;
 
-    public void setParent(Class parent) {
-        this.parent = parent;
-    }
-
-    public boolean isRoot() {
-        return parent == null;
-    }
-
-
-    public abstract Node lazyLoadWithChildren(String schema) throws SQLException;
-
-
+    public abstract void loadElement(Node node) throws SQLException;
 
     protected Map<String, String> fillAttributes(ResultSet resultSet) throws SQLException {
         Map<String, String> attrs = new HashMap<>();

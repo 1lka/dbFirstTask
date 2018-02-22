@@ -8,7 +8,4 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Load {
     String element();
-
-    Class<? extends Loader> parent() default Loader.class;
-
 }

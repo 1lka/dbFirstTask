@@ -43,11 +43,20 @@ public class LoaderManager {
     public Node lazyDBLoad(String dataBase) {
         Loader loader = loaders.get(root.getName());
         try {
-            root = loader.lazyLoadWithChildren(dataBase);
+            root = loader.lazyLoad(dataBase);
         } catch (SQLException e) {
             throw new RuntimeException("something went wrong", e);
         }
         return root;
+    }
+
+    public void loadElement(Node node) {
+        Loader loader = loaders.get(node.getName());
+        try {
+            loader.loadElement(node);
+        } catch (SQLException e) {
+            throw new RuntimeException("can't load element: " + node);
+        }
     }
 
 

@@ -53,11 +53,7 @@ public class LoadersInitializer {
             if (annotation != null) {
                 Load load = (Load) annotation;
                 String element = load.element();
-                Class parent = load.parent();
                 Loader loader = (Loader) c.newInstance();
-                if (!parent.equals(Loader.class)) {
-                    loader.setParent(parent);
-                }
                 loaders.put(element, loader);
             }
         }

@@ -18,7 +18,16 @@ public class JDBCTest {
 
         LoaderManager manager = new LoaderManager(type, url, login, pass);
         Node n = manager.lazyDBLoad(schema);
-        System.out.println(n);
+
+        Node table = n.deepSearch("TABLE_NAME", "film");
+        manager.loadElement(table);
+
+        Node procedure = n.wideSearch("procedure");
+        manager.loadElement(procedure);
+
+        Node function = n.wideSearch("function");
+        manager.loadElement(function);
+
 
         XMLStrategyImpl x = new XMLStrategyImpl();
         x.serialize(n,"tmp.xml");
