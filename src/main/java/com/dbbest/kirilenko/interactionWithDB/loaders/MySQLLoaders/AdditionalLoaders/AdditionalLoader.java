@@ -37,6 +37,9 @@ public abstract class AdditionalLoader {
         for (int i = 1; i <= count; i++) {
             String key = metaData.getColumnName(i);
             String value = String.valueOf(resultSet.getObject(i));
+            if ("null".equals(value) || "".equals(value)) {
+                continue;
+            }
             attrs.put(key, value);
         }
         return attrs;

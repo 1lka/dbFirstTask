@@ -14,10 +14,10 @@ public class PrinterManager {
         printers = ReflectionUtil.obtain(type, Printer.class);
     }
 
-    public void printDDL(Node node) {
+    public String printDDL(Node node) {
         String nodeName = node.getName();
         Printer printer = printers.get(nodeName);
-        printer.printElement(node);
+        return printer.printElement(node);
     }
 
 
