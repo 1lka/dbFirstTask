@@ -32,10 +32,12 @@ public class JDBCTest {
 
         PrinterManager printerManager = new PrinterManager(type);
         Node tables = n.wideSearch(DBElement.TABLES);
-        System.out.println(printerManager.printDDL(tables.getChildren().get(0)));
+        System.out.println(printerManager.printDDL(tables.wideSearch("TABLE_NAME","film")));
 
         XMLStrategyImpl strategy = new XMLStrategyImpl();
         strategy.serialize(n,"tmp.xml");
+
+
     }
 
     private static void fill(Node n, LoaderManager m) {

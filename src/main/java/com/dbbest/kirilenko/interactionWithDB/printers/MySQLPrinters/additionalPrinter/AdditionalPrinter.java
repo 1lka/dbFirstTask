@@ -3,5 +3,5 @@ package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters.additional
 import com.dbbest.kirilenko.Tree.Node;
 
 public interface AdditionalPrinter {
-    public String printElement(Node node);
+    public StringBuilder printElements(Node node);
 }

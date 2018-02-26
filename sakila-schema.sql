@@ -33,6 +33,15 @@ CREATE TABLE actor (
   KEY idx_actor_last_name (last_name)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE actor(
+actor_id smallint(5) unsigned NOT NULL auto_increment,
+first_name varchar(45) NOT NULL ,
+last_name varchar(45) NOT NULL ,
+last_update timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+PRIMARY KEY (actor_id),
+KEY idx_actor_last_name (last_name)
+)ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
+
 --
 -- Table structure for table `address`
 --
@@ -63,6 +72,8 @@ CREATE TABLE category (
   last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY  (category_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 --
 -- Table structure for table `city`
@@ -202,6 +213,17 @@ CREATE TRIGGER `upd_film` AFTER UPDATE ON `film` FOR EACH ROW BEGIN
     END IF;
   END;;
 
+CREATE TRIGGER upd_film AFTER UPDATE ON film FOR EACH ROW BEGIN
+    IF (old.title != new.title) OR (old.description != new.description) OR (old.film_id != new.film_id)
+    THEN
+        UPDATE film_text
+            SET title=new.title,
+                description=new.description,
+                film_id=new.film_id
+        WHERE film_id=old.film_id;
+    END IF;
+  END;;
+
 
 CREATE TRIGGER `del_film` AFTER DELETE ON `film` FOR EACH ROW BEGIN
     DELETE FROM film_text WHERE film_id = old.film_id;
@@ -261,23 +283,23 @@ CREATE TABLE payment (
 -- Table structure for table `rental`
 --
 
-CREATE TABLE rental (
-  rental_id INT NOT NULL AUTO_INCREMENT,
-  rental_date DATETIME NOT NULL,
-  inventory_id MEDIUMINT UNSIGNED NOT NULL,
-  customer_id SMALLINT UNSIGNED NOT NULL,
-  return_date DATETIME DEFAULT NULL,
-  staff_id TINYINT UNSIGNED NOT NULL,
-  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (rental_id),
-  UNIQUE KEY  (rental_date,inventory_id,customer_id),
-  KEY idx_fk_inventory_id (inventory_id),
-  KEY idx_fk_customer_id (customer_id),
-  KEY idx_fk_staff_id (staff_id),
-  CONSTRAINT fk_rental_staff FOREIGN KEY (staff_id) REFERENCES staff (staff_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_rental_inventory FOREIGN KEY (inventory_id) REFERENCES inventory (inventory_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_rental_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE rental(
+rental_id int(11) NOT NULL auto_increment,
+rental_date datetime NOT NULL ,
+inventory_id mediumint(8) unsigned NOT NULL ,
+customer_id smallint(5) unsigned NOT NULL ,
+return_date datetime,
+staff_id tinyint(3) unsigned NOT NULL ,
+last_update timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+PRIMARY KEY (rental_id),
+KEY idx_fk_customer_id (customer_id),
+KEY idx_fk_inventory_id (inventory_id),
+KEY idx_fk_staff_id (staff_id),
+UNIQUE KEY rental_date, customer_id, inventory_id,CONSTRAINT fk_rental_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+CONSTRAINT fk_rental_inventory FOREIGN KEY (inventory_id) REFERENCES inventory (inventory_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+CONSTRAINT fk_rental_staff FOREIGN KEY (staff_id) REFERENCES staff (staff_id) ON DELETE RESTRICT ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT COLLATE=utf8_general_ci;
 
 --
 -- Table structure for table `staff`

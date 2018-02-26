@@ -14,17 +14,25 @@ public class SchemaPrinter extends Printer {
     public String printElement(Node node) {
         Map<String, String> attrs = node.getAttrs();
         StringBuilder sb = new StringBuilder();
-
-        sb.append("CREATE SCHEMA ")
+        sb.append("DROP SCHEMA IF EXISTS ")
                 .append(attrs.get("SCHEMA_NAME"))
-                .append("\n")
+                .append(";")
+                .append(System.lineSeparator())
+                .append("CREATE SCHEMA ")
+                .append(attrs.get("SCHEMA_NAME"))
+                .append(";")
+                .append(System.lineSeparator())
                 .append("DEFAULT CHARACTER SET ")
                 .append(attrs.get("DEFAULT_CHARACTER_SET_NAME"))
-                .append("\n")
+                .append(";")
+                .append(System.lineSeparator())
                 .append("DEFAULT COLLATE ")
                 .append(attrs.get("DEFAULT_COLLATION_NAME"))
-                .append(';');
-
+                .append(";")
+                .append(System.lineSeparator())
+                .append("USE ")
+                .append(attrs.get("SCHEMA_NAME"))
+                .append(";");
         return sb.toString();
     }
 }
