@@ -32,7 +32,9 @@ public class JDBCTest {
 
         PrinterManager printerManager = new PrinterManager(type);
         Node tables = n.wideSearch(DBElement.TABLES);
-        System.out.println(printerManager.printDDL(tables.wideSearch("TABLE_NAME","film")));
+        Node views = n.wideSearch(DBElement.VIEWS);
+//        System.out.println(printerManager.printDDL(tables.wideSearch("TABLE_NAME","film")));
+        System.out.println(printerManager.printDDL(views.wideSearch("TABLE_NAME", "sales_by_film_category")));
 
         XMLStrategyImpl strategy = new XMLStrategyImpl();
         strategy.serialize(n,"tmp.xml");

@@ -438,31 +438,14 @@ ORDER BY total_sales DESC;
 
 CREATE DEFINER=CURRENT_USER SQL SECURITY INVOKER VIEW actor_info
 AS
-SELECT
-a.actor_id,
-a.first_name,
-a.last_name,
-GROUP_CONCAT(DISTINCT CONCAT(c.name, ': ',
-		(SELECT GROUP_CONCAT(f.title ORDER BY f.title SEPARATOR ', ')
-                    FROM sakila.film f
-                    INNER JOIN sakila.film_category fc
-                      ON f.film_id = fc.film_id
-                    INNER JOIN sakila.film_actor fa
-                      ON f.film_id = fa.film_id
-                    WHERE fc.category_id = c.category_id
-                    AND fa.actor_id = a.actor_id
-                 )
-             )
-             ORDER BY c.name SEPARATOR '; ')
-AS film_info
-FROM sakila.actor a
-LEFT JOIN sakila.film_actor fa
-  ON a.actor_id = fa.actor_id
-LEFT JOIN sakila.film_category fc
-  ON fa.film_id = fc.film_id
-LEFT JOIN sakila.category c
-  ON fc.category_id = c.category_id
-GROUP BY a.actor_id, a.first_name, a.last_name;
+select `a`.`actor_id` AS `actor_id`,`a`.`first_name` AS `first_name`,`a`.`last_name`
+ AS `last_name`,group_concat(distinct concat(`c`.`name`,': ',(select group_concat(`f`.`title` order by `f`.`title` ASC s
+ eparator ', ') from ((`sakila`.`film` `f` join `sakila`.`film_category` `fc` on((`f`.`film_id` = `fc`.`film_id`))) join `sak
+ ila`.`film_actor` `fa` on((`f`.`film_id` = `fa`.`film_id`))) where ((`fc`.`category_id` = `c`.`category_id`) and (`fa`.`acto
+ r_id` = `a`.`actor_id`)))) order by `c`.`name` ASC separator '; ') AS `film_info` from (((`sakila`.`actor` `a` left join `sa
+ kila`.`film_actor` `fa` on((`a`.`actor_id` = `fa`.`actor_id`))) left join `sakila`.`film_category` `fc` on((`fa`.`film_id` = `
+ fc`.`film_id`))) left join `sakila`.`category` `c` on((`fc`.`category_id` = `c`.`category_id`))) group by `a`.`actor_id`,`a`.`first_name`,`a`.`last_name`;
+
 
 --
 -- Procedure structure for procedure `rewards_report`
