@@ -5,10 +5,13 @@
     <groupId>com.dbbest.kirilenko</groupId>
     <artifactId>firstTask</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
+    <packaging>pom</packaging>
     <name>firstTask</name>
-    <url>http://maven.apache.org</url>
+
+    <modules>
+        <module>core</module>
+        <module>console</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
