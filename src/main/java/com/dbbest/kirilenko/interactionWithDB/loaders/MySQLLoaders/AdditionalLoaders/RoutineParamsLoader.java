@@ -12,7 +12,7 @@ public class RoutineParamsLoader extends AdditionalLoader {
 
 
     private static final String LOAD_ELEMENT_QUERY =
-            "select * from INFORMATION_SCHEMA.PARAMETERS where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ?";
+            "select * from INFORMATION_SCHEMA.PARAMETERS where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? order by ORDINAL_POSITION";
 
     private static final String ROUTINE_SCHEMA = "ROUTINE_SCHEMA";
 
