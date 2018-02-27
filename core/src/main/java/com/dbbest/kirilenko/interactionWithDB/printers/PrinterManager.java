@@ -19,6 +19,4 @@ public class PrinterManager {
         Printer printer = printers.get(nodeName);
         return printer.printElement(node);
     }
-
-
 }

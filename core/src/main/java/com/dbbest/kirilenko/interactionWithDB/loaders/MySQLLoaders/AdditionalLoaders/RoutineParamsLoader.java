@@ -10,9 +10,9 @@ public class RoutineParamsLoader extends AdditionalLoader {
 
 //    private static final String SQL_QUERY = "select * from INFORMATION_SCHEMA.PARAMETERS where SPECIFIC_SCHEMA = ? order by ROUTINE_TYPE,SPECIFIC_NAME,ORDINAL_POSITION";
 
-
     private static final String LOAD_ELEMENT_QUERY =
-            "select * from INFORMATION_SCHEMA.PARAMETERS where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? order by ORDINAL_POSITION";
+            "select * from INFORMATION_SCHEMA.PARAMETERS " +
+                    "where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? order by ORDINAL_POSITION";
 
     private static final String ROUTINE_SCHEMA = "ROUTINE_SCHEMA";
 

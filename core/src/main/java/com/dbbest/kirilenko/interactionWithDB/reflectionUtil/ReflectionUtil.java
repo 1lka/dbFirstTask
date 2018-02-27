@@ -17,7 +17,7 @@ public class ReflectionUtil {
     public static <T> Map<String, T> obtain(DBType type, Class<T> clazz) {
         ArrayList<Class> classes = null;
         try {
-            classes = findClasses();
+            classes = findClassesInDirectory();
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException("can't load classes");
         }
@@ -81,7 +81,7 @@ public class ReflectionUtil {
         throw new RuntimeException("Class " + clazz + " must be Loader or Printer");
     }
 
-    private static ArrayList<Class> findClasses() throws ClassNotFoundException, IOException {
+    private static ArrayList<Class> findClassesInDirectory() throws ClassNotFoundException, IOException {
         String pack = ReflectionUtil.class.getPackage().getName();
         String[] directories = pack.split("\\.");
         String path = directories[0];
@@ -96,20 +96,12 @@ public class ReflectionUtil {
 
         ArrayList<Class> classes = new ArrayList<>();
         for (File directory : dirs) {
-            classes.addAll(findClasses(directory, path));
+            classes.addAll(findClassesInDirectory(directory, path));
         }
         return classes;
     }
 
-    /**
-     * Recursive method used to find all classes in a given directory and subdirs.
-     *
-     * @param directory   The base directory
-     * @param packageName The package name for classes found inside the base directory
-     * @return The classes
-     * @throws ClassNotFoundException
-     */
-    private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
+    private static List<Class> findClassesInDirectory(File directory, String packageName) throws ClassNotFoundException {
         List<Class> classes = new ArrayList<>();
         if (!directory.exists()) {
             return classes;
@@ -119,7 +111,7 @@ public class ReflectionUtil {
         for (File file : files) {
             if (file.isDirectory()) {
                 assert !file.getName().contains(".");
-                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+                classes.addAll(findClassesInDirectory(file, packageName + "." + file.getName()));
             } else if (file.getName().endsWith(".class")) {
                 classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
             }

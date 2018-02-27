@@ -1,11 +1,13 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
+import com.dbbest.kirilenko.Tree.ChildrenList;
 import com.dbbest.kirilenko.Tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Map;
 
 @Load(element = DBElement.SCHEMA)
@@ -28,34 +30,36 @@ public class SchemaLoader extends Loader {
             Node schemaNode = new Node(DBElement.SCHEMA);
             Map<String, String> attrs = fillAttributes(resultSet);
             schemaNode.setAttrs(attrs);
-            loadChildren(schemaNode, schema);
+            schemaNode.setChildren(loadChildren(schema));
             return schemaNode;
         } else {
             throw new RuntimeException("no such schema");
         }
     }
 
-    private void loadChildren(Node schemaNode, String schema) throws SQLException {
+    private List<Node> loadChildren(String schema) throws SQLException {
+        List<Node> children = new ChildrenList<>();
+
         Loader tableLoader = new TableLoader(getConnection());
         Node tables = tableLoader.lazyLoad(schema);
-        schemaNode.addChild(tables);
+        children.add(tables);
 
         Loader viewLoader = new ViewLoader(getConnection());
         Node views = viewLoader.lazyLoad(schema);
-        schemaNode.addChild(views);
+        children.add(views);
 
         Loader procedureLoader = new ProcedureLoader(getConnection());
         Node procedures = procedureLoader.lazyLoad(schema);
-        schemaNode.addChild(procedures);
+        children.add(procedures);
 
         Loader functionLoader = new FunctionLoader(getConnection());
         Node functions = functionLoader.lazyLoad(schema);
-        schemaNode.addChild(functions);
+        children.add(functions);
+
+        return children;
     }
 
     @Override
     public void loadElement(Node node) {
     }
-
-
 }

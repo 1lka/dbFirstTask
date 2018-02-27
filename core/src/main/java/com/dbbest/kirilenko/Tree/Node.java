@@ -111,7 +111,7 @@ public class Node {
      * @param children list of new children
      */
     public void setChildren(List<Node> children) {
-        this.children = children;
+        addChildren(children);
     }
 
     /**

@@ -15,8 +15,6 @@ public class ProcedureLoader extends Loader {
     private static final String SQL_QUERY =
             "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'PROCEDURE' order by SPECIFIC_NAME";
 
-    private static final String ROUTINE_TYPE = "ROUTINE_TYPE";
-
     public ProcedureLoader() {
     }
 

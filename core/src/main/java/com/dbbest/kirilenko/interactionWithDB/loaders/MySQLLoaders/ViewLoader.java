@@ -37,7 +37,6 @@ public class ViewLoader extends Loader{
 
     @Override
     public void loadElement(Node node) {
-
     }
 
 }

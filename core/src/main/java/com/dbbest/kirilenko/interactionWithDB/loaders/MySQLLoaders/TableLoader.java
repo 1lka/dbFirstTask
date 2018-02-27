@@ -54,5 +54,4 @@ public class TableLoader extends Loader {
         loader = new TableTriggerLoader(getConnection());
         loader.loadDetails(node);
     }
-
 }

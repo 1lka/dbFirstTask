@@ -13,7 +13,7 @@ import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 
 import java.util.List;
 
-public class JDBCTest {
+public class TestDB {
 
     public static void main(String[] args) throws SerializationException {
 
@@ -24,30 +24,24 @@ public class JDBCTest {
         String schema = "sakila";
 
         LoaderManager manager = new LoaderManager(type, url, login, pass);
-        Node n = manager.lazyDBLoad(schema);
-        List<Node> list = n.getChildren();
-        for (Node node : list) {
-            fill(node, manager);
+        Node root = manager.lazyDBLoad(schema);
+        for (Node child : root.getChildren()) {
+            for (Node node : child.getChildren()) {
+                manager.loadElement(node);
+            }
         }
 
         PrinterManager printerManager = new PrinterManager(type);
-        Node tables = n.wideSearch(DBElement.TABLES);
-        Node views = n.wideSearch(DBElement.VIEWS);
-        Node procedures = n.wideSearch(DBElement.PROCEDURES);
-//        System.out.println(printerManager.printDDL(tables.wideSearch("TABLE_NAME","film")));
-        System.out.println(printerManager.printDDL(procedures.wideSearch("ROUTINE_NAME", "rewards_report")));
-//        System.out.println(printerManager.printDDL(procedures.wideSearch("ROUTINE_NAME", "inventory_held_by_customer")));
-//        System.out.println(printerManager.printDDL(procedures.wideSearch("ROUTINE_NAME", "inventory_in_stock")));
+        Node tables = root.wideSearch(DBElement.TABLES);
+        for (Node table : tables.getChildren()) {
+            System.out.println(printerManager.printDDL(table));
+        }
+
+
 
 //        XMLStrategyImpl strategy = new XMLStrategyImpl();
-//        strategy.serialize(n,"tmp.xml");
-
-
+//        strategy.serialize(root, "tmp.xml");
     }
 
-    private static void fill(Node n, LoaderManager m) {
-        for (Node node : n.getChildren()) {
-            m.loadElement(node);
-        }
-    }
+
 }

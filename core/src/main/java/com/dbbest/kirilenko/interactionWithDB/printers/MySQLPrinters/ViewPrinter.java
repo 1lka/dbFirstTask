@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters;
 
 import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.Constants;
 import com.dbbest.kirilenko.interactionWithDB.DBElement;
 import com.dbbest.kirilenko.interactionWithDB.printers.Print;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
@@ -13,16 +14,18 @@ public class ViewPrinter extends Printer {
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
         Map<String, String> attrs = node.getAttrs();
+
         sb.append("CREATE ");
-        if ("INVOKER".equals(attrs.get("SECURITY_TYPE"))) {
+        if ("INVOKER".equals(attrs.get(Constants.SECURITY_TYPE))) {
             sb.append("DEFINER=CURRENT_USER SQL SECURITY INVOKER ");
         }
+
         sb.append("VIEW ")
-                .append(attrs.get("TABLE_NAME"))
+                .append(attrs.get(Constants.TABLE_NAME))
                 .append(System.lineSeparator())
                 .append("AS")
                 .append(System.lineSeparator())
-                .append(attrs.get("VIEW_DEFINITION"))
+                .append(attrs.get(Constants.VIEW_DEFINITION))
                 .append(";");
 
         return sb.toString();
