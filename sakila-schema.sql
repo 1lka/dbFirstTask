@@ -453,11 +453,8 @@ select `a`.`actor_id` AS `actor_id`,`a`.`first_name` AS `first_name`,`a`.`last_n
 
 DELIMITER //
 
-CREATE PROCEDURE rewards_report (
-    IN min_monthly_purchases TINYINT UNSIGNED
-    , IN min_dollar_amount_purchased DECIMAL(10,2) UNSIGNED
-    , OUT count_rewardees INT
-)
+CREATE PROCEDURE rewards_report (IN min_monthly_purchases TINYINT UNSIGNED,
+                    IN min_dollar_amount_purchased DECIMAL(10,2) UNSIGNED, OUT count_rewardees INT)
 LANGUAGE SQL
 NOT DETERMINISTIC
 READS SQL DATA

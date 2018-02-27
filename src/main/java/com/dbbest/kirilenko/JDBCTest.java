@@ -33,11 +33,11 @@ public class JDBCTest {
         PrinterManager printerManager = new PrinterManager(type);
         Node tables = n.wideSearch(DBElement.TABLES);
         Node views = n.wideSearch(DBElement.VIEWS);
-        Node functions = n.wideSearch(DBElement.FUNCTIONS);
+        Node procedures = n.wideSearch(DBElement.PROCEDURES);
 //        System.out.println(printerManager.printDDL(tables.wideSearch("TABLE_NAME","film")));
-        System.out.println(printerManager.printDDL(functions.wideSearch("ROUTINE_NAME", "get_customer_balance")));
-        System.out.println(printerManager.printDDL(functions.wideSearch("ROUTINE_NAME", "inventory_held_by_customer")));
-        System.out.println(printerManager.printDDL(functions.wideSearch("ROUTINE_NAME", "inventory_in_stock")));
+        System.out.println(printerManager.printDDL(procedures.wideSearch("ROUTINE_NAME", "rewards_report")));
+//        System.out.println(printerManager.printDDL(procedures.wideSearch("ROUTINE_NAME", "inventory_held_by_customer")));
+//        System.out.println(printerManager.printDDL(procedures.wideSearch("ROUTINE_NAME", "inventory_in_stock")));
 
 //        XMLStrategyImpl strategy = new XMLStrategyImpl();
 //        strategy.serialize(n,"tmp.xml");
