@@ -1,7 +1,6 @@
 package com.dbbest.kirilenko.serialization.strategy;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.exceptions.SerializationException;
+import com.dbbest.kirilenko.tree.Node;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -10,11 +9,8 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class XMLStrategyImplTest {
     private static XMLStrategyImpl strategy;

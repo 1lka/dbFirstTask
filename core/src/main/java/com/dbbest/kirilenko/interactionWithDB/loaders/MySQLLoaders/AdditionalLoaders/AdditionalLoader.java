@@ -1,7 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.tree.Node;
 
 import java.sql.*;
 import java.util.HashMap;

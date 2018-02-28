@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.printers;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.ReflectionUtil;
 
@@ -11,7 +11,7 @@ public class PrinterManager {
     private final Map<String, Printer> printers;
 
     public PrinterManager(DBType type) {
-        printers = ReflectionUtil.obtain(type, Printer.class);
+        printers = ReflectionUtil.obtain(type, NodePrinter.class);
     }
 
     public String printDDL(Node node) {

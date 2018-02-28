@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class RoutineParamsLoader extends AdditionalLoader {
 
     @Override
     public void loadDetails(Node node) throws SQLException {
-        Node parameters = new Node(DBElement.PARAMETERS);
+        Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
         node.addChild(parameters);
 
         String schemaName = node.getAttrs().get(ROUTINE_SCHEMA);
@@ -35,7 +35,7 @@ public class RoutineParamsLoader extends AdditionalLoader {
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, routineName);
 
         while (resultSet.next()) {
-            Node routine = new Node(DBElement.PARAMETER);
+            Node routine = new Node(MySQLConstants.DBEntity.PARAMETER);
             Map<String, String> attrs = fillAttributes(resultSet);
             routine.setAttrs(attrs);
             parameters.addChild(routine);

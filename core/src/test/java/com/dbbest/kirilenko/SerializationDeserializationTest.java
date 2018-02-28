@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 import org.junit.Assert;
 import org.junit.Ignore;

@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters.additionalPrinter;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.Constants;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 
 import java.util.List;
@@ -13,27 +13,27 @@ public class TriggerPrinter extends Printer {
         StringBuilder sb = new StringBuilder();
         List<Node> triggers = node.getChildren();
         if (triggers.size() > 0) {
-            sb.append(Constants.NEW_DELIMITER);
+            sb.append(MySQLConstants.Delimiters.NEW_DELIMITER);
             for (Node trigger : triggers) {
                 Map<String, String> attrs = trigger.getAttrs();
 
                 sb.append(System.lineSeparator())
                         .append("CREATE TRIGGER ")
-                        .append(attrs.get(Constants.TRIGGER_NAME))
+                        .append(attrs.get(MySQLConstants.AttributeName.TRIGGER_NAME))
                         .append(" ")
-                        .append(attrs.get(Constants.ACTION_TIMING))
+                        .append(attrs.get(MySQLConstants.AttributeName.ACTION_TIMING))
                         .append(" ")
-                        .append(attrs.get(Constants.EVENT_MANIPULATION))
+                        .append(attrs.get(MySQLConstants.AttributeName.EVENT_MANIPULATION))
                         .append(" ON ")
-                        .append(attrs.get(Constants.EVENT_OBJECT_TABLE))
+                        .append(attrs.get(MySQLConstants.AttributeName.EVENT_OBJECT_TABLE))
                         .append(" FOR EACH ")
-                        .append(attrs.get(Constants.ACTION_ORIENTATION))
+                        .append(attrs.get(MySQLConstants.AttributeName.ACTION_ORIENTATION))
                         .append(System.lineSeparator())
-                        .append(attrs.get(Constants.ACTION_STATEMENT))
-                        .append(Constants.DELIMITER)
+                        .append(attrs.get(MySQLConstants.AttributeName.ACTION_STATEMENT))
+                        .append(MySQLConstants.Delimiters.DELIMITER)
                         .append(System.lineSeparator());
             }
-            sb.append(Constants.OLD_DELIMITER);
+            sb.append(MySQLConstants.Delimiters.OLD_DELIMITER);
         }
         return sb.toString();
     }

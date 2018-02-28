@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters.additionalPrinter;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.Constants;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 
 import java.util.List;
@@ -17,8 +17,8 @@ public class PrimaryKeyPrinter extends Printer {
             sb.append("PRIMARY KEY (");
             for (Node pKey : pKeys) {
                 Map<String, String> attrs = pKey.getAttrs();
-                sb.append(attrs.get(Constants.COLUMN_NAME))
-                        .append(",");
+                sb.append(attrs.get(MySQLConstants.AttributeName.COLUMN_NAME))
+                        .append(MySQLConstants.Delimiters.COMA);
             }
             int last = sb.lastIndexOf(",");
             if (last < 0) {

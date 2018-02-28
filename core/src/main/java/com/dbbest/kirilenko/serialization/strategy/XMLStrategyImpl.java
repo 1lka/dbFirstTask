@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko.serialization.strategy;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
@@ -15,7 +15,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

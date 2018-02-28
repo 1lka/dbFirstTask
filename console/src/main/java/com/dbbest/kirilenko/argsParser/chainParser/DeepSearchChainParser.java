@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko.argsParser.chainParser;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.argsParser.ArgsParserManager;
 import com.dbbest.kirilenko.argsParser.exceptions.ArgsInputException;
 import org.apache.commons.cli.CommandLine;

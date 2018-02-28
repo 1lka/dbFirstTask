@@ -1,49 +1,48 @@
 package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.Constants;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
-import com.dbbest.kirilenko.interactionWithDB.printers.Print;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
+import com.dbbest.kirilenko.interactionWithDB.printers.NodePrinter;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 
 import java.util.List;
 import java.util.Map;
 
-@Print(element = DBElement.FUNCTION)
+@NodePrinter(element = MySQLConstants.DBEntity.FUNCTION)
 public class FunctionPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
         Map<String, String> attrs = node.getAttrs();
-        Node paramsNode = node.wideSearch(DBElement.PARAMETERS);
+        Node paramsNode = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
         List<Node> params = paramsNode.getChildren();
 
-        sb.append(Constants.NEW_DELIMITER)
+        sb.append(MySQLConstants.Delimiters.NEW_DELIMITER)
                 .append(System.lineSeparator())
                 .append("CREATE FUNCTION ")
-                .append(attrs.get(Constants.ROUTINE_NAME))
+                .append(attrs.get(MySQLConstants.AttributeName.ROUTINE_NAME))
                 .append("(");
         for (int i = 1; i < params.size(); i++) {
-            sb.append(params.get(i).getAttrs().get(Constants.PARAMETER_NAME))
+            sb.append(params.get(i).getAttrs().get(MySQLConstants.AttributeName.PARAMETER_NAME))
                     .append(" ")
-                    .append(params.get(i).getAttrs().get(Constants.DTD_IDENTIFIER));
+                    .append(params.get(i).getAttrs().get(MySQLConstants.AttributeName.DTD_IDENTIFIER));
             if (!(i + 1 == params.size())) {
-                sb.append(" ,");
+                sb.append(MySQLConstants.Delimiters.COMA);
             }
         }
         sb.append(") RETURNS ")
-                .append(params.get(0).getAttrs().get(Constants.DTD_IDENTIFIER))
+                .append(params.get(0).getAttrs().get(MySQLConstants.AttributeName.DTD_IDENTIFIER))
                 .append(System.lineSeparator());
-        if ("YES".equals(attrs.get(Constants.IS_DETERMINISTIC))) {
+        if ("YES".equals(attrs.get(MySQLConstants.AttributeName.IS_DETERMINISTIC))) {
             sb.append("DETERMINISTIC")
                     .append(System.lineSeparator());
         }
-        sb.append(attrs.get(Constants.SQL_DATA_ACCESS))
+        sb.append(attrs.get(MySQLConstants.AttributeName.SQL_DATA_ACCESS))
                 .append(System.lineSeparator())
-                .append(attrs.get(Constants.ROUTINE_DEFINITION))
-                .append(Constants.DELIMITER)
+                .append(attrs.get(MySQLConstants.AttributeName.ROUTINE_DEFINITION))
+                .append(MySQLConstants.Delimiters.DELIMITER)
                 .append(System.lineSeparator())
-                .append(Constants.OLD_DELIMITER);
+                .append(MySQLConstants.Delimiters.OLD_DELIMITER);
         return sb.toString();
     }
 }

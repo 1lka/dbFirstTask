@@ -1,8 +1,8 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
-import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
+import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.*;
 
@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@Load(element = DBElement.TABLE)
+@EntityLoader(element = MySQLConstants.DBEntity.TABLE)
 public class TableLoader extends Loader {
 
     private static final String SQL_QUERY =
@@ -26,11 +26,11 @@ public class TableLoader extends Loader {
 
     @Override
     public Node lazyLoad(String schema) throws SQLException {
-        Node tables = new Node(DBElement.TABLES);
+        Node tables = new Node(MySQLConstants.NodeNames.TABLES);
 
         ResultSet resultSet = executeQuery(SQL_QUERY, schema);
         while (resultSet.next()) {
-            Node table = new Node(DBElement.TABLE);
+            Node table = new Node(MySQLConstants.DBEntity.TABLE);
             table.setAttrs(fillAttributes(resultSet));
             tables.addChild(table);
         }

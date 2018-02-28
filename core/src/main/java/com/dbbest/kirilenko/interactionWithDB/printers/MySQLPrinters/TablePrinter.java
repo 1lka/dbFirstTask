@@ -1,15 +1,14 @@
 package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.Constants;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters.additionalPrinter.*;
-import com.dbbest.kirilenko.interactionWithDB.printers.Print;
+import com.dbbest.kirilenko.interactionWithDB.printers.NodePrinter;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 
 import java.util.Map;
 
-@Print(element = DBElement.TABLE)
+@NodePrinter(element = MySQLConstants.DBEntity.TABLE)
 public class TablePrinter extends Printer {
 
     @Override
@@ -23,14 +22,14 @@ public class TablePrinter extends Printer {
         Printer fKeyPrinter = new ForeignKeyPrinter();
         Printer triggerPrinter = new TriggerPrinter();
 
-        String columns = columnsPrinter.printElement(node.wideSearch(DBElement.COLUMNS));
-        String pKeys = pKeyPrinter.printElement(node.wideSearch(DBElement.PRIMARY_KEYS));
-        String indexes = indexPrinter.printElement(node.wideSearch(DBElement.INDEXES));
-        String fKeys = fKeyPrinter.printElement(node.wideSearch(DBElement.FOREIGN_KEYS));
-        String triggers = triggerPrinter.printElement(node.wideSearch(DBElement.TRIGGERS));
+        String columns = columnsPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.COLUMNS));
+        String pKeys = pKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.PRIMARY_KEYS));
+        String indexes = indexPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.INDEXES));
+        String fKeys = fKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.FOREIGN_KEYS));
+        String triggers = triggerPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.TRIGGERS));
 
         sb.append("CREATE TABLE ")
-                .append(attrs.get(Constants.TABLE_NAME))
+                .append(attrs.get(MySQLConstants.AttributeName.TABLE_NAME))
                 .append("(")
                 .append(System.lineSeparator())
                 .append(columns)
@@ -46,10 +45,10 @@ public class TablePrinter extends Printer {
 
         sb.append(System.lineSeparator())
                 .append(")ENGINE=")
-                .append(attrs.get(Constants.ENGINE))
+                .append(attrs.get(MySQLConstants.AttributeName.ENGINE))
                 .append(" DEFAULT COLLATE=")
-                .append(attrs.get(Constants.TABLE_COLLATION))
-                .append(";")
+                .append(attrs.get(MySQLConstants.AttributeName.TABLE_COLLATION))
+                .append(MySQLConstants.Delimiters.SEMICOLON)
                 .append(System.lineSeparator())
                 .append(triggers);
 

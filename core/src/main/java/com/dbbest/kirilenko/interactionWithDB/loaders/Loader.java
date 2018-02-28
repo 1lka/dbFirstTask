@@ -1,13 +1,12 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 
 import java.sql.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public abstract class Loader {
+public abstract class Loader{
 
     private Connection connection;
 

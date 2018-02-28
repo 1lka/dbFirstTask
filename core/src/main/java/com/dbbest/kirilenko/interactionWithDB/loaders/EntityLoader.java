@@ -1,9 +1,9 @@
-package com.dbbest.kirilenko.interactionWithDB.printers;
+package com.dbbest.kirilenko.interactionWithDB.loaders;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Print {
+public @interface EntityLoader {
     String element();
 }

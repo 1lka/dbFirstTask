@@ -1,8 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
-import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.AdditionalLoader;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class TableIndexLoader extends AdditionalLoader {
 
     @Override
     public void loadDetails(Node node) throws SQLException {
-        Node indexes = new Node(DBElement.INDEXES);
+        Node indexes = new Node(MySQLConstants.NodeNames.INDEXES);
         node.addChild(indexes);
 
         String schemaName = node.getAttrs().get(TABLE_SCHEMA);
@@ -31,7 +30,7 @@ public class TableIndexLoader extends AdditionalLoader {
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         while (resultSet.next()) {
-            Node index = new Node(DBElement.INDEX);
+            Node index = new Node(MySQLConstants.DBEntity.INDEX);
             Map<String, String> attrs = fillAttributes(resultSet);
             index.setAttrs(attrs);
             indexes.addChild(index);

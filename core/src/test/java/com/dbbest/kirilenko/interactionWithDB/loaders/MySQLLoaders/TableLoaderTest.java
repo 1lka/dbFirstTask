@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.MySQLConnect;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;

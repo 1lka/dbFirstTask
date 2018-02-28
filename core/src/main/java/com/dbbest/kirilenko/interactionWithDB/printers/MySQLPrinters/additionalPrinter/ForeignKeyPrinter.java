@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters.additionalPrinter;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.Constants;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 
 import java.util.List;
@@ -17,20 +17,20 @@ public class ForeignKeyPrinter extends Printer {
         for (Node fKey : fKeys) {
             Map<String, String> attrs = fKey.getAttrs();
             sb.append("CONSTRAINT ")
-                    .append(attrs.get(Constants.CONSTRAINT_NAME))
+                    .append(attrs.get(MySQLConstants.AttributeName.CONSTRAINT_NAME))
                     .append(" ")
                     .append("FOREIGN KEY")
                     .append(" (")
-                    .append(attrs.get(Constants.COLUMN_NAME))
+                    .append(attrs.get(MySQLConstants.AttributeName.COLUMN_NAME))
                     .append(") REFERENCES ")
-                    .append(attrs.get(Constants.REFERENCED_TABLE_NAME))
+                    .append(attrs.get(MySQLConstants.AttributeName.REFERENCED_TABLE_NAME))
                     .append(" (")
-                    .append(attrs.get(Constants.REFERENCED_COLUMN_NAME))
+                    .append(attrs.get(MySQLConstants.AttributeName.REFERENCED_COLUMN_NAME))
                     .append(") ON DELETE ")
-                    .append(attrs.get(Constants.DELETE_RULE))
+                    .append(attrs.get(MySQLConstants.AttributeName.DELETE_RULE))
                     .append(" ON UPDATE ")
-                    .append(attrs.get(Constants.UPDATE_RULE))
-                    .append(",")
+                    .append(attrs.get(MySQLConstants.AttributeName.UPDATE_RULE))
+                    .append(MySQLConstants.Delimiters.COMA)
                     .append(System.lineSeparator());
         }
         return sb.toString();

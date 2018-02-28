@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko.serialization;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;

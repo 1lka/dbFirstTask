@@ -1,17 +1,11 @@
 package com.dbbest.kirilenko;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.exceptions.SerializationException;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
-import com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters.SchemaPrinter;
-import com.dbbest.kirilenko.interactionWithDB.printers.Print;
-import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
-import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
-
-import java.util.List;
 
 public class TestDB {
 
@@ -32,7 +26,7 @@ public class TestDB {
         }
 
         PrinterManager printerManager = new PrinterManager(type);
-        Node tables = root.wideSearch(DBElement.TABLES);
+        Node tables = root.wideSearch(MySQLConstants.NodeNames.TABLES);
         for (Node table : tables.getChildren()) {
             System.out.println(printerManager.printDDL(table));
         }

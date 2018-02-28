@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class TableColumnLoader extends AdditionalLoader {
 
     @Override
     public void loadDetails(Node node) throws SQLException {
-        Node columns = new Node(DBElement.COLUMNS);
+        Node columns = new Node(MySQLConstants.NodeNames.COLUMNS);
         node.addChild(columns);
 
         String schemaName = node.getAttrs().get(TABLE_SCHEMA);
@@ -33,7 +33,7 @@ public class TableColumnLoader extends AdditionalLoader {
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         while (resultSet.next()) {
-            Node column = new Node(DBElement.COLUMN);
+            Node column = new Node(MySQLConstants.DBEntity.COLUMN);
             Map<String, String> attrs = fillAttributes(resultSet);
             column.setAttrs(attrs);
             columns.addChild(column);

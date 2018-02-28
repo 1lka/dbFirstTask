@@ -1,15 +1,15 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
-import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
+import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.AdditionalLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.RoutineParamsLoader;
 
 import java.sql.*;
 
-@Load(element = DBElement.PROCEDURE)
+@EntityLoader(element = MySQLConstants.DBEntity.PROCEDURE)
 public class ProcedureLoader extends Loader {
 
     private static final String SQL_QUERY =
@@ -25,11 +25,11 @@ public class ProcedureLoader extends Loader {
 
     @Override
     public Node lazyLoad(String schema) throws SQLException {
-        Node procedures = new Node(DBElement.PROCEDURES);
+        Node procedures = new Node(MySQLConstants.NodeNames.PROCEDURES);
 
         ResultSet resultSet = executeQuery(SQL_QUERY, schema);
         while (resultSet.next()) {
-            Node procedure = new Node(DBElement.PROCEDURE);
+            Node procedure = new Node(MySQLConstants.DBEntity.PROCEDURE);
             procedure.setAttrs(fillAttributes(resultSet));
             procedures.addChild(procedure);
         }

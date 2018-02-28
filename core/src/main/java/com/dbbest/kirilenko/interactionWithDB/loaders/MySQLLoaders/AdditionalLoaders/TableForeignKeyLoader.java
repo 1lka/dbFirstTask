@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class TableForeignKeyLoader extends AdditionalLoader {
 
     @Override
     public void loadDetails(Node node) throws SQLException {
-        Node fKeys = new Node(DBElement.FOREIGN_KEYS);
+        Node fKeys = new Node(MySQLConstants.NodeNames.FOREIGN_KEYS);
         node.addChild(fKeys);
 
         String schemaName = node.getAttrs().get(TABLE_SCHEMA);
@@ -34,7 +34,7 @@ public class TableForeignKeyLoader extends AdditionalLoader {
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         while (resultSet.next()) {
-            Node column = new Node(DBElement.FOREIGN_KEY);
+            Node column = new Node(MySQLConstants.DBEntity.FOREIGN_KEY);
             Map<String, String> attrs = fillAttributes(resultSet);
             column.setAttrs(attrs);
             fKeys.addChild(column);

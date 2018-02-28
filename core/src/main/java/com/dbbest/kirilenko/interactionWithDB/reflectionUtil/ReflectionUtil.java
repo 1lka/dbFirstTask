@@ -1,9 +1,9 @@
 package com.dbbest.kirilenko.interactionWithDB.reflectionUtil;
 
 import com.dbbest.kirilenko.interactionWithDB.DBType;
-import com.dbbest.kirilenko.interactionWithDB.loaders.Load;
+import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.interactionWithDB.printers.Print;
+import com.dbbest.kirilenko.interactionWithDB.printers.NodePrinter;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 
 import java.io.File;
@@ -14,7 +14,7 @@ import java.util.*;
 
 public class ReflectionUtil {
 
-    public static <T> Map<String, T> obtain(DBType type, Class<T> clazz) {
+    public static <T> Map<String, T> obtain(DBType type, Class clazz) {
         ArrayList<Class> classes = null;
         try {
             classes = findClassesInDirectory();
@@ -43,9 +43,10 @@ public class ReflectionUtil {
         throw new RuntimeException("Loaders or Printers are not found");
     }
 
-    private static <T> Map<String, T> fillThings(String path, ArrayList<Class> classes, Class<T> clazz)
+    private static <T> Map<String, T> fillThings(String path, ArrayList<Class> classes, Class clazz)
             throws IllegalAccessException, InstantiationException {
-        ArrayList<Class> packClasses = new ArrayList<>();
+
+        List<Class> packClasses = new ArrayList<>();
         for (Class c : classes) {
             String className = c.getName();
             if (className.startsWith(path)) {
@@ -54,31 +55,34 @@ public class ReflectionUtil {
         }
 
         Map<String, T> lp = new HashMap<>();
-        if (clazz == Loader.class) {
+
+
+        //todo избавиться от дублирования
+        if (clazz == EntityLoader.class) {
             for (Class c : packClasses) {
-                Annotation annotation = c.getAnnotation(Load.class);
+                Annotation annotation = c.getAnnotation(EntityLoader.class);
                 if (annotation != null) {
-                    Load load = (Load) annotation;
-                    String loaderName = load.element();
-                    Object loader = c.newInstance();
+                    EntityLoader entityLoader = (EntityLoader) annotation;
+                    String loaderName = entityLoader.element();
+                    Loader loader = (Loader) c.newInstance();
                     lp.put(loaderName, (T) loader);
                 }
             }
             return lp;
         }
-        if (clazz == Printer.class) {
+        if (clazz == NodePrinter.class) {
             for (Class c : packClasses) {
-                Annotation annotation = c.getAnnotation(Print.class);
+                Annotation annotation = c.getAnnotation(NodePrinter.class);
                 if (annotation != null) {
-                    Print print = (Print) annotation;
-                    String printerName = print.element();
+                    NodePrinter nodePrinter = (NodePrinter) annotation;
+                    String printerName = nodePrinter.element();
                     Printer printer = (Printer) c.newInstance();
                     lp.put(printerName, (T) printer);
                 }
             }
             return lp;
         }
-        throw new RuntimeException("Class " + clazz + " must be Loader or Printer");
+        throw new RuntimeException("Class " + clazz + " must be EntityLoader or NodePrinter class");
     }
 
     private static ArrayList<Class> findClassesInDirectory() throws ClassNotFoundException, IOException {

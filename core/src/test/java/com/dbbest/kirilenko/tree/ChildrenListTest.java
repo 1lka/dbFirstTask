@@ -1,4 +1,4 @@
-package com.dbbest.kirilenko.Tree;
+package com.dbbest.kirilenko.tree;
 
 import com.dbbest.kirilenko.exceptions.NodeException;
 import org.junit.BeforeClass;

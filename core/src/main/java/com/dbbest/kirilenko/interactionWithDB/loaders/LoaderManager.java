@@ -1,14 +1,13 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.exceptions.LoaderException;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.ReflectionUtil;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
@@ -24,7 +23,7 @@ public class LoaderManager {
     public LoaderManager(DBType type, String url, String login, String pass) {
         this.type = type;
         initConnection(url, login, pass);
-        loaders = ReflectionUtil.obtain(type, Loader.class);
+        loaders = ReflectionUtil.obtain(type, EntityLoader.class);
     }
 
     private void initConnection(String dbURL, String login, String pass) {
@@ -41,7 +40,7 @@ public class LoaderManager {
         String mainLoaderName;
         switch (type) {
             case MYSQL:
-                mainLoaderName = DBElement.SCHEMA;
+                mainLoaderName = MySQLConstants.DBEntity.SCHEMA;
                 break;
             default:
                 throw new LoaderException();

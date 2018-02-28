@@ -1,13 +1,11 @@
 package com.dbbest.kirilenko.serialization;
 
-import com.dbbest.kirilenko.Tree.Node;
+import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-
-import static org.junit.Assert.*;
 
 public class SerializationManagerTest {
 

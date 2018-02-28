@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders;
 
-import com.dbbest.kirilenko.Tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.DBElement;
+import com.dbbest.kirilenko.tree.Node;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import org.junit.BeforeClass;
@@ -29,7 +29,7 @@ public class LoaderPrinterManagerTest {
 
     @Test
     public void loadTables() {
-        Node tables = root.wideSearch(DBElement.TABLES);
+        Node tables = root.wideSearch(MySQLConstants.NodeNames.TABLES);
         for (Node table : tables.getChildren()) {
             loaderManager.loadElement(table);
             System.out.println(printerManager.printDDL(table));
@@ -38,7 +38,7 @@ public class LoaderPrinterManagerTest {
 
     @Test
     public void loadViews() {
-        Node wiews = root.wideSearch(DBElement.VIEWS);
+        Node wiews = root.wideSearch(MySQLConstants.NodeNames.VIEWS);
         for (Node view : wiews.getChildren()) {
             loaderManager.loadElement(view);
             System.out.println(printerManager.printDDL(view));
@@ -47,7 +47,7 @@ public class LoaderPrinterManagerTest {
 
     @Test
     public void loadProcedures() {
-        Node wiews = root.wideSearch(DBElement.PROCEDURES);
+        Node wiews = root.wideSearch(MySQLConstants.NodeNames.PROCEDURES);
         for (Node view : wiews.getChildren()) {
             loaderManager.loadElement(view);
             System.out.println(printerManager.printDDL(view));
@@ -57,7 +57,7 @@ public class LoaderPrinterManagerTest {
 
     @Test
     public void loadFunctions() {
-        Node wiews = root.wideSearch(DBElement.FUNCTIONS);
+        Node wiews = root.wideSearch(MySQLConstants.NodeNames.FUNCTIONS);
         for (Node view : wiews.getChildren()) {
             loaderManager.loadElement(view);
             System.out.println(printerManager.printDDL(view));
