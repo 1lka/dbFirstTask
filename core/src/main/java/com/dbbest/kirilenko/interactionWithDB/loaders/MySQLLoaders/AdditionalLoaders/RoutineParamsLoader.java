@@ -1,12 +1,13 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.Map;
 
-public class RoutineParamsLoader extends AdditionalLoader {
+public class RoutineParamsLoader extends Loader {
 
 //    private static final String SQL_QUERY = "select * from INFORMATION_SCHEMA.PARAMETERS where SPECIFIC_SCHEMA = ? order by ROUTINE_TYPE,SPECIFIC_NAME,ORDINAL_POSITION";
 
@@ -26,6 +27,20 @@ public class RoutineParamsLoader extends AdditionalLoader {
     }
 
     @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public Node loadElement(Node node) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public Node fullLoad(Node node) {
+        return null;
+    }
+
     public void loadDetails(Node node) throws SQLException {
         Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
         node.addChild(parameters);

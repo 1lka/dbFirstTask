@@ -60,7 +60,7 @@ public class ReflectionUtil {
         //todo избавиться от дублирования
         if (clazz == EntityLoader.class) {
             for (Class c : packClasses) {
-                Annotation annotation = c.getAnnotation(EntityLoader.class);
+                Annotation annotation = c.getAnnotation(clazz);
                 if (annotation != null) {
                     EntityLoader entityLoader = (EntityLoader) annotation;
                     String loaderName = entityLoader.element();
@@ -72,7 +72,7 @@ public class ReflectionUtil {
         }
         if (clazz == NodePrinter.class) {
             for (Class c : packClasses) {
-                Annotation annotation = c.getAnnotation(NodePrinter.class);
+                Annotation annotation = c.getAnnotation(clazz);
                 if (annotation != null) {
                     NodePrinter nodePrinter = (NodePrinter) annotation;
                     String printerName = nodePrinter.element();

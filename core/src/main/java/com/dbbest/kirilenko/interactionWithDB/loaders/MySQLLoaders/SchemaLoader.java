@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
+import com.dbbest.kirilenko.exceptions.LoaderException;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
@@ -24,42 +25,30 @@ public class SchemaLoader extends Loader {
     }
 
     @Override
-    public Node lazyLoad(String schema) throws SQLException {
-        ResultSet resultSet = executeQuery(SQL_QUERY, schema);
-        if (resultSet.next()) {
-            Node schemaNode = new Node(MySQLConstants.DBEntity.SCHEMA);
-            Map<String, String> attrs = fillAttributes(resultSet);
-            schemaNode.setAttrs(attrs);
-            schemaNode.setChildren(loadChildren(schema));
-            return schemaNode;
-        } else {
-            throw new RuntimeException("no such schema");
-        }
-    }
-
-    private List<Node> loadChildren(String schema) throws SQLException {
+    public Node lazyChildrenLoad(Node node) throws SQLException {
         List<Node> children = new ChildrenList<>();
-
         Loader tableLoader = new TableLoader(getConnection());
-        Node tables = tableLoader.lazyLoad(schema);
-        children.add(tables);
 
-        Loader viewLoader = new ViewLoader(getConnection());
-        Node views = viewLoader.lazyLoad(schema);
-        children.add(views);
-
-        Loader procedureLoader = new ProcedureLoader(getConnection());
-        Node procedures = procedureLoader.lazyLoad(schema);
-        children.add(procedures);
-
-        Loader functionLoader = new FunctionLoader(getConnection());
-        Node functions = functionLoader.lazyLoad(schema);
-        children.add(functions);
-
-        return children;
+        return null;
     }
 
     @Override
-    public void loadElement(Node node) {
+    public Node loadElement(Node node) throws SQLException {
+        String schema = node.getAttrs().get(MySQLConstants.AttributeName.SCHEMA_NAME);
+        ResultSet resultSet = executeQuery(SQL_QUERY, schema);
+        if (resultSet.next()) {
+            Map<String, String> attrs = fillAttributes(resultSet);
+            node.setAttrs(attrs);
+            return node;
+        } else {
+            throw new LoaderException("there is no such schema: " + schema);
+        }
+    }
+
+    @Override
+    public Node fullLoad(Node node) throws SQLException {
+        this.loadElement(node);
+
+        return null;
     }
 }

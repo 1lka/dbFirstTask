@@ -18,19 +18,6 @@ public class TestDB {
         String schema = "sakila";
 
         LoaderManager manager = new LoaderManager(type, url, login, pass);
-        Node root = manager.lazyDBLoad(schema);
-        for (Node child : root.getChildren()) {
-            for (Node node : child.getChildren()) {
-                manager.loadElement(node);
-            }
-        }
-
-        PrinterManager printerManager = new PrinterManager(type);
-        Node tables = root.wideSearch(MySQLConstants.NodeNames.TABLES);
-        for (Node table : tables.getChildren()) {
-            System.out.println(printerManager.printDDL(table));
-        }
-
 
 
 //        XMLStrategyImpl strategy = new XMLStrategyImpl();

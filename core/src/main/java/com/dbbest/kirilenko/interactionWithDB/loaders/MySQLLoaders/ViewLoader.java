@@ -21,20 +21,18 @@ public class ViewLoader extends Loader{
     }
 
     @Override
-    public Node lazyLoad(String schema) throws SQLException {
-        Node views = new Node(MySQLConstants.NodeNames.VIEWS);
-
-        ResultSet resultSet = executeQuery(SQL_QUERY, schema);
-        while (resultSet.next()) {
-            Node view = new Node(MySQLConstants.DBEntity.VIEW);
-            view.setAttrs(fillAttributes(resultSet));
-            views.addChild(view);
-        }
-        return views;
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        return null;
     }
 
     @Override
-    public void loadElement(Node node) {
+    public Node loadElement(Node node) {
+        return null;
+    }
+
+    @Override
+    public Node fullLoad(Node node) {
+        return null;
     }
 
 }

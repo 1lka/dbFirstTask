@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Loader{
+public abstract class Loader {
 
     private Connection connection;
 
@@ -25,9 +25,31 @@ public abstract class Loader{
         this.connection = connection;
     }
 
-    public abstract Node lazyLoad(String schema) throws SQLException;
+    /**
+     * Loads children for current node
+     *
+     * @param node for children loading
+     * @return node with children
+     * @throws SQLException
+     */
+    public abstract Node lazyChildrenLoad(Node node) throws SQLException;
 
-    public abstract void loadElement(Node node) throws SQLException;
+    /**
+     * Fully loads node (fill it's attributes)
+     *
+     * @param node
+     * @return
+     * @throws SQLException
+     */
+    public abstract Node loadElement(Node node) throws SQLException;
+
+    /**
+     * Loads attributes for node and loads it's children
+     *
+     * @param node
+     * @return
+     */
+    public abstract Node fullLoad(Node node) throws SQLException;
 
     protected Map<String, String> fillAttributes(ResultSet resultSet) throws SQLException {
         Map<String, String> attrs = new HashMap<>();
@@ -44,9 +66,11 @@ public abstract class Loader{
         return attrs;
     }
 
-    protected ResultSet executeQuery(String query, String param) throws SQLException {
+    protected ResultSet executeQuery(String query, String... params) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, param);
+        for (int i = 0; i < params.length; i++) {
+            statement.setString(i + 1, params[i]);
+        }
         return statement.executeQuery();
     }
 

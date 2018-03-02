@@ -25,33 +25,17 @@ public class TableLoader extends Loader {
     }
 
     @Override
-    public Node lazyLoad(String schema) throws SQLException {
-        Node tables = new Node(MySQLConstants.NodeNames.TABLES);
-
-        ResultSet resultSet = executeQuery(SQL_QUERY, schema);
-        while (resultSet.next()) {
-            Node table = new Node(MySQLConstants.DBEntity.TABLE);
-            table.setAttrs(fillAttributes(resultSet));
-            tables.addChild(table);
-        }
-        return tables;
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        return null;
     }
 
     @Override
-    public void loadElement(Node node) throws SQLException {
-        AdditionalLoader loader = new TableColumnLoader(getConnection());
-        loader.loadDetails(node);
+    public Node loadElement(Node node) throws SQLException {
+        return null;
+    }
 
-        loader = new TableIndexLoader(getConnection());
-        loader.loadDetails(node);
-
-        loader = new TableForeignKeyLoader(getConnection());
-        loader.loadDetails(node);
-
-        loader = new TablePrimaryKeyLoader(getConnection());
-        loader.loadDetails(node);
-
-        loader = new TableTriggerLoader(getConnection());
-        loader.loadDetails(node);
+    @Override
+    public Node fullLoad(Node node) {
+        return null;
     }
 }

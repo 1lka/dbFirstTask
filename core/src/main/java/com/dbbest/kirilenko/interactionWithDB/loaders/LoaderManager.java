@@ -36,31 +36,5 @@ public class LoaderManager {
         }
     }
 
-    public Node lazyDBLoad(String dataBase) {
-        String mainLoaderName;
-        switch (type) {
-            case MYSQL:
-                mainLoaderName = MySQLConstants.DBEntity.SCHEMA;
-                break;
-            default:
-                throw new LoaderException();
-        }
-        Loader loader = loaders.get(mainLoaderName);
-        try {
-            loader.setConnection(connection);
-            return loader.lazyLoad(dataBase);
-        } catch (SQLException e) {
-            throw new LoaderException("something went wrong", e);
-        }
-    }
 
-    public void loadElement(Node node) {
-        Loader loader = loaders.get(node.getName());
-        loader.setConnection(connection);
-        try {
-            loader.loadElement(node);
-        } catch (SQLException e) {
-            throw new RuntimeException("can't load element: " + node);
-        }
-    }
 }

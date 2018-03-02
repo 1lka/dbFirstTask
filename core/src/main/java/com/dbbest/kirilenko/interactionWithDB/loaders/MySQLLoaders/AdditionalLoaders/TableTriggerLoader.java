@@ -1,12 +1,13 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.Map;
 
-public class TableTriggerLoader extends AdditionalLoader {
+public class TableTriggerLoader extends Loader {
 
 //    private static final String SQL_QUERY =
 //            "select * from INFORMATION_SCHEMA.TRIGGERS where TRIGGER_SCHEMA = ?";
@@ -21,14 +22,28 @@ public class TableTriggerLoader extends AdditionalLoader {
         super(connection);
     }
 
+    @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        return null;
+    }
 
     @Override
+    public Node loadElement(Node node) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public Node fullLoad(Node node) {
+        return null;
+    }
+
+
     public void loadDetails(Node node) throws SQLException {
         Node triggers = new Node(MySQLConstants.NodeNames.TRIGGERS);
         node.addChild(triggers);
 
-        String schemaName = node.getAttrs().get(TABLE_SCHEMA);
-        String tableName = node.getAttrs().get(TABLE_NAME);
+        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
+        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         while (resultSet.next()) {

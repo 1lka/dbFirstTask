@@ -1,12 +1,16 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.Map;
 
-public class TableIndexLoader extends AdditionalLoader {
+import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.AttributeName.TABLE_NAME;
+import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.AttributeName.TABLE_SCHEMA;
+
+public class TableIndexLoader extends Loader {
 
     private static final String LOAD_ELEMENT_QUERY =
             "select TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, NON_UNIQUE, INDEX_SCHEMA, INDEX_NAME ,group_concat(COLUMN_NAME separator ', ') " +
@@ -21,6 +25,20 @@ public class TableIndexLoader extends AdditionalLoader {
     }
 
     @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public Node loadElement(Node node) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public Node fullLoad(Node node) {
+        return null;
+    }
+
     public void loadDetails(Node node) throws SQLException {
         Node indexes = new Node(MySQLConstants.NodeNames.INDEXES);
         node.addChild(indexes);

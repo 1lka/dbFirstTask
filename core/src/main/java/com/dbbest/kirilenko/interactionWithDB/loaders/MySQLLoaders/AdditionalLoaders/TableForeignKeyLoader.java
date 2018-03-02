@@ -1,12 +1,15 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
-import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.Node;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 
-public class TableForeignKeyLoader extends AdditionalLoader {
+public class TableForeignKeyLoader extends Loader {
 
     private static final String LOAD_ELEMENT_QUERY =
             "select A.CONSTRAINT_CATALOG, A.CONSTRAINT_SCHEMA, A.CONSTRAINT_NAME, A.UNIQUE_CONSTRAINT_CATALOG," +
@@ -25,12 +28,26 @@ public class TableForeignKeyLoader extends AdditionalLoader {
     }
 
     @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public Node loadElement(Node node) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public Node fullLoad(Node node) {
+        return null;
+    }
+
     public void loadDetails(Node node) throws SQLException {
         Node fKeys = new Node(MySQLConstants.NodeNames.FOREIGN_KEYS);
         node.addChild(fKeys);
 
-        String schemaName = node.getAttrs().get(TABLE_SCHEMA);
-        String tableName = node.getAttrs().get(TABLE_NAME);
+        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
+        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         while (resultSet.next()) {

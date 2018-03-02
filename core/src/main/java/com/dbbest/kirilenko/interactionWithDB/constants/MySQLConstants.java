@@ -32,6 +32,7 @@ public class MySQLConstants {
 
     public static class AttributeName{
         public final static String SCHEMA_NAME = "SCHEMA_NAME";
+        public final static String TABLE_SCHEMA = "TABLE_SCHEMA";
         public final static String DEFAULT_CHARACTER_SET_NAME = "DEFAULT_CHARACTER_SET_NAME";
         public final static String DEFAULT_COLLATION_NAME = "DEFAULT_COLLATION_NAME";
         public final static String TABLE_NAME = "TABLE_NAME";
