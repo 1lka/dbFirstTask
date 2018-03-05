@@ -9,44 +9,44 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
-public class SchemaLoaderTest {
+public class TableLoaderTest {
 
     private static Node root;
-    private static Loader schemaLoader;
+    private static Loader tableLoader;
 
     @BeforeClass
     public static void init() {
         Connection connection = Connection4Test.getConnection();
-        schemaLoader = new SchemaLoader(connection);
+        tableLoader = new TableLoader(connection);
     }
 
     @Before
     public void before() {
-        root = new Node(MySQLConstants.DBEntity.SCHEMA);
+        root = new Node(MySQLConstants.DBEntity.TABLE);
         String schemaName = "sakila";
+        String tableName = "actor";
         Map<String, String> attrs = new HashMap<>();
-        attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
+        attrs.put(MySQLConstants.AttributeName.TABLE_SCHEMA, schemaName);
+        attrs.put(MySQLConstants.AttributeName.TABLE_NAME, tableName);
         root.setAttrs(attrs);
     }
 
     @Test
-    public void lazyChildrenLoad() throws SQLException {
-        System.out.println(schemaLoader.lazyChildrenLoad(root));
+    public void lazyChildrenLoad() {
     }
 
     @Test
-    public void loadElement() throws SQLException {
-        System.out.println(schemaLoader.loadElement(root));
+    public void loadElement() {
     }
 
     @Test
-    public void fullLoad() throws SQLException {
-        System.out.println(schemaLoader.fullLoadElement(root));
+    public void fullLoadElement() {
+    }
+
+    @Test
+    public void loadCategory() {
     }
 }

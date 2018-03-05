@@ -5,6 +5,7 @@ import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Map;
 
 import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.AttributeName.TABLE_NAME;
@@ -35,7 +36,12 @@ public class TableIndexLoader extends Loader {
     }
 
     @Override
-    public Node fullLoad(Node node) {
+    public Node fullLoadElement(Node node) {
+        return null;
+    }
+
+    @Override
+    public List<Node> loadCategory(Node node) throws SQLException {
         return null;
     }
 

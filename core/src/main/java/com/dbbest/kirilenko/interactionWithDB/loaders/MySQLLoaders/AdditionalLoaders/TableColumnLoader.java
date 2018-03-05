@@ -7,6 +7,7 @@ import com.dbbest.kirilenko.tree.Node;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 public class TableColumnLoader extends Loader {
@@ -37,7 +38,12 @@ public class TableColumnLoader extends Loader {
     }
 
     @Override
-    public Node fullLoad(Node node) {
+    public Node fullLoadElement(Node node) {
+        return null;
+    }
+
+    @Override
+    public List<Node> loadCategory(Node node) throws SQLException {
         return null;
     }
 

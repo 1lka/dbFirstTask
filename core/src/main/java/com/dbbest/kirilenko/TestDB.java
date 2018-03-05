@@ -20,6 +20,7 @@ public class TestDB {
         LoaderManager manager = new LoaderManager(type, url, login, pass);
 
 
+
 //        XMLStrategyImpl strategy = new XMLStrategyImpl();
 //        strategy.serialize(root, "tmp.xml");
     }

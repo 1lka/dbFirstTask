@@ -4,6 +4,7 @@ import com.dbbest.kirilenko.tree.Node;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Loader {
@@ -49,7 +50,9 @@ public abstract class Loader {
      * @param node
      * @return
      */
-    public abstract Node fullLoad(Node node) throws SQLException;
+    public abstract Node fullLoadElement(Node node) throws SQLException;
+
+    public abstract List<Node> loadCategory(Node node) throws SQLException;
 
     protected Map<String, String> fillAttributes(ResultSet resultSet) throws SQLException {
         Map<String, String> attrs = new HashMap<>();
@@ -73,6 +76,4 @@ public abstract class Loader {
         }
         return statement.executeQuery();
     }
-
-
 }

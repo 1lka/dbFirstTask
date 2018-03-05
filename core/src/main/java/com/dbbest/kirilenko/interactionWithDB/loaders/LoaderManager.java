@@ -1,12 +1,11 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders;
 
-import com.dbbest.kirilenko.tree.Node;
-import com.dbbest.kirilenko.exceptions.LoaderException;
+import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
-import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
-import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.ReflectionUtil;
+import com.dbbest.kirilenko.tree.Node;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -32,7 +31,23 @@ public class LoaderManager {
             connect.initConnection(dbURL, login, pass);
             connection = connect.getConnection();
         } catch (SQLException e) {
-            throw new LoaderException("can't obtain connection to DB: " + dbURL, e);
+            throw new LoadingException("can't obtain connection to DB: " + dbURL, e);
+        }
+    }
+
+    /**
+     * fill attributes for given node
+     *
+     * @param node
+     * @return
+     */
+    public Node loadElement(Node node) {
+        String nodeName = node.getName();
+        try {
+            Loader loader = loaders.get(nodeName);
+            return loader.loadElement(node);
+        } catch (Exception e) {
+            throw new LoadingException("problems with loading " + nodeName + " node", e);
         }
     }
 

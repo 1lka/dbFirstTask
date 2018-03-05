@@ -5,6 +5,7 @@ import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Map;
 
 public class RoutineParamsLoader extends Loader {
@@ -37,7 +38,12 @@ public class RoutineParamsLoader extends Loader {
     }
 
     @Override
-    public Node fullLoad(Node node) {
+    public Node fullLoadElement(Node node) {
+        return null;
+    }
+
+    @Override
+    public List<Node> loadCategory(Node node) throws SQLException {
         return null;
     }
 

@@ -1,6 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
-import com.dbbest.kirilenko.exceptions.LoaderException;
+import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
@@ -26,10 +26,32 @@ public class SchemaLoader extends Loader {
 
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
-        List<Node> children = new ChildrenList<>();
         Loader tableLoader = new TableLoader(getConnection());
+        Loader viewLoader = new ViewLoader(getConnection());
+        Loader procedureLoader = new ProcedureLoader(getConnection());
+        Loader functionLoader = new FunctionLoader(getConnection());
 
-        return null;
+        List<Node> tablesList = tableLoader.loadCategory(node);
+        Node tables = new Node(MySQLConstants.NodeNames.TABLES);
+        tables.addChildren(tablesList);
+        node.addChild(tables);
+
+        List<Node> viewList = viewLoader.loadCategory(node);
+        Node views = new Node(MySQLConstants.NodeNames.VIEWS);
+        views.addChildren(viewList);
+        node.addChild(views);
+
+        List<Node> procedureList = procedureLoader.loadCategory(node);
+        Node procedures = new Node(MySQLConstants.NodeNames.PROCEDURES);
+        procedures.addChildren(procedureList);
+        node.addChild(procedures);
+
+        List<Node> funcList = functionLoader.loadCategory(node);
+        Node functions = new Node(MySQLConstants.NodeNames.FUNCTIONS);
+        functions.addChildren(funcList);
+        node.addChild(functions);
+
+        return node;
     }
 
     @Override
@@ -41,14 +63,28 @@ public class SchemaLoader extends Loader {
             node.setAttrs(attrs);
             return node;
         } else {
-            throw new LoaderException("there is no such schema: " + schema);
+            throw new LoadingException("there is no such schema: " + schema);
         }
     }
 
     @Override
-    public Node fullLoad(Node node) throws SQLException {
+    public Node fullLoadElement(Node node) throws SQLException {
         this.loadElement(node);
+        Loader tableLoader = new TableLoader(getConnection());
+        Loader viewLoader = new ViewLoader(getConnection());
+        Loader procedureLoader = new ProcedureLoader(getConnection());
+        Loader functionLoader = new FunctionLoader(getConnection());
 
+        tableLoader.fullLoadElement(node);
+        viewLoader.fullLoadElement(node);
+        procedureLoader.fullLoadElement(node);
+        functionLoader.fullLoadElement(node);
+
+        return node;
+    }
+
+    @Override
+    public List<Node> loadCategory(Node node) throws SQLException {
         return null;
     }
 }
