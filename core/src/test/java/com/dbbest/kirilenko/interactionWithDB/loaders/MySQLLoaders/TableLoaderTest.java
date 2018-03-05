@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,11 +40,34 @@ public class TableLoaderTest {
     }
 
     @Test
-    public void loadElement() {
+    public void loadElement() throws SQLException {
+        System.out.println(tableLoader.loadElement(root));
     }
 
     @Test
-    public void fullLoadElement() {
+    public void fullLoadElement() throws SQLException {
+        Node schema = new Node(MySQLConstants.DBEntity.SCHEMA);
+        String schemaName = "sakila";
+        Map<String, String> attrs = new HashMap<>();
+        attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
+        schema.setAttrs(attrs);
+
+        System.out.println(tableLoader.fullLoadElement(schema));
+    }
+
+    @Test
+    public void fullLoadElement2() throws SQLException {
+        Node schema = new Node(MySQLConstants.DBEntity.SCHEMA);
+        String schemaName = "sakila";
+        Map<String, String> attrs = new HashMap<>();
+        attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
+        schema.setAttrs(attrs);
+
+        Node tables = new Node(MySQLConstants.NodeNames.TABLES);
+        schema.addChild(tables);
+        tables.addChild(root);
+
+        System.out.println(tableLoader.fullLoadElement(schema));
     }
 
     @Test

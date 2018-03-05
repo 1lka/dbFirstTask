@@ -2,6 +2,7 @@ package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLo
 
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
 import java.sql.Connection;
@@ -43,23 +44,18 @@ public class TableColumnLoader extends Loader {
     }
 
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
-        return null;
-    }
-
-    public void loadDetails(Node node) throws SQLException {
-        Node columns = new Node(MySQLConstants.NodeNames.COLUMNS);
-        node.addChild(columns);
-
-        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
-        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+    public List<Node> loadCategory(Node table) throws SQLException {
+        String schemaName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
+        String tableName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
+        List<Node> columnList = new ChildrenList<>();
         while (resultSet.next()) {
             Node column = new Node(MySQLConstants.DBEntity.COLUMN);
             Map<String, String> attrs = fillAttributes(resultSet);
             column.setAttrs(attrs);
-            columns.addChild(column);
+            columnList.add(column);
         }
+        return columnList;
     }
 }
