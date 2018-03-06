@@ -9,22 +9,28 @@ import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 
 public class ReflectionUtil {
 
-    public static <T> Map<String, T> obtain(DBType type, Class clazz) {
-        ArrayList<Class> classes = null;
-        try {
-            classes = findClassesInDirectory();
-        } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException("can't load classes");
-        }
-        String packInfo = "package-info";
+    private static ArrayList<Class> classes;
 
+    private final static String PACKAGE_INFO = "package-info";
+
+    static {
+        try {
+            classes = findAllClasses();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException("problems with class loading");
+        }
+    }
+
+    public static Map obtain(DBType type, Class clazz) {
         for (Class c : classes) {
-            if (packInfo.equals(c.getSimpleName())) {
+            if (PACKAGE_INFO.equals(c.getSimpleName())) {
                 Annotation ann = c.getAnnotation(PackageAnnotation.class);
                 if (ann != null) {
                     PackageAnnotation annotation = (PackageAnnotation) ann;
@@ -32,8 +38,8 @@ public class ReflectionUtil {
                         int lastPoint = c.getName().lastIndexOf(".");
                         String path = c.getName().substring(0, lastPoint);
                         try {
-                            return fillThings(path, classes, clazz);
-                        } catch (IllegalAccessException | InstantiationException e) {
+                            return fillMap(path, clazz);
+                        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
                             throw new RuntimeException("can't load classes");
                         }
                     }
@@ -43,8 +49,8 @@ public class ReflectionUtil {
         throw new RuntimeException("Loaders or Printers are not found");
     }
 
-    private static <T> Map<String, T> fillThings(String path, ArrayList<Class> classes, Class clazz)
-            throws IllegalAccessException, InstantiationException {
+    private static Map fillMap(String path, Class clazz)
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
 
         List<Class> packClasses = new ArrayList<>();
         for (Class c : classes) {
@@ -53,39 +59,22 @@ public class ReflectionUtil {
                 packClasses.add(c);
             }
         }
+        Map map = new HashMap();
 
-        Map<String, T> lp = new HashMap<>();
-
-
-        //todo избавиться от дублирования
-        if (clazz == EntityLoader.class) {
-            for (Class c : packClasses) {
-                Annotation annotation = c.getAnnotation(clazz);
-                if (annotation != null) {
-                    EntityLoader entityLoader = (EntityLoader) annotation;
-                    String loaderName = entityLoader.element();
-                    Loader loader = (Loader) c.newInstance();
-                    lp.put(loaderName, (T) loader);
-                }
+        for (Class c : packClasses) {
+            Annotation a = c.getAnnotation(clazz);
+            if (a != null) {
+                Class<?> type = a.annotationType();
+                Method m = type.getMethod("element");
+                String key = (String) m.invoke(a);
+                Object value = c.newInstance();
+                map.put(key, value);
             }
-            return lp;
         }
-        if (clazz == NodePrinter.class) {
-            for (Class c : packClasses) {
-                Annotation annotation = c.getAnnotation(clazz);
-                if (annotation != null) {
-                    NodePrinter nodePrinter = (NodePrinter) annotation;
-                    String printerName = nodePrinter.element();
-                    Printer printer = (Printer) c.newInstance();
-                    lp.put(printerName, (T) printer);
-                }
-            }
-            return lp;
-        }
-        throw new RuntimeException("Class " + clazz + " must be EntityLoader or NodePrinter class");
+        return map;
     }
 
-    private static ArrayList<Class> findClassesInDirectory() throws ClassNotFoundException, IOException {
+    private static ArrayList<Class> findAllClasses() throws ClassNotFoundException, IOException {
         String pack = ReflectionUtil.class.getPackage().getName();
         String[] directories = pack.split("\\.");
         String path = directories[0];
