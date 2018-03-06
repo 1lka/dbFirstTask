@@ -3,6 +3,7 @@ package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.RoutineParamsLoader;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
@@ -27,17 +28,39 @@ public class FunctionLoader extends Loader{
 
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
-        return null;
+        return node;
     }
 
     @Override
     public Node loadElement(Node node) throws SQLException {
-        return null;
+        return node;
     }
 
     @Override
-    public Node fullLoadElement(Node node) {
-        return null;
+    public Node fullLoadElement(Node node) throws SQLException {
+        if (MySQLConstants.DBEntity.FUNCTION.equals(node.getName())) {
+            Loader paramsLoader = new RoutineParamsLoader(getConnection());
+            List<Node> paramList = paramsLoader.loadCategory(node);
+            Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
+            parameters.addChildren(paramList);
+            node.addChild(parameters);
+            return node;
+        } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
+            Node functions = node.wideSearch(MySQLConstants.NodeNames.FUNCTIONS);
+            List<Node> functionList;
+            if (functions == null) {
+                functions = new Node(MySQLConstants.NodeNames.FUNCTIONS);
+                node.addChild(functions);
+                functionList = loadCategory(node);
+                functions.addChildren(functionList);
+            } else {
+                functionList = functions.getChildren();
+            }
+            for (Node procedure : functionList) {
+                fullLoadElement(procedure);
+            }
+        }
+        return node;
     }
 
     @Override

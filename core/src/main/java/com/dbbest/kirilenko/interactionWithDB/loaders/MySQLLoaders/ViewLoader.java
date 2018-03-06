@@ -25,17 +25,21 @@ public class ViewLoader extends Loader{
 
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
-        return null;
+        return node;
     }
 
     @Override
     public Node loadElement(Node node) {
-        return null;
+        return node;
     }
 
     @Override
-    public Node fullLoadElement(Node node) {
-        return null;
+    public Node fullLoadElement(Node node) throws SQLException {
+        Node views = new Node(MySQLConstants.NodeNames.VIEWS);
+        List<Node> viewList = loadCategory(node);
+        views.addChildren(viewList);
+        node.addChild(views);
+        return node;
     }
 
     @Override
@@ -51,5 +55,4 @@ public class ViewLoader extends Loader{
         }
         return viewList;
     }
-
 }

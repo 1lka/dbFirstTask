@@ -38,18 +38,38 @@ public class LoaderManager {
     /**
      * fill attributes for given node
      *
-     * @param node
-     * @return
+     * @param node for attribute loading
+     * @return node
      */
     public Node loadElement(Node node) {
-        String nodeName = node.getName();
+        return load((n, l) ->
+                l.loadElement(n), node);
+    }
+
+    public Node fullLoadElement(Node node) {
+        return load((n, l) ->
+                l.fullLoadElement(n), node);
+    }
+
+    public Node lazyChildrenLoad(Node node) {
+        return load((n, l) ->
+                l.lazyChildrenLoad(n), node);
+    }
+
+    private Node load(LoadingInterface lambda, Node node) {
         try {
-            Loader loader = loaders.get(nodeName);
-            return loader.loadElement(node);
-        } catch (Exception e) {
-            throw new LoadingException("problems with loading " + nodeName + " node", e);
+            Loader loader = loaders.get(node.getName());
+            loader.setConnection(connection);
+            return lambda.load(node, loader);
+        } catch (NullPointerException e) {
+            throw new LoadingException("can't get loader for " + node.getName() + " node");
+        } catch (SQLException e) {
+            throw new LoadingException("can't load " + node, e);
         }
     }
 
-
+    @FunctionalInterface
+    private interface LoadingInterface {
+        Node load(Node node, Loader loader) throws SQLException;
+    }
 }

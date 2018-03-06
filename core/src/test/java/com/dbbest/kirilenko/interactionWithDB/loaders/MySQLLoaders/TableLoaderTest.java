@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
+import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Connection4Test;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
@@ -41,6 +42,7 @@ public class TableLoaderTest {
 
     @Test
     public void loadElement() throws SQLException {
+        System.out.println("loadElement");
         System.out.println(tableLoader.loadElement(root));
     }
 
@@ -51,7 +53,7 @@ public class TableLoaderTest {
         Map<String, String> attrs = new HashMap<>();
         attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
         schema.setAttrs(attrs);
-
+        System.out.println("fullLoad");
         System.out.println(tableLoader.fullLoadElement(schema));
     }
 
@@ -66,11 +68,13 @@ public class TableLoaderTest {
         Node tables = new Node(MySQLConstants.NodeNames.TABLES);
         schema.addChild(tables);
         tables.addChild(root);
+        System.out.println("fullLoad2");
 
         System.out.println(tableLoader.fullLoadElement(schema));
     }
 
-    @Test
-    public void loadCategory() {
+    @Test(expected = LoadingException.class)
+    public void loadElementException() throws SQLException {
+        tableLoader.loadElement(new Node(MySQLConstants.NodeNames.TABLES));
     }
 }

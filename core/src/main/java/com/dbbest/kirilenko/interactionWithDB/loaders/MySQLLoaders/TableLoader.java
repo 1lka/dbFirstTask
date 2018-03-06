@@ -80,8 +80,6 @@ public class TableLoader extends Loader {
             FKs.addChildren(FKList);
             node.addChild(FKs);
 
-            //todo load indexes PKs FKs
-
             Loader PKLoader = new TablePrimaryKeyLoader(getConnection());
             List<Node> PKList = PKLoader.loadCategory(node);
             Node PKs = new Node(MySQLConstants.NodeNames.PRIMARY_KEYS);

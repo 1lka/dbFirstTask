@@ -3,6 +3,7 @@ package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.*;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
@@ -32,12 +33,35 @@ public class ProcedureLoader extends Loader {
 
     @Override
     public Node loadElement(Node node) throws SQLException {
-        return null;
+        return node;
     }
 
     @Override
-    public Node fullLoadElement(Node node) {
-        return null;
+    public Node fullLoadElement(Node node) throws SQLException {
+        if (MySQLConstants.DBEntity.PROCEDURE.equals(node.getName())) {
+            this.loadElement(node);
+            Loader paramsLoader = new RoutineParamsLoader(getConnection());
+            List<Node> paramList = paramsLoader.loadCategory(node);
+            Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
+            parameters.addChildren(paramList);
+            node.addChild(parameters);
+            return node;
+        } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
+            Node procedures = node.wideSearch(MySQLConstants.NodeNames.PROCEDURES);
+            List<Node> procedureList;
+            if (procedures == null) {
+                procedures = new Node(MySQLConstants.NodeNames.PROCEDURES);
+                node.addChild(procedures);
+                procedureList = loadCategory(node);
+                procedures.addChildren(procedureList);
+            } else {
+                procedureList = procedures.getChildren();
+            }
+            for (Node procedure : procedureList) {
+                fullLoadElement(procedure);
+            }
+        }
+        return node;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
@@ -15,10 +16,6 @@ public class RoutineParamsLoader extends Loader {
     private static final String LOAD_ELEMENT_QUERY =
             "select * from INFORMATION_SCHEMA.PARAMETERS " +
                     "where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? order by ORDINAL_POSITION";
-
-    private static final String ROUTINE_SCHEMA = "ROUTINE_SCHEMA";
-
-    private static final String ROUTINE_NAME = "ROUTINE_NAME";
 
     public RoutineParamsLoader() {
     }
@@ -44,22 +41,18 @@ public class RoutineParamsLoader extends Loader {
 
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
-        return null;
-    }
+        String schemaName = node.getAttrs().get("ROUTINE_SCHEMA");
+        String routineName = node.getAttrs().get("ROUTINE_NAME");
 
-    public void loadDetails(Node node) throws SQLException {
-        Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
-        node.addChild(parameters);
-
-        String schemaName = node.getAttrs().get(ROUTINE_SCHEMA);
-        String routineName = node.getAttrs().get(ROUTINE_NAME);
+        List<Node> paramList = new ChildrenList<>();
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, routineName);
-
         while (resultSet.next()) {
-            Node routine = new Node(MySQLConstants.DBEntity.PARAMETER);
+            Node parameter = new Node(MySQLConstants.DBEntity.PARAMETER);
             Map<String, String> attrs = fillAttributes(resultSet);
-            routine.setAttrs(attrs);
-            parameters.addChild(routine);
+            parameter.setAttrs(attrs);
+            paramList.add(parameter);
         }
+        return paramList;
     }
+
 }

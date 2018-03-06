@@ -237,13 +237,21 @@ public class Node {
         }
     }
 
+
     @Override
     public String toString() {
         String parentsName = null;
         if (parent != null) {
             parentsName = parent.getName();
         }
-        return "\nNode name=" + name + ", attrs=" + attrs + ", children=" + children + ", parent's name=" + parentsName;
+        StringBuilder sb = new StringBuilder();
+        Node p = getParent();
+        while (p != null) {
+            sb.append("  ");
+            p = p.getParent();
+        }
+
+        return "\n" + sb.toString() + "Node name=" + name + ", attrs=" + attrs + ", children=" + children + ", parent's name=" + parentsName;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
+import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Connection4Test;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
@@ -51,5 +52,10 @@ public class SchemaLoaderTest {
     public void fullLoad() throws SQLException {
         System.out.println("full");
         System.out.println(schemaLoader.fullLoadElement(root));
+    }
+
+    @Test(expected = LoadingException.class)
+    public void noSuchNameTest() throws SQLException {
+        schemaLoader.loadElement(new Node());
     }
 }
