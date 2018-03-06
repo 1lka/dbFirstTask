@@ -37,16 +37,19 @@ public class SchemaLoaderTest {
 
     @Test
     public void lazyChildrenLoad() throws SQLException {
+        System.out.println("lazy");
         System.out.println(schemaLoader.lazyChildrenLoad(root));
     }
 
     @Test
     public void loadElement() throws SQLException {
+        System.out.println("loadElement()");
         System.out.println(schemaLoader.loadElement(root));
     }
 
     @Test
     public void fullLoad() throws SQLException {
+        System.out.println("full");
         System.out.println(schemaLoader.fullLoadElement(root));
     }
 }

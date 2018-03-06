@@ -2,6 +2,7 @@ package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLo
 
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
 import java.sql.Connection;
@@ -44,23 +45,20 @@ public class TableForeignKeyLoader extends Loader {
     }
 
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
-        return null;
-    }
-
-    public void loadDetails(Node node) throws SQLException {
-        Node fKeys = new Node(MySQLConstants.NodeNames.FOREIGN_KEYS);
-        node.addChild(fKeys);
-
-        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
-        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+    public List<Node> loadCategory(Node table) throws SQLException {
+        String schemaName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
+        String tableName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
+        List<Node> FKList = new ChildrenList<>();
         while (resultSet.next()) {
-            Node column = new Node(MySQLConstants.DBEntity.FOREIGN_KEY);
+            Node FKey = new Node(MySQLConstants.DBEntity.FOREIGN_KEY);
             Map<String, String> attrs = fillAttributes(resultSet);
-            column.setAttrs(attrs);
-            fKeys.addChild(column);
+            FKey.setAttrs(attrs);
+            FKList.add(FKey);
         }
+        return FKList;
     }
+
+
 }

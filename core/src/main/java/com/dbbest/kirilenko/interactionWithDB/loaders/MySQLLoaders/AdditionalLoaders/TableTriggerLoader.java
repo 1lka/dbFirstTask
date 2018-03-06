@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
@@ -40,23 +41,18 @@ public class TableTriggerLoader extends Loader {
 
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
-        return null;
-    }
-
-
-    public void loadDetails(Node node) throws SQLException {
-        Node triggers = new Node(MySQLConstants.NodeNames.TRIGGERS);
-        node.addChild(triggers);
-
         String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
         String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
+
+        List<Node> triggerList = new ChildrenList<>();
 
         while (resultSet.next()) {
             Node trigger = new Node(MySQLConstants.DBEntity.TRIGGER);
             Map<String, String> attrs = fillAttributes(resultSet);
             trigger.setAttrs(attrs);
-            triggers.addChild(trigger);
+            triggerList.add(trigger);
         }
+        return triggerList;
     }
 }

@@ -243,7 +243,7 @@ public class Node {
         if (parent != null) {
             parentsName = parent.getName();
         }
-        return "Node name=" + name + ", attrs=" + attrs + ", children=" + children + ", parent's name=" + parentsName + "\n";
+        return "\nNode name=" + name + ", attrs=" + attrs + ", children=" + children + ", parent's name=" + parentsName;
     }
 
     @Override

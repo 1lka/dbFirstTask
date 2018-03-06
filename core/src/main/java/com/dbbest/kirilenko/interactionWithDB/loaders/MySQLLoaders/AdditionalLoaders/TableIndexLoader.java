@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
@@ -41,8 +42,19 @@ public class TableIndexLoader extends Loader {
     }
 
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
-        return null;
+    public List<Node> loadCategory(Node table) throws SQLException {
+        String schemaName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
+        String tableName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+        ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
+
+        List<Node> indexesList = new ChildrenList<>();
+        while (resultSet.next()) {
+            Node index = new Node(MySQLConstants.DBEntity.INDEX);
+            Map<String, String> attrs = fillAttributes(resultSet);
+            index.setAttrs(attrs);
+            indexesList.add(index);
+        }
+        return indexesList;
     }
 
     public void loadDetails(Node node) throws SQLException {

@@ -1,7 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
-import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.TableColumnLoader;
+import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.*;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
@@ -34,7 +34,7 @@ public class TableLoader extends Loader {
 
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
-        return null;
+        return node;
     }
 
     @Override
@@ -68,7 +68,33 @@ public class TableLoader extends Loader {
             columns.addChildren(columnsList);
             node.addChild(columns);
 
+            Loader indexLoader = new TableIndexLoader(getConnection());
+            List<Node> indexesList = indexLoader.loadCategory(node);
+            Node indexes = new Node(MySQLConstants.NodeNames.INDEXES);
+            indexes.addChildren(indexesList);
+            node.addChild(indexes);
+
+            Loader FKLoader = new TableForeignKeyLoader(getConnection());
+            List<Node> FKList = FKLoader.loadCategory(node);
+            Node FKs = new Node(MySQLConstants.NodeNames.FOREIGN_KEYS);
+            FKs.addChildren(FKList);
+            node.addChild(FKs);
+
             //todo load indexes PKs FKs
+
+            Loader PKLoader = new TablePrimaryKeyLoader(getConnection());
+            List<Node> PKList = PKLoader.loadCategory(node);
+            Node PKs = new Node(MySQLConstants.NodeNames.PRIMARY_KEYS);
+            PKs.addChildren(PKList);
+            node.addChild(PKs);
+
+            Loader triggerLoader = new TableTriggerLoader(getConnection());
+            List<Node> triggersList = triggerLoader.loadCategory(node);
+            Node triggers = new Node(MySQLConstants.NodeNames.TRIGGERS);
+            triggers.addChildren(triggersList);
+            node.addChild(triggers);
+
+
 
             return node;
 

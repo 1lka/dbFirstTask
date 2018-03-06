@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
@@ -42,22 +43,18 @@ public class TablePrimaryKeyLoader extends Loader {
 
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
-        return null;
-    }
-
-    public void loadDetails(Node node) throws SQLException {
-        Node pKeys = new Node(MySQLConstants.NodeNames.PRIMARY_KEYS);
-        node.addChild(pKeys);
-
         String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
         String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
+
+        List<Node> PKeys = new ChildrenList<>();
 
         while (resultSet.next()) {
             Node pKey = new Node(MySQLConstants.DBEntity.PRIMARY_KEY);
             Map<String, String> attrs = fillAttributes(resultSet);
             pKey.setAttrs(attrs);
-            pKeys.addChild(pKey);
+            PKeys.add(pKey);
         }
+        return PKeys;
     }
 }
