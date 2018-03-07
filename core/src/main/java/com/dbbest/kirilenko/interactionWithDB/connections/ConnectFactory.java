@@ -4,6 +4,12 @@ import com.dbbest.kirilenko.interactionWithDB.DBType;
 
 public class ConnectFactory {
 
+    /**
+     * Factory method.
+     *
+     * @param type of database
+     * @return connect for database
+     */
     public static Connect getConnect(DBType type) {
         switch (type) {
             case MYSQL:

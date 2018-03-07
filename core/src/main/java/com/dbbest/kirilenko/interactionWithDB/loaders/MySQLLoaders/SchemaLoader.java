@@ -24,6 +24,12 @@ public class SchemaLoader extends Loader {
         super(connection);
     }
 
+    /**
+     * loads tables, views and routines attributes for schema
+     *
+     * @param node for children loading
+     * @return node with lazy loaded children
+     */
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
         Loader tableLoader = new TableLoader(getConnection());
@@ -54,6 +60,12 @@ public class SchemaLoader extends Loader {
         return node;
     }
 
+    /**
+     * loads all attributes for schema node
+     *
+     * @param node for attribute loading
+     * @return loaded schema node
+     */
     @Override
     public Node loadElement(Node node) throws SQLException {
         String schema = node.getAttrs().get(MySQLConstants.AttributeName.SCHEMA_NAME);
@@ -67,6 +79,12 @@ public class SchemaLoader extends Loader {
         }
     }
 
+    /**
+     * loads full tree of schema node
+     *
+     * @param node for full loading
+     * @return fully loaded tree
+     */
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         this.loadElement(node);

@@ -42,6 +42,12 @@ public class ViewLoader extends Loader{
         return node;
     }
 
+    /**
+     * loads all views
+     *
+     * @param node contains required parameters
+     * @return list of views
+     */
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
         List<Node> viewList = new ChildrenList<>();

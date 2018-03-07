@@ -28,7 +28,7 @@ public class ReflectionUtil {
         }
     }
 
-    public static Map obtain(DBType type, Class clazz) {
+    public static Map obtainMap(DBType type, Class clazz) {
         for (Class c : classes) {
             if (PACKAGE_INFO.equals(c.getSimpleName())) {
                 Annotation ann = c.getAnnotation(PackageAnnotation.class);

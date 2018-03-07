@@ -22,7 +22,7 @@ public class LoaderManager {
     public LoaderManager(DBType type, String url, String login, String pass) {
         this.type = type;
         initConnection(url, login, pass);
-        loaders = ReflectionUtil.obtain(type, EntityLoader.class);
+        loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
     }
 
     private void initConnection(String dbURL, String login, String pass) {
@@ -31,7 +31,7 @@ public class LoaderManager {
             connect.initConnection(dbURL, login, pass);
             connection = connect.getConnection();
         } catch (SQLException e) {
-            throw new LoadingException("can't obtain connection to DB: " + dbURL, e);
+            throw new LoadingException("can't obtainMap connection to DB: " + dbURL, e);
         }
     }
 
@@ -46,11 +46,23 @@ public class LoaderManager {
                 l.loadElement(n), node);
     }
 
+    /**
+     * Fully loads given node
+     *
+     * @param node for loading
+     * @return fully loaded node
+     */
     public Node fullLoadElement(Node node) {
         return load((n, l) ->
                 l.fullLoadElement(n), node);
     }
 
+    /**
+     * Lazy loads children for given node.
+     *
+     * @param node for lazy children loading
+     * @return node with loaded children
+     */
     public Node lazyChildrenLoad(Node node) {
         return load((n, l) ->
                 l.lazyChildrenLoad(n), node);
@@ -67,6 +79,7 @@ public class LoaderManager {
             throw new LoadingException("can't load " + node, e);
         }
     }
+
 
     @FunctionalInterface
     private interface LoadingInterface {

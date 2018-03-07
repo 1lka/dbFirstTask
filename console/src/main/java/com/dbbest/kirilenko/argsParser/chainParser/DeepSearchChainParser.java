@@ -29,7 +29,7 @@ public class DeepSearchChainParser extends AbstractChainParser {
 
     /**
      * Obtain command for deep search in tree, if command exists
-     * obtain parameters for search.
+     * obtainMap parameters for search.
      *
      * @throws ArgsInputException if no params for search.
      */

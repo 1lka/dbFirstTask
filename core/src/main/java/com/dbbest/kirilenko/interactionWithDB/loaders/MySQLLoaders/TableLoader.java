@@ -37,6 +37,12 @@ public class TableLoader extends Loader {
         return node;
     }
 
+    /**
+     * Loads table attributes for node
+     *
+     * @param node for attribute loading
+     * @return loaded table node
+     */
     @Override
     public Node loadElement(Node node) throws SQLException {
         String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
@@ -55,7 +61,7 @@ public class TableLoader extends Loader {
      * loads table if node is table.
      *
      * @param node schema or table
-     * @return
+     * @return fully loaded tables
      */
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
@@ -92,10 +98,7 @@ public class TableLoader extends Loader {
             triggers.addChildren(triggersList);
             node.addChild(triggers);
 
-
-
             return node;
-
         } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
             Node tables = node.wideSearch(MySQLConstants.NodeNames.TABLES);
             List<Node> tablesList;
@@ -114,6 +117,12 @@ public class TableLoader extends Loader {
         return node;
     }
 
+    /**
+     * loads all tables with loaded attributes
+     *
+     * @param node contains required parameters
+     * @return list of loaded tables
+     */
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
         List<Node> tables = new ChildrenList<>();

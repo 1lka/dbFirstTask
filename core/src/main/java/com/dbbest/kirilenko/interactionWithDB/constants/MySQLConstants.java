@@ -1,7 +1,13 @@
 package com.dbbest.kirilenko.interactionWithDB.constants;
 
+/**
+ * this class contains constants for working with MySQL database
+ */
 public class MySQLConstants {
 
+    /**
+     * class with names of nodes constants
+     */
     public static class NodeNames {
         public final static String TABLES = "tables";
         public final static String VIEWS = "views";
@@ -15,6 +21,9 @@ public class MySQLConstants {
         public final static String PARAMETERS = "parameters";
     }
 
+    /**
+     * class contains database entity names
+     */
     public static class DBEntity {
         public final static String SCHEMA = "schema";
         public final static String TABLE = "table";
@@ -29,7 +38,9 @@ public class MySQLConstants {
         public final static String PARAMETER = "parameter";
 
     }
-
+    /**
+     * class contains INFORMATION_SCHEMA column names
+     */
     public static class AttributeName{
         public final static String SCHEMA_NAME = "SCHEMA_NAME";
         public final static String TABLE_SCHEMA = "TABLE_SCHEMA";
@@ -70,7 +81,9 @@ public class MySQLConstants {
         public final static String EXTRA = "EXTRA";
         public final static String DATA_TYPE = "DATA_TYPE";
     }
-
+    /**
+     * class contains delimiters for printers
+     */
     public static class Delimiters {
         public final static String NEW_DELIMITER = "DELIMITER $$";
         public final static String OLD_DELIMITER = "DELIMITER ;";
