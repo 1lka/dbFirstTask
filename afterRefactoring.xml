@@ -207,7 +207,7 @@
       </columns>
       <indexes>
         <index CARDINALITY="0" COLUMNS_NAME="film_id" INDEX_NAME="idx_fk_film_id" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="1" TABLE_CATALOG="def" TABLE_NAME="inventory" TABLE_SCHEMA="sakila"/>
-        <index CARDINALITY="0" COLUMNS_NAME="film_id, store_id" INDEX_NAME="idx_store_id_film_id" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="1" TABLE_CATALOG="def" TABLE_NAME="inventory" TABLE_SCHEMA="sakila"/>
+        <index CARDINALITY="0" COLUMNS_NAME="store_id, film_id" INDEX_NAME="idx_store_id_film_id" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="1" TABLE_CATALOG="def" TABLE_NAME="inventory" TABLE_SCHEMA="sakila"/>
       </indexes>
       <foreign_keys>
         <foreign_key COLUMN_NAME="film_id" CONSTRAINT_CATALOG="def" CONSTRAINT_NAME="fk_inventory_film" CONSTRAINT_SCHEMA="sakila" DELETE_RULE="RESTRICT" MATCH_OPTION="NONE" ORDINAL_POSITION="1" POSITION_IN_UNIQUE_CONSTRAINT="1" REFERENCED_COLUMN_NAME="film_id" REFERENCED_TABLE_NAME="film" TABLE_NAME="inventory" UNIQUE_CONSTRAINT_CATALOG="def" UNIQUE_CONSTRAINT_NAME="PRIMARY" UPDATE_RULE="CASCADE"/>

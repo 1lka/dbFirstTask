@@ -33,7 +33,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>com.dbbest.kirilenko.TestDB</mainClass>
+                            <mainClass>com.dbbest.kirilenko.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

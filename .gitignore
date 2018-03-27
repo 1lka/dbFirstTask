@@ -1,5 +1,8 @@
 target
+
 .idea
-firstTask.iml
+
+*.iml
+
 log.txt
 

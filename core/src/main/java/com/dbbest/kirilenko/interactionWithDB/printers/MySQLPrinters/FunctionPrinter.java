@@ -14,6 +14,7 @@ public class FunctionPrinter extends Printer {
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
         Map<String, String> attrs = node.getAttrs();
+
         Node paramsNode = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
         List<Node> params = paramsNode.getChildren();
 
