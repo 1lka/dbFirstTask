@@ -8,12 +8,13 @@ import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TestDB {
 
-    public static void main(String[] args) throws SerializationException {
+    public static void main(String[] args) throws SerializationException, SQLException {
         DBType type = DBType.MYSQL;
         String url = "jdbc:mysql://localhost/?useSSL=false";
         String login = "root";

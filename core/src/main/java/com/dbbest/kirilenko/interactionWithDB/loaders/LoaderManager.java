@@ -19,20 +19,17 @@ public class LoaderManager {
 
     private final Map<String, Loader> loaders;
 
-    public LoaderManager(DBType type, String url, String login, String pass) {
+    public LoaderManager(DBType type, String url, String login, String pass) throws SQLException {
         this.type = type;
         initConnection(url, login, pass);
         loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
     }
 
-    private void initConnection(String dbURL, String login, String pass) {
+    private void initConnection(String dbURL, String login, String pass) throws SQLException {
         Connect connect = ConnectFactory.getConnect(type);
-        try {
-            connect.initConnection(dbURL, login, pass);
-            connection = connect.getConnection();
-        } catch (SQLException e) {
-            throw new LoadingException("can't obtainMap connection to DB: " + dbURL, e);
-        }
+
+        connect.initConnection(dbURL, login, pass);
+        connection = connect.getConnection();
     }
 
     /**
