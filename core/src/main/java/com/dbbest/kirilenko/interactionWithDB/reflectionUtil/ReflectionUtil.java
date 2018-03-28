@@ -12,6 +12,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 
 public class ReflectionUtil {
@@ -83,8 +84,9 @@ public class ReflectionUtil {
         Enumeration<URL> resources = classLoader.getResources(path);
         List<File> dirs = new ArrayList<>();
         while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            dirs.add(new File(resource.getFile()));
+            String path2 = resources.nextElement().getPath();
+            File directory = new File(URLDecoder.decode(path2, "UTF-8"));
+            dirs.add(directory);
         }
 
         ArrayList<Class> classes = new ArrayList<>();
