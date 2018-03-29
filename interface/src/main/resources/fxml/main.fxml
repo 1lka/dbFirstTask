@@ -27,7 +27,7 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
       </Button>
-      <Button fx:id="tbnClose" alignment="CENTER" cancelButton="true" mnemonicParsing="false" onAction="#exit" prefWidth="200.0" text="exit" textAlignment="CENTER">
+      <Button fx:id="btnClose" alignment="CENTER" cancelButton="true" mnemonicParsing="false" onAction="#exit" prefWidth="200.0" text="exit" textAlignment="CENTER">
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>

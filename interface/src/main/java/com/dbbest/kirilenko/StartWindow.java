@@ -27,7 +27,7 @@ public class StartWindow extends Application {
         StartView startView = fxmlLoader.getController();
         startView.setMainStage(primaryStage);
 
-        Scene scene = new Scene(root, 220, 120);
+        Scene scene = new Scene(root);
         primaryStage.setResizable(false);
 
         primaryStage.setTitle("Welcome page");

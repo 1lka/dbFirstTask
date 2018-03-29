@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -21,7 +22,7 @@ public class StartView {
     private Button btnOpen;
 
     @FXML
-    private Button tbnClose;
+    private Button btnClose;
 
     private Stage mainStage;
     private Stage newProjectStage;
@@ -30,29 +31,20 @@ public class StartView {
 
     @FXML
     private void initialize() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
-        parent = fxmlLoader.load();
-        newProjectView = fxmlLoader.getController();
+//        FXMLLoader fxmlLoader = new FXMLLoader();
+//        fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
+//        parent = fxmlLoader.load();
+//        newProjectView = fxmlLoader.getController();
+        newProjectView = new NewProjectView();
+
     }
 
     public void setMainStage(Stage mainStage) {
         this.mainStage = mainStage;
     }
 
-    public void createNewProject(ActionEvent actionEvent) {
-        if (newProjectStage == null) {
-            System.out.println("creating new Stage");
-            newProjectStage = new Stage();
-            newProjectStage.setTitle("Редактирование записи");
-            newProjectStage.setMinHeight(150);
-            newProjectStage.setMinWidth(300);
-            newProjectStage.setResizable(false);
-            newProjectStage.setScene(new Scene(parent));
-            newProjectStage.initModality(Modality.WINDOW_MODAL);
-            newProjectStage.initOwner(mainStage);
-        }
-        newProjectStage.showAndWait(); // для ожидания закрытия окна
+    public void createNewProject(ActionEvent actionEvent) throws IOException {
+        newProjectView.show(actionEvent);
     }
 
     public void exit(ActionEvent actionEvent) {

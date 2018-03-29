@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
 
-<FlowPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.OpenedProjectView">
+<AnchorPane minHeight="400.0" minWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.OpenedProjectView">
    <children>
-      <MenuBar prefHeight="25.0" prefWidth="600.0">
+      <MenuBar AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -25,21 +26,23 @@
             </items>
           </Menu>
         </menus>
+         <padding>
+            <Insets left="5.0" right="5.0" />
+         </padding>
       </MenuBar>
-      <TreeView prefHeight="375.0" prefWidth="200.0" />
-      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="375.0" prefWidth="400.0">
-        <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+      <SplitPane dividerPositions="0.4" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+         <items>
+            <AnchorPane minWidth="150.0">
                <children>
-                  <Label layoutY="6.0" prefHeight="184.0" prefWidth="398.0" text="Label" />
+                  <TreeView fx:id="treeView" layoutX="59.0" layoutY="76.0" onMouseClicked="#expandTreeItem" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+            <AnchorPane minWidth="250.0">
                <children>
-                  <TextArea prefHeight="183.0" prefWidth="398.0" />
+                  <TextArea layoutX="32.0" layoutY="56.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-        </items>
+         </items>
       </SplitPane>
    </children>
-</FlowPane>
+</AnchorPane>
