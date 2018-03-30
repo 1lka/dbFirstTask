@@ -12,6 +12,7 @@
         <module>core</module>
         <module>console</module>
         <module>interface</module>
+        <module>GUI</module>
     </modules>
 
     <properties>
