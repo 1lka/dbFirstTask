@@ -1,18 +1,17 @@
 package view;
 
 import javafx.application.Application;
-import javafx.beans.property.ObjectProperty;
-import javafx.event.EventType;
+import javafx.beans.property.Property;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import model.NodeModel;
 import viewModel.ViewModel;
 
 import java.sql.SQLException;
@@ -20,24 +19,27 @@ import java.sql.SQLException;
 public class Start extends Application {
 
     @FXML
-    private TreeView<String> treeView;
+    public MenuItem loadElement;
+
+    @FXML
+    public MenuItem doNothing;
+
+    @FXML
+    private TreeView<NodeModel> treeView;
+
+    private TreeItem<NodeModel> selectedItem;
+
+    private ViewModel viewModel;
 
     @FXML
     private void initialize() throws SQLException {
-        treeView.setEditable(true);
         viewModel = new ViewModel();
-        TreeItem<String> rootNode = new TreeItem<>(viewModel.getRoot().toString());
-        treeView.setRoot(rootNode);
-        treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        treeView.addEventHandler(MouseEvent.MOUSE_CLICKED, (event -> {
-            loadNode(treeView.selectionModelProperty());}));
-    }
+        treeView.setEditable(true);
 
-    private void loadNode(ObjectProperty<MultipleSelectionModel<TreeItem<String>>> property) {
-        System.out.println(property.get().getSelectedItem().getValue());
-    }
+        treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
 
-    private ViewModel viewModel;
+
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -53,5 +55,17 @@ public class Start extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public void load(ActionEvent actionEvent) {
+        TreeItem<NodeModel> treeItem = treeView.getSelectionModel().getSelectedItem();
+        System.out.println(treeItem + " is been fullLoading");
+        viewModel.load(treeItem);
+
+
+    }
+
+    public void doNothing(ActionEvent actionEvent) {
+        System.out.println("doing nothing");
     }
 }

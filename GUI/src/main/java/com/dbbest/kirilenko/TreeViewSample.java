@@ -2,20 +2,22 @@ package com.dbbest.kirilenko;
 
 import java.util.Arrays;
 import java.util.List;
-
 import javafx.application.Application;
-import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.VBox;
@@ -24,6 +26,8 @@ public class TreeViewSample extends Application {
 
 
     List<Employee> employees = Arrays.<Employee>asList(
+            new Employee("Jacob Smith", "Accounts Department"),
+            new Employee("Isabella Johnson", "Accounts Department"),
             new Employee("Ethan Williams", "Sales Department"),
             new Employee("Emma Jones", "Sales Department"),
             new Employee("Michael Brown", "Sales Department"),
@@ -32,11 +36,9 @@ public class TreeViewSample extends Application {
             new Employee("Susan Collins", "Sales Department"),
             new Employee("Mike Graham", "IT Support"),
             new Employee("Judy Mayer", "IT Support"),
-            new Employee("Gregory Smith", "IT Support"),
-            new Employee("Jacob Smith", "Accounts Department"),
-            new Employee("Isabella Johnson", "Accounts Department"));
+            new Employee("Gregory Smith", "IT Support"));
     TreeItem<String> rootNode =
-            new TreeItem<String>("MyCompany Human Resources");
+            new TreeItem<>("MyCompany Human Resources");
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -46,17 +48,17 @@ public class TreeViewSample extends Application {
     public void start(Stage stage) {
         rootNode.setExpanded(true);
         for (Employee employee : employees) {
-            TreeItem<String> empLeaf = new TreeItem<String>(employee.getName());
+            TreeItem<String> empLeaf = new TreeItem<>(employee.getName());
             boolean found = false;
             for (TreeItem<String> depNode : rootNode.getChildren()) {
-                if (depNode.getValue().contentEquals(employee.getDepartment())) {
+                if (depNode.getValue().contentEquals(employee.getDepartment())){
                     depNode.getChildren().add(empLeaf);
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                TreeItem<String> depNode = new TreeItem<>(employee.getDepartment());
+                TreeItem depNode = new TreeItem(employee.getDepartment());
                 rootNode.getChildren().add(depNode);
                 depNode.getChildren().add(empLeaf);
             }
@@ -67,27 +69,27 @@ public class TreeViewSample extends Application {
         final Scene scene = new Scene(box, 400, 300);
         scene.setFill(Color.LIGHTGRAY);
 
-        TreeView<String> treeView = new TreeView<String>(rootNode);
+        TreeView<String> treeView = new TreeView<>(rootNode);
         treeView.setEditable(true);
-        treeView.setCellFactory(p -> new TextFieldTreeCellImpl());
+        treeView.setCellFactory((TreeView<String> p) ->
+                new TextFieldTreeCellImpl());
 
         box.getChildren().add(treeView);
         stage.setScene(scene);
         stage.show();
     }
 
-    private final class TextFieldTreeCellImpl extends TreeCell<String> {
-
-
+    private final class TextFieldTreeCellImpl extends TextFieldTreeCell<String> {
 
         private TextField textField;
-        private ContextMenu addMenu = new ContextMenu();
+        private final ContextMenu addMenu = new ContextMenu();
 
         public TextFieldTreeCellImpl() {
+//            System.out.println("constructor " + getTreeItem());
             MenuItem addMenuItem = new MenuItem("Add Employee");
             addMenu.getItems().add(addMenuItem);
-            addMenuItem.setOnAction(t -> {
-                TreeItem<String> newEmployee =
+            addMenuItem.setOnAction((ActionEvent t) -> {
+                TreeItem newEmployee =
                         new TreeItem<>("New Employee");
                 getTreeItem().getChildren().add(newEmployee);
             });
@@ -95,6 +97,7 @@ public class TreeViewSample extends Application {
 
         @Override
         public void startEdit() {
+            System.out.println("start edit");
             super.startEdit();
 
             if (textField == null) {
@@ -107,6 +110,7 @@ public class TreeViewSample extends Application {
 
         @Override
         public void cancelEdit() {
+//            System.out.println("cancel edit");
             super.cancelEdit();
 
             setText((String) getItem());
@@ -115,6 +119,7 @@ public class TreeViewSample extends Application {
 
         @Override
         public void updateItem(String item, boolean empty) {
+            System.out.println(empty);
             super.updateItem(item, empty);
 
             if (empty) {
@@ -131,8 +136,8 @@ public class TreeViewSample extends Application {
                     setText(getString());
                     setGraphic(getTreeItem().getGraphic());
                     if (
-                            !getTreeItem().isLeaf() && getTreeItem().getParent() != null
-                            ) {
+                            !getTreeItem().isLeaf()&&getTreeItem().getParent()!= null
+                            ){
                         setContextMenu(addMenu);
                     }
                 }
@@ -141,15 +146,11 @@ public class TreeViewSample extends Application {
 
         private void createTextField() {
             textField = new TextField(getString());
-            textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
-                @Override
-                public void handle(KeyEvent t) {
-                    if (t.getCode() == KeyCode.ENTER) {
-                        commitEdit(textField.getText());
-                    } else if (t.getCode() == KeyCode.ESCAPE) {
-                        cancelEdit();
-                    }
+            textField.setOnKeyReleased((KeyEvent t) -> {
+                if (t.getCode() == KeyCode.ENTER) {
+                    commitEdit(textField.getText());
+                } else if (t.getCode() == KeyCode.ESCAPE) {
+                    cancelEdit();
                 }
             });
 
@@ -165,7 +166,7 @@ public class TreeViewSample extends Application {
         private final SimpleStringProperty name;
         private final SimpleStringProperty department;
 
-        public Employee(String name, String department) {
+        private Employee(String name, String department) {
             this.name = new SimpleStringProperty(name);
             this.department = new SimpleStringProperty(department);
         }

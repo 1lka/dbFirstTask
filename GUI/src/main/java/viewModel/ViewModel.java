@@ -4,6 +4,10 @@ import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.tree.Node;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.TreeItem;
 import model.NodeModel;
 
 import java.sql.SQLException;
@@ -16,14 +20,16 @@ public class ViewModel {
     private final static String pass = "root";
 
     private LoaderManager manager;
-    private NodeModel root;
 
-    public NodeModel getRoot() {
-        return root;
+    private final SimpleObjectProperty<TreeItem<NodeModel>> rootItemProperty = new SimpleObjectProperty<>();
+
+
+    public TreeItem<NodeModel> getRootItemProperty() {
+        return rootItemProperty.get();
     }
 
-    public void setRoot(NodeModel root) {
-        this.root = root;
+    public SimpleObjectProperty<TreeItem<NodeModel>> rootItemPropertyProperty() {
+        return rootItemProperty;
     }
 
     public ViewModel() throws SQLException {
@@ -34,8 +40,21 @@ public class ViewModel {
         Map<String, String> attrs = new HashMap<>();
         attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
         rootNode.setAttrs(attrs);
+        rootItemProperty.set(new TreeItem<>(new NodeModel(rootNode)));
 
-        root = new NodeModel(rootNode);
+    }
+
+    public void load(TreeItem<NodeModel> value) {
+        Node node = value.getValue().getNode();
+        manager.fullLoadElement(node);
+
+        value.getChildren().addAll(new NodeModel(node).getChildren());
+
+
+
+    }
+
+    private void addChildren(Node node, NodeModel model) {
 
     }
 }
