@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ViewModel {
+
     private final static String url = "jdbc:mysql://localhost/?useSSL=false";
     private final static String login = "root";
     private final static String pass = "root";

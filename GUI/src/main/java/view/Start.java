@@ -7,7 +7,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
 import model.NodeModel;
@@ -25,8 +24,6 @@ public class Start extends Application {
 
     @FXML
     private TreeView<NodeModel> treeView;
-
-    private TreeItem<NodeModel> selectedItem;
 
     private ViewModel viewModel;
 
