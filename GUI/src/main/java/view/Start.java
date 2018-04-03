@@ -1,15 +1,14 @@
 package view;
 
 import javafx.application.Application;
-import javafx.beans.property.Property;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
 import model.NodeModel;
 import viewModel.ViewModel;
@@ -35,10 +34,11 @@ public class Start extends Application {
     private void initialize() throws SQLException {
         viewModel = new ViewModel();
         treeView.setEditable(true);
-
         treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
 
+        treeView.getSelectionModel().select(0);
 
+        viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
     }
 
     @Override
@@ -58,11 +58,7 @@ public class Start extends Application {
     }
 
     public void load(ActionEvent actionEvent) {
-        TreeItem<NodeModel> treeItem = treeView.getSelectionModel().getSelectedItem();
-        System.out.println(treeItem + " is been fullLoading");
-        viewModel.load(treeItem);
-
-
+        viewModel.load();
     }
 
     public void doNothing(ActionEvent actionEvent) {

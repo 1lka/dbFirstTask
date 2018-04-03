@@ -12,7 +12,17 @@ public class NodeModel {
 
     private Node node;
 
+    private TreeItem<NodeModel> root;
+
     private ObservableList<TreeItem<NodeModel>> children;
+
+    public TreeItem<NodeModel> getRoot() {
+        return root;
+    }
+
+    public Node getNode() {
+        return node;
+    }
 
     public void setNode(Node node) {
         this.node = node;
@@ -22,21 +32,14 @@ public class NodeModel {
         return children;
     }
 
-    public void setChildren(ObservableList<TreeItem<NodeModel>> children) {
-        this.children = children;
-    }
-
     public NodeModel(Node node) {
+        this.node = node;
         children = FXCollections.observableArrayList();
         for (Node child : node.getChildren()) {
-            children.add(new TreeItem<>(new NodeModel(child)));
+            children.add(new NodeModel(child).getRoot());
         }
-
-        this.node = node;
-    }
-
-    public Node getNode() {
-        return node;
+        root = new TreeItem<>(this);
+        root.getChildren().addAll(children);
     }
 
     @Override

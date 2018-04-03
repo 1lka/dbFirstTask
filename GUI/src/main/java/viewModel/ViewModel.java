@@ -6,7 +6,6 @@ import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.TreeItem;
 import model.NodeModel;
 
@@ -21,14 +20,15 @@ public class ViewModel {
 
     private LoaderManager manager;
 
-    private final SimpleObjectProperty<TreeItem<NodeModel>> rootItemProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<TreeItem<NodeModel>> rootItemProperty = new SimpleObjectProperty<>();
 
+    private ObjectProperty<TreeItem<NodeModel>> selectedItem = new SimpleObjectProperty<>();
 
-    public TreeItem<NodeModel> getRootItemProperty() {
-        return rootItemProperty.get();
+    public ObjectProperty<TreeItem<NodeModel>> selectedItemProperty() {
+        return selectedItem;
     }
 
-    public SimpleObjectProperty<TreeItem<NodeModel>> rootItemPropertyProperty() {
+    public ObjectProperty<TreeItem<NodeModel>> rootItemPropertyProperty() {
         return rootItemProperty;
     }
 
@@ -40,21 +40,16 @@ public class ViewModel {
         Map<String, String> attrs = new HashMap<>();
         attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
         rootNode.setAttrs(attrs);
-        rootItemProperty.set(new TreeItem<>(new NodeModel(rootNode)));
-
-    }
-
-    public void load(TreeItem<NodeModel> value) {
-        Node node = value.getValue().getNode();
-        manager.fullLoadElement(node);
-
-        value.getChildren().addAll(new NodeModel(node).getChildren());
-
+        NodeModel root = new NodeModel(rootNode);
+        rootItemProperty.set(new TreeItem<>(root));
 
 
     }
 
-    private void addChildren(Node node, NodeModel model) {
-
+    public void load() {
+        Node nodeForLoading = selectedItem.getValue().getValue().getNode();
+        manager.lazyChildrenLoad(nodeForLoading);
+        NodeModel nm = new NodeModel(nodeForLoading);
+        selectedItem.get().getChildren().addAll(nm.getChildren());
     }
 }
