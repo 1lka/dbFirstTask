@@ -30,7 +30,20 @@ public class Node {
      */
     private Node parent;
 
+    /**
+     * text value of node
+     */
     private String value;
+
+    private String nameToPrint;
+
+    public String getNameToPrint() {
+        return nameToPrint;
+    }
+
+    public void setNameToPrint(String nameToPrint) {
+        this.nameToPrint = nameToPrint;
+    }
 
     public String getValue() {
         return value;
@@ -48,6 +61,7 @@ public class Node {
     public Node() {
         this.children = new ChildrenList<>();
         this.attrs = new HashMap<>();
+        this.nameToPrint = this.name;
     }
 
     /**

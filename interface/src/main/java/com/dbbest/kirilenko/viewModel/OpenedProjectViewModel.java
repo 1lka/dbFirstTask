@@ -5,10 +5,7 @@ import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.tree.Node;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
@@ -27,6 +24,8 @@ public class OpenedProjectViewModel {
     private ObjectProperty<TreeItem<TreeModel>> selectedItem = new SimpleObjectProperty<>();
 
     private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
+
+    private BooleanProperty showContext = new SimpleBooleanProperty();
 
     private StringProperty ddl = new SimpleStringProperty();
 
@@ -71,7 +70,14 @@ public class OpenedProjectViewModel {
 
             String ddlOfNode = printerManager.printDDL(selectedNode);
             ddl.set(ddlOfNode);
+
+            if (selectedNode.getName() == selectedNode.getNameToPrint()) {
+                showContext.set(false);
+            } else {
+                showContext.set(true);
+            }
         });
+
 
 
     }

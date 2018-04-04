@@ -35,7 +35,7 @@
                     <children>
                         <TreeView fx:id="treeView" layoutX="59.0" layoutY="76.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <contextMenu>
-                                <ContextMenu>
+                                <ContextMenu fx:id="contextMenu">
                                     <items>
                                         <MenuItem mnemonicParsing="false" onAction="#lazyLoad" text="lazy load" />
                                         <MenuItem mnemonicParsing="false" onAction="#loadElement" text="load element" />

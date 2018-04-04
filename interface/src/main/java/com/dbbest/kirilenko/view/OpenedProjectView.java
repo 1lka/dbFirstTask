@@ -6,12 +6,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
@@ -24,6 +27,9 @@ public class OpenedProjectView {
 
     @FXML
     public TableColumn<Map.Entry<String, String>, String> valueColumn;
+
+    @FXML
+    public ContextMenu contextMenu;
 
     @FXML
     private TableView<Map.Entry<String, String>> attrTable;
@@ -50,6 +56,14 @@ public class OpenedProjectView {
 
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
         ddlArea.textProperty().bind(viewModel.ddlProperty());
+
+        treeView.addEventFilter(MouseEvent.MOUSE_PRESSED,event -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                System.out.println("consume");
+                event.consume();
+            }
+        });
+
 
 
     }

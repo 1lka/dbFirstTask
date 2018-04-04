@@ -69,6 +69,7 @@ public class SchemaLoader extends Loader {
     @Override
     public Node loadElement(Node node) throws SQLException {
         String schema = node.getAttrs().get(MySQLConstants.AttributeName.SCHEMA_NAME);
+        node.setNameToPrint(schema);
         ResultSet resultSet = executeQuery(SQL_QUERY, schema);
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
