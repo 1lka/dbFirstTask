@@ -46,7 +46,6 @@ public class TableLoader extends Loader {
     @Override
     public Node loadElement(Node node) throws SQLException {
         String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
-        node.setNameToPrint(tableName);
         String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
         ResultSet resultSet = executeQuery(TABLE_QUERY, schemaName, tableName);
         if (resultSet.next()) {

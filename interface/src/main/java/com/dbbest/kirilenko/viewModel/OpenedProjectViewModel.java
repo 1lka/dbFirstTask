@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.viewModel;
 
+import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
@@ -26,6 +27,10 @@ public class OpenedProjectViewModel {
     private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
 
     private BooleanProperty showContext = new SimpleBooleanProperty();
+
+    public boolean isShowContext() {
+        return showContext.get();
+    }
 
     private StringProperty ddl = new SimpleStringProperty();
 
@@ -68,10 +73,16 @@ public class OpenedProjectViewModel {
             Map<String, String> map = selectedNode.getAttrs();
             table.setValue(FXCollections.observableArrayList(map.entrySet()));
 
-            String ddlOfNode = printerManager.printDDL(selectedNode);
-            ddl.set(ddlOfNode);
+            try {
+                String ddlOfNode = printerManager.printDDL(selectedNode);
+                ddl.set(ddlOfNode);
+            } catch (NullPointerException e) {
+                ddl.setValue("nothing to show");
+            }
 
-            if (selectedNode.getName() == selectedNode.getNameToPrint()) {
+
+            //todo create mechanism to ignoring conteiner node
+            if (selectedNode.getName().equals("tables")) {
                 showContext.set(false);
             } else {
                 showContext.set(true);
@@ -84,14 +95,22 @@ public class OpenedProjectViewModel {
 
     public void lazyLoad() {
         Node nodeForLoading = selectedItem.getValue().getValue().getNode();
-        loaderManager.lazyChildrenLoad(nodeForLoading);
+        try {
+            loaderManager.lazyChildrenLoad(nodeForLoading);
+        } catch (LoadingException e) {
+            return;
+        }
         TreeModel nm = new TreeModel(nodeForLoading);
         selectedItem.get().getChildren().addAll(nm.getChildren());
     }
 
     public void fullyLoad() {
         Node nodeForLoading = selectedItem.getValue().getValue().getNode();
-        loaderManager.fullLoadElement(nodeForLoading);
+        try {
+            loaderManager.fullLoadElement(nodeForLoading);
+        } catch (LoadingException e) {
+            return;
+        }
         TreeModel nm = new TreeModel(nodeForLoading);
         selectedItem.get().getChildren().addAll(nm.getChildren());
     }

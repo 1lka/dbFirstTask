@@ -2,11 +2,9 @@ package com.dbbest.kirilenko.view;
 
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
+import com.sun.javafx.scene.control.skin.LabeledText;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,7 +12,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
@@ -51,22 +48,23 @@ public class OpenedProjectView {
         treeView.getSelectionModel().select(0);
         viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
 
-        attributeColumn.setCellValueFactory(p ->  new SimpleStringProperty(p.getValue().getKey()));
+        attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
 
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
-        treeView.addEventFilter(MouseEvent.MOUSE_PRESSED,event -> {
-            if (event.getButton() == MouseButton.SECONDARY) {
-                System.out.println("consume");
+        treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
+
+            if (!viewModel.isShowContext() || event.getTarget().getClass() != LabeledText.class) {
                 event.consume();
             }
-        });
+
+        }
+    );
 
 
-
-    }
+}
 
     private Stage primaryStage;
 
