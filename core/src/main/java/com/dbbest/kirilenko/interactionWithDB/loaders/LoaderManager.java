@@ -15,11 +15,33 @@ public class LoaderManager {
 
     private DBType type;
 
+    public DBType getType() {
+        return type;
+    }
+
     private Connection connection;
 
     private final Map<String, Loader> loaders;
 
-    public LoaderManager(DBType type, String url, String login, String pass) throws SQLException {
+    private static LoaderManager instance;
+
+    public static synchronized LoaderManager getInstance(DBType type, String url, String login, String pass) throws SQLException {
+        if (instance == null) {
+            instance = new LoaderManager(type, url, login, pass);
+        }
+        return instance;
+    }
+
+    public static synchronized LoaderManager getInstance() {
+        return instance;
+    }
+
+    public static void clearManager() throws SQLException {
+        instance.connection.close();
+        instance = null;
+    }
+
+    private LoaderManager(DBType type, String url, String login, String pass) throws SQLException {
         this.type = type;
         initConnection(url, login, pass);
         loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
@@ -77,9 +99,17 @@ public class LoaderManager {
         }
     }
 
-
     @FunctionalInterface
     private interface LoadingInterface {
         Node load(Node node, Loader loader) throws SQLException;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return "manager connected to " + connection.getCatalog();
+        } catch (SQLException e) {
+            return "no connection";
+        }
     }
 }

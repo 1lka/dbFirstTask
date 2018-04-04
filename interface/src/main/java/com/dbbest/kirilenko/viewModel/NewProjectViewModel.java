@@ -2,6 +2,7 @@ package com.dbbest.kirilenko.viewModel;
 
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -11,9 +12,15 @@ import java.sql.SQLException;
 public class NewProjectViewModel {
 
     private StringProperty url = new SimpleStringProperty();
+    private StringProperty dbName = new SimpleStringProperty();
     private StringProperty login = new SimpleStringProperty();
     private StringProperty password = new SimpleStringProperty();
+
+    private StringProperty dbFullAddress = new SimpleStringProperty();
+
+
     private LoaderManager manager;
+
     //todo change later
     public NewProjectViewModel() {
 
@@ -27,20 +34,12 @@ public class NewProjectViewModel {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url.set(url);
-    }
-
     public String getLogin() {
         return login.get();
     }
 
     public StringProperty loginProperty() {
         return login;
-    }
-
-    public void setLogin(String login) {
-        this.login.set(login);
     }
 
     public String getPassword() {
@@ -51,23 +50,23 @@ public class NewProjectViewModel {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password.set(password);
+    public String getDbName() {
+        return dbName.get();
     }
 
+    public StringProperty dbNameProperty() {
+        return dbName;
+    }
 
-
-    public boolean connect() {
+    public LoaderManager connect() {
         if (manager == null) {
             try {
-                manager = new LoaderManager(DBType.MYSQL, getUrl(), getLogin(), getPassword());
-                System.out.println("connected");
-                return true;
+                manager = LoaderManager.getInstance(DBType.MYSQL, getUrl(), getLogin(), getPassword());
+                System.err.println("connected");
             } catch (SQLException e) {
                 System.err.println("not connected");
-                return false;
             }
         }
-        return true;
+        return manager;
     }
 }

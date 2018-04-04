@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
@@ -9,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="203.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.NewProjectView">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="190.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.NewProjectView">
    <children>
       <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
          <children>
@@ -28,6 +34,26 @@
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
+            </TextField>
+         </children>
+      </HBox>
+      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
+         <children>
+            <Label maxWidth="100.0" prefWidth="100.0" text="DB name">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="dbName" prefWidth="200.0">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
             </TextField>
          </children>
       </HBox>
@@ -73,7 +99,7 @@
       </HBox>
       <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
          <children>
-            <Button alignment="CENTER" fx:id="btnConnect" defaultButton="true" mnemonicParsing="false" onAction="#connect" prefWidth="200.0" text="Connect">
+            <Button fx:id="btnConnect" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#connect" prefWidth="200.0" text="Connect">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
@@ -84,15 +110,6 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" prefHeight="42.0" prefWidth="250.0">
-         <children>
-            <Text fx:id="errorMessage" textAlignment="CENTER">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Text>
          </children>
       </HBox>
    </children>

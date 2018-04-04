@@ -13,6 +13,9 @@ public class IndexPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
+        if (node == null) {
+            return sb.toString();
+        }
         List<Node> indexes = new ArrayList<>(node.getChildren());
 
         for (Node index : indexes) {

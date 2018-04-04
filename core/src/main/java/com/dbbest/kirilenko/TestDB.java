@@ -26,7 +26,7 @@ public class TestDB {
         attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
         root.setAttrs(attrs);
 
-        LoaderManager manager = new LoaderManager(type, url, login, pass);
+        LoaderManager manager = LoaderManager.getInstance(type, url, login, pass);
         manager.fullLoadElement(root);
 
         PrinterManager printerManager = new PrinterManager(type);

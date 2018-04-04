@@ -34,7 +34,7 @@ public class ViewModel {
     }
 
     public ViewModel() throws SQLException {
-        manager = new LoaderManager(DBType.MYSQL, url, login, pass);
+        manager = LoaderManager.getInstance(DBType.MYSQL, url, login, pass);
         System.out.println("connected");
         Node rootNode = new Node(MySQLConstants.DBEntity.SCHEMA);
         String schemaName = "sakila";

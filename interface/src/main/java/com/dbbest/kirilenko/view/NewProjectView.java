@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.view;
 
+import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.viewModel.NewProjectViewModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -7,8 +8,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -23,6 +24,9 @@ public class NewProjectView {
     private TextField url;
 
     @FXML
+    private TextField dbName;
+
+    @FXML
     private TextField login;
 
     @FXML
@@ -31,35 +35,37 @@ public class NewProjectView {
     @FXML
     private Button btnConnect;
 
-    @FXML
-    private Text errorMessage;
-
     private NewProjectViewModel newProjectViewModel;
+
     private Stage stage;
 
     @FXML
-    private void initialize() throws IOException {
+    private void initialize() {
         newProjectViewModel = new NewProjectViewModel();
-
         newProjectViewModel.urlProperty().bind(url.textProperty());
+        newProjectViewModel.dbNameProperty().bind(dbName.textProperty());
         newProjectViewModel.loginProperty().bind(login.textProperty());
         newProjectViewModel.passwordProperty().bind(password.textProperty());
     }
 
     public void connect(ActionEvent actionEvent) throws Exception {
-        if (newProjectViewModel.connect()) {
-            errorMessage.setText("");
+        LoaderManager manager = newProjectViewModel.connect();
+        if (manager != null) {
             OpenedProjectView openedProject = new OpenedProjectView();
-            openedProject.show(actionEvent);
+            openedProject.show(actionEvent, dbName);
         } else {
-            errorMessage.setText("not connected");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("Wrong credentials");
+            alert.setContentText("wrong credentials");
+            alert.showAndWait();
         }
     }
 
     public void show(ActionEvent actionEvent) throws IOException {
         if (stage == null) {
             stage = new Stage();
-            stage.setTitle("New project");
+            stage.setTitle("create new project");
             stage.setResizable(false);
 
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -73,7 +79,7 @@ public class NewProjectView {
             Window mainStage = source.getScene().getWindow();
             stage.initOwner(mainStage);
         }
-        stage.showAndWait(); // для ожидания закрытия окна
+        stage.showAndWait();
     }
 }
 

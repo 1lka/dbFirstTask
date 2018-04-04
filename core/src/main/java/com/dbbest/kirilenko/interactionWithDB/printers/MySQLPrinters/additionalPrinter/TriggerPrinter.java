@@ -11,6 +11,9 @@ public class TriggerPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
+        if (node == null) {
+            return sb.toString();
+        }
         List<Node> triggers = node.getChildren();
         if (triggers.size() > 0) {
             sb.append(MySQLConstants.Delimiters.NEW_DELIMITER);

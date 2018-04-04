@@ -12,6 +12,9 @@ public class ForeignKeyPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
+        if (node == null) {
+            return sb.toString();
+        }
         List<Node> fKeys = node.getChildren();
 
         for (Node fKey : fKeys) {

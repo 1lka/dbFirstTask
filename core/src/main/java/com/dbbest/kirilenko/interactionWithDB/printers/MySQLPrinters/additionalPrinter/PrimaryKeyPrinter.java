@@ -12,6 +12,9 @@ public class PrimaryKeyPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
+        if (node == null) {
+            return sb.toString();
+        }
         List<Node> pKeys = node.getChildren();
         if (pKeys.size() > 0) {
             sb.append("PRIMARY KEY (");

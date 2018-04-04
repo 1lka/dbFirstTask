@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class StartView {
+public class MainView {
 
     @FXML
     private Button btnCreate;
@@ -24,35 +24,23 @@ public class StartView {
     @FXML
     private Button btnClose;
 
-    private Stage mainStage;
-    private Stage newProjectStage;
-    private Parent parent;
     private NewProjectView newProjectView;
 
     @FXML
-    private void initialize() throws IOException {
-//        FXMLLoader fxmlLoader = new FXMLLoader();
-//        fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
-//        parent = fxmlLoader.load();
-//        newProjectView = fxmlLoader.getController();
+    private void initialize()  {
         newProjectView = new NewProjectView();
-
-    }
-
-    public void setMainStage(Stage mainStage) {
-        this.mainStage = mainStage;
     }
 
     public void createNewProject(ActionEvent actionEvent) throws IOException {
         newProjectView.show(actionEvent);
     }
 
+    public void openExistingProject(ActionEvent actionEvent) {
+        System.out.println("todo existing project");
+    }
+
     public void exit(ActionEvent actionEvent) {
         System.out.println("exit");
         Platform.exit();
-    }
-
-    public void openExistingProject(ActionEvent actionEvent) {
-        System.out.println("todo existing project");
     }
 }

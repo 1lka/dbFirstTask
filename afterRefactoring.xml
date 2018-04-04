@@ -270,7 +270,7 @@
         <index CARDINALITY="0" COLUMNS_NAME="customer_id" INDEX_NAME="idx_fk_customer_id" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="1" TABLE_CATALOG="def" TABLE_NAME="rental" TABLE_SCHEMA="sakila"/>
         <index CARDINALITY="0" COLUMNS_NAME="inventory_id" INDEX_NAME="idx_fk_inventory_id" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="1" TABLE_CATALOG="def" TABLE_NAME="rental" TABLE_SCHEMA="sakila"/>
         <index CARDINALITY="0" COLUMNS_NAME="staff_id" INDEX_NAME="idx_fk_staff_id" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="1" TABLE_CATALOG="def" TABLE_NAME="rental" TABLE_SCHEMA="sakila"/>
-        <index CARDINALITY="0" COLUMNS_NAME="inventory_id, rental_date, customer_id" INDEX_NAME="rental_date" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="0" TABLE_CATALOG="def" TABLE_NAME="rental" TABLE_SCHEMA="sakila"/>
+        <index CARDINALITY="0" COLUMNS_NAME="rental_date, customer_id, inventory_id" INDEX_NAME="rental_date" INDEX_SCHEMA="sakila" INDEX_TYPE="BTREE" NON_UNIQUE="0" TABLE_CATALOG="def" TABLE_NAME="rental" TABLE_SCHEMA="sakila"/>
       </indexes>
       <foreign_keys>
         <foreign_key COLUMN_NAME="customer_id" CONSTRAINT_CATALOG="def" CONSTRAINT_NAME="fk_rental_customer" CONSTRAINT_SCHEMA="sakila" DELETE_RULE="RESTRICT" MATCH_OPTION="NONE" ORDINAL_POSITION="1" POSITION_IN_UNIQUE_CONSTRAINT="1" REFERENCED_COLUMN_NAME="customer_id" REFERENCED_TABLE_NAME="customer" TABLE_NAME="rental" UNIQUE_CONSTRAINT_CATALOG="def" UNIQUE_CONSTRAINT_NAME="PRIMARY" UPDATE_RULE="CASCADE"/>

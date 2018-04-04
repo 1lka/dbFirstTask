@@ -13,6 +13,10 @@ public class ColumnPrinter extends Printer {
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
 
+        if (node == null) {
+            return sb.toString();
+        }
+
         List<Node> columns = node.getChildren();
         for (Node column : columns) {
             Map<String, String> attrs = column.getAttrs();
