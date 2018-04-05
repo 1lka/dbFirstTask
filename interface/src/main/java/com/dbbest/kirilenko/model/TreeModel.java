@@ -5,11 +5,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
+import java.util.Map;
+
 public class TreeModel {
 
     private Node node;
 
     private ObservableMap<String, String> attrs = FXCollections.observableHashMap();
+
+    //для отслеживания изменения аттрибутов
+    private ObservableList<Map.Entry<String, String>> tableElements = FXCollections.observableArrayList();
+
 
     private ObservableList<TreeModel> children = FXCollections.observableArrayList();
 
@@ -33,8 +39,6 @@ public class TreeModel {
             children.add(new TreeModel(child));
         }
 //        List<TreeModel> list = node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList());
-
-
 
     }
 
