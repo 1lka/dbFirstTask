@@ -67,6 +67,8 @@ public class OpenedProjectViewModel {
         TreeModel root = new TreeModel(rootNode);
         rootItemProperty.set(new TreeItem<>(root));
 
+
+
         selectedItem.addListener((observable, oldValue, newValue) -> {
             newValue.getValue().getChildren();
             Node selectedNode = newValue.getValue().getNode();
@@ -74,7 +76,7 @@ public class OpenedProjectViewModel {
             Map<String, String> map = selectedNode.getAttrs();
 
             //todo change to observable entryset
-            table.setValue(FXCollections.observableArrayList(map.entrySet()));
+            table.setValue(newValue.getValue().getTableElements());
 
             try {
                 String ddlOfNode = printerManager.printDDL(selectedNode);
@@ -94,6 +96,19 @@ public class OpenedProjectViewModel {
 
 
 
+    }
+
+    public void r() {
+        new Thread(()->{
+            for (int i = 0; i < 50; i++) {
+                selectedItem.getValue().getValue().getAttrs().put(String.valueOf(i), String.valueOf(i));
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public void lazyLoad() {
