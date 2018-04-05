@@ -3,39 +3,39 @@ package com.dbbest.kirilenko.model;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
+import javafx.collections.ObservableMap;
 
 public class TreeModel {
+
     private Node node;
 
-    private TreeItem<TreeModel> root;
+    private ObservableMap<String, String> attrs = FXCollections.observableHashMap();
 
-    private ObservableList<TreeItem<TreeModel>> children;
+    private ObservableList<TreeModel> children = FXCollections.observableArrayList();
 
-    public TreeItem<TreeModel> getRoot() {
-        return root;
+    public ObservableMap<String, String> getAttrs() {
+        return attrs;
+    }
+
+    public ObservableList<TreeModel> getChildren() {
+        return children;
     }
 
     public Node getNode() {
         return node;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
-    }
-
-    public ObservableList<TreeItem<TreeModel>> getChildren() {
-        return children;
-    }
-
     public TreeModel(Node node) {
         this.node = node;
-        children = FXCollections.observableArrayList();
+        attrs.putAll(node.getAttrs());
+        //todo change loop for stream
         for (Node child : node.getChildren()) {
-            children.add(new TreeModel(child).getRoot());
+            children.add(new TreeModel(child));
         }
-        root = new TreeItem<>(this);
-        root.getChildren().addAll(children);
+//        List<TreeModel> list = node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList());
+
+
+
     }
 
     @Override

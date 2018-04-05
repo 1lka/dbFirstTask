@@ -68,9 +68,12 @@ public class OpenedProjectViewModel {
         rootItemProperty.set(new TreeItem<>(root));
 
         selectedItem.addListener((observable, oldValue, newValue) -> {
+            newValue.getValue().getChildren();
             Node selectedNode = newValue.getValue().getNode();
 
             Map<String, String> map = selectedNode.getAttrs();
+
+            //todo change to observable entryset
             table.setValue(FXCollections.observableArrayList(map.entrySet()));
 
             try {
@@ -101,7 +104,7 @@ public class OpenedProjectViewModel {
             return;
         }
         TreeModel nm = new TreeModel(nodeForLoading);
-        selectedItem.get().getChildren().addAll(nm.getChildren());
+//        selectedItem.get().getChildren().addAll(nm.getChildren());
     }
 
     public void fullyLoad() {
@@ -112,6 +115,6 @@ public class OpenedProjectViewModel {
             return;
         }
         TreeModel nm = new TreeModel(nodeForLoading);
-        selectedItem.get().getChildren().addAll(nm.getChildren());
+//        selectedItem.get().getChildren().addAll(nm.getChildren());
     }
 }

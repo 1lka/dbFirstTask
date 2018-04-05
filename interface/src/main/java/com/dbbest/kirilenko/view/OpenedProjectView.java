@@ -3,6 +3,7 @@ package com.dbbest.kirilenko.view;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -48,8 +49,8 @@ public class OpenedProjectView {
         treeView.getSelectionModel().select(0);
         viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
 
-        attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
-        valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
+        attributeColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getKey()));
+        valueColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getValue()));
 
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
         ddlArea.textProperty().bind(viewModel.ddlProperty());
@@ -79,10 +80,6 @@ public class OpenedProjectView {
         stage.setResizable(true);
         stage.setMinHeight(400);
         stage.setMinWidth(400);
-    }
-
-    public void expandTreeItem(MouseEvent mouseEvent) {
-
     }
 
     public void lazyLoad(ActionEvent actionEvent) {
