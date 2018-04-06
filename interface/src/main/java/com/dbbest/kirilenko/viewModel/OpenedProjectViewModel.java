@@ -5,6 +5,7 @@ import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.model.TreeModel;
+import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -28,11 +29,13 @@ public class OpenedProjectViewModel {
 
     private BooleanProperty showContext = new SimpleBooleanProperty();
 
+    private StringProperty ddl = new SimpleStringProperty();
+
+    private TreeItemService service = new TreeItemService();
+
     public boolean isShowContext() {
         return showContext.get();
     }
-
-    private StringProperty ddl = new SimpleStringProperty();
 
     public StringProperty ddlProperty() {
         return ddl;
@@ -98,17 +101,18 @@ public class OpenedProjectViewModel {
 
     }
 
-    public void r() {
-        new Thread(()->{
-            for (int i = 0; i < 50; i++) {
-                selectedItem.getValue().getValue().getAttrs().put(String.valueOf(i), String.valueOf(i));
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    public void fullyLoad() {
+        TreeModel treeModel = selectedItem.getValue().getValue();
+        Node nodeForLoading = treeModel.getNode();
+
+        try {
+            loaderManager.fullLoadElement(nodeForLoading);
+            treeModel.fullyLoadedProperty().set(true);
+            treeModel.update();
+        } catch (LoadingException e) {
+            return;
+        }
+        service.createTreeItems(selectedItem.getValue());
     }
 
     public void lazyLoad() {
@@ -119,17 +123,5 @@ public class OpenedProjectViewModel {
             return;
         }
         TreeModel nm = new TreeModel(nodeForLoading);
-//        selectedItem.get().getChildren().addAll(nm.getChildren());
-    }
-
-    public void fullyLoad() {
-        Node nodeForLoading = selectedItem.getValue().getValue().getNode();
-        try {
-            loaderManager.fullLoadElement(nodeForLoading);
-        } catch (LoadingException e) {
-            return;
-        }
-        TreeModel nm = new TreeModel(nodeForLoading);
-//        selectedItem.get().getChildren().addAll(nm.getChildren());
     }
 }

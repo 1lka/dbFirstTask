@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.view;
 
 import com.dbbest.kirilenko.model.TreeModel;
+import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
 import javafx.beans.property.SimpleStringProperty;
@@ -29,6 +30,9 @@ public class OpenedProjectView {
     public ContextMenu contextMenu;
 
     @FXML
+    public MenuItem FL;
+
+    @FXML
     private TableView<Map.Entry<String, String>> attrTable;
 
     @FXML
@@ -38,6 +42,8 @@ public class OpenedProjectView {
     private TreeView<TreeModel> treeView;
 
     private OpenedProjectViewModel viewModel;
+    private Stage primaryStage;
+
 
     @FXML
     private void initialize() {
@@ -54,16 +60,16 @@ public class OpenedProjectView {
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
+        FL.disableProperty().bind(viewModel.selectedItemProperty().getValue().getValue().fullyLoadedProperty());
+
         treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
             if (!viewModel.isShowContext() || event.getTarget().getClass() != LabeledText.class) {
                 event.consume();
             }
         });
 
-        viewModel.r();
     }
 
-    private Stage primaryStage;
 
     public void show(ActionEvent event, TextField dbName) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
@@ -76,10 +82,6 @@ public class OpenedProjectView {
         stage.setResizable(true);
         stage.setMinHeight(400);
         stage.setMinWidth(400);
-    }
-
-    public void expandTreeItem(MouseEvent mouseEvent) {
-
     }
 
     public void lazyLoad(ActionEvent actionEvent) {

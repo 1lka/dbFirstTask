@@ -107,7 +107,7 @@ public class LoaderManager {
     @Override
     public String toString() {
         try {
-            return "manager connected to " + connection.getCatalog();
+            return "manager connected to " + connection.getMetaData().getURL();
         } catch (SQLException e) {
             return "no connection";
         }
