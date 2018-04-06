@@ -31,6 +31,7 @@ public class OpenedProjectView {
 
     @FXML
     public MenuItem FL;
+    public MenuItem LL;
 
     @FXML
     private TableView<Map.Entry<String, String>> attrTable;
@@ -43,7 +44,6 @@ public class OpenedProjectView {
 
     private OpenedProjectViewModel viewModel;
     private Stage primaryStage;
-
 
     @FXML
     private void initialize() {
@@ -60,7 +60,8 @@ public class OpenedProjectView {
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
-        FL.disableProperty().bind(viewModel.selectedItemProperty().getValue().getValue().fullyLoadedProperty());
+        FL.disableProperty().bind(viewModel.fullyLoadedItemProperty());
+        LL.disableProperty().bind(viewModel.lazyLoadedItemProperty());
 
         treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
             if (!viewModel.isShowContext() || event.getTarget().getClass() != LabeledText.class) {

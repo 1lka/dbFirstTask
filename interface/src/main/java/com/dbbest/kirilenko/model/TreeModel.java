@@ -45,6 +45,7 @@ public class TreeModel {
 
     private void setParent(TreeModel parent) {
         this.parent = parent;
+        bindLoadedProperties();
     }
 
     public boolean isLazyLoaded() {
@@ -53,10 +54,6 @@ public class TreeModel {
 
     public BooleanProperty lazyLoadedProperty() {
         return lazyLoaded;
-    }
-
-    public boolean isFullyLoaded() {
-        return fullyLoaded.get();
     }
 
     public BooleanProperty fullyLoadedProperty() {
@@ -71,24 +68,26 @@ public class TreeModel {
         this.node = node;
         attrs.addListener((MapChangeListener<? super String, ? super String>) change -> {
             if (change.wasAdded()) {
-                System.out.println("attribute " + change.getKey() + " " + change.getValueAdded());
                 MyEntry entry = new MyEntry(change.getKey(), change.getValueAdded());
                 tableElements.add(entry);
             }
         });
-        if (getParent() != null) {
-            this.lazyLoaded.bind(getParent().lazyLoadedProperty());
-            this.fullyLoaded.bind(getParent().fullyLoadedProperty());
-        }
-        this.lazyLoaded.bind(this.fullyLoadedProperty());
 
+        if (getParent() != null) {
+            bindLoadedProperties();
+        }
         update();
+    }
+
+    private void bindLoadedProperties() {
+        this.fullyLoaded.bind(getParent().fullyLoadedProperty());
+        this.lazyLoaded.bind(getParent().fullyLoadedProperty());
     }
 
     public void update() {
         attrs.putAll(node.getAttrs());
-//todo change loop for stream
-//        List<TreeModel> list = node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList());
+//      todo change loop for stream
+//      List<TreeModel> list = node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList());
         children.clear();
         for (Node child : node.getChildren()) {
             TreeModel treeModel = new TreeModel(child);

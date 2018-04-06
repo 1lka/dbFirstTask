@@ -18,12 +18,16 @@ import java.util.Map;
 public class OpenedProjectViewModel {
 
     private LoaderManager loaderManager;
-
     private PrinterManager printerManager;
+    private TreeModel selectedTreeModel;
 
     private ObjectProperty<TreeItem<TreeModel>> rootItemProperty = new SimpleObjectProperty<>();
 
     private ObjectProperty<TreeItem<TreeModel>> selectedItem = new SimpleObjectProperty<>();
+
+    private BooleanProperty lazyLoadedItem = new SimpleBooleanProperty(false);
+
+    private BooleanProperty fullyLoadedItem = new SimpleBooleanProperty(false);
 
     private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
 
@@ -32,6 +36,14 @@ public class OpenedProjectViewModel {
     private StringProperty ddl = new SimpleStringProperty();
 
     private TreeItemService service = new TreeItemService();
+
+    public BooleanProperty lazyLoadedItemProperty() {
+        return lazyLoadedItem;
+    }
+
+    public BooleanProperty fullyLoadedItemProperty() {
+        return fullyLoadedItem;
+    }
 
     public boolean isShowContext() {
         return showContext.get();
@@ -60,8 +72,6 @@ public class OpenedProjectViewModel {
         //todo костыль
         printerManager = new PrinterManager(loaderManager.getType());
 
-
-
         Node rootNode = new Node(MySQLConstants.DBEntity.SCHEMA);
         String schemaName = "sakila";
         Map<String, String> attrs = new HashMap<>();
@@ -70,16 +80,12 @@ public class OpenedProjectViewModel {
         TreeModel root = new TreeModel(rootNode);
         rootItemProperty.set(new TreeItem<>(root));
 
-
-
         selectedItem.addListener((observable, oldValue, newValue) -> {
-            newValue.getValue().getChildren();
-            Node selectedNode = newValue.getValue().getNode();
-
-            Map<String, String> map = selectedNode.getAttrs();
-
-            //todo change to observable entryset
+            selectedTreeModel = newValue.getValue();
+            Node selectedNode = selectedTreeModel.getNode();
             table.setValue(newValue.getValue().getTableElements());
+            lazyLoadedItem.set(selectedTreeModel.lazyLoadedProperty().get());
+            fullyLoadedItem.set(selectedTreeModel.fullyLoadedProperty().get());
 
             try {
                 String ddlOfNode = printerManager.printDDL(selectedNode);
@@ -87,7 +93,6 @@ public class OpenedProjectViewModel {
             } catch (NullPointerException e) {
                 ddl.setValue("nothing to show");
             }
-
 
             //todo create mechanism to ignoring conteiner node
             if (selectedNode.getName().equals("tables")) {
@@ -97,31 +102,35 @@ public class OpenedProjectViewModel {
             }
         });
 
-
-
     }
 
     public void fullyLoad() {
-        TreeModel treeModel = selectedItem.getValue().getValue();
-        Node nodeForLoading = treeModel.getNode();
-
+        Node nodeForLoading = selectedTreeModel.getNode();
         try {
             loaderManager.fullLoadElement(nodeForLoading);
-            treeModel.fullyLoadedProperty().set(true);
-            treeModel.update();
+            selectedTreeModel.fullyLoadedProperty().set(true);
+            selectedTreeModel.lazyLoadedProperty().set(true);
+            selectedTreeModel.update();
         } catch (LoadingException e) {
             return;
         }
         service.createTreeItems(selectedItem.getValue());
+
+        String ddlOfNode = printerManager.printDDL(nodeForLoading);
+        ddl.set(ddlOfNode);
+        fullyLoadedItem.set(true);
     }
 
     public void lazyLoad() {
-        Node nodeForLoading = selectedItem.getValue().getValue().getNode();
+        Node nodeForLoading = selectedTreeModel.getNode();
         try {
             loaderManager.lazyChildrenLoad(nodeForLoading);
+            selectedTreeModel.lazyLoadedProperty().set(true);
+            selectedTreeModel.update();
         } catch (LoadingException e) {
             return;
         }
-        TreeModel nm = new TreeModel(nodeForLoading);
+        service.createTreeItems(selectedItem.getValue());
+        lazyLoadedItem.set(true);
     }
 }
