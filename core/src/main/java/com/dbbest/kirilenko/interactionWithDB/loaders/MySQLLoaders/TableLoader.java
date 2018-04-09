@@ -99,7 +99,6 @@ public class TableLoader extends Loader {
             node.addChild(triggers);
 
             return node;
-            //todo delete
         } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
             Node tables = node.wideSearch(MySQLConstants.NodeNames.TABLES);
             List<Node> tablesList;

@@ -9,6 +9,10 @@ import java.util.Map;
 
 public abstract class Loader {
 
+    private final static String ELEMENT_LOADED = "elementLoaded";
+    private final static String FULLY_LOADED = "fullyLoaded";
+    private final static String LAZILY_LOADED = "lazilyLoaded";
+
     private Connection connection;
 
     public Loader() {

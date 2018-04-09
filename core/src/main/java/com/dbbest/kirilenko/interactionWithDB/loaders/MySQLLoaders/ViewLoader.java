@@ -35,10 +35,27 @@ public class ViewLoader extends Loader{
 
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
-        Node views = new Node(MySQLConstants.NodeNames.VIEWS);
-        List<Node> viewList = loadCategory(node);
-        views.addChildren(viewList);
-        node.addChild(views);
+        if (MySQLConstants.DBEntity.VIEW.equals(node.getName())) {
+            Node views = new Node(MySQLConstants.NodeNames.VIEWS);
+            List<Node> viewList = loadCategory(node);
+            views.addChildren(viewList);
+            node.addChild(views);
+            return node;
+        } if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
+            Node views = node.wideSearch(MySQLConstants.NodeNames.VIEWS);
+            List<Node> viewsList;
+            if (views == null) {
+                views = new Node(MySQLConstants.NodeNames.VIEWS);
+                node.addChild(views);
+                viewsList = loadCategory(node);
+                views.addChildren(viewsList);
+            } else {
+                viewsList = views.getChildren();
+            }
+            for (Node view : viewsList) {
+                fullLoadElement(view);
+            }
+        }
         return node;
     }
 
