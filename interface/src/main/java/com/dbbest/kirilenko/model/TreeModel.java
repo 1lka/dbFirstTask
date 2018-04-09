@@ -69,8 +69,16 @@ public class TreeModel {
         fullyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.FULLY_LOADED)));
         lazyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.LAZILY_LOADED)));
         elementLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.ELEMENT_LOADED)));
-        children.clear();
-        children.addAll(FXCollections.observableList(node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList())));
+
+        //todo change to flatMap
+        children.addAll(node.getChildren().stream()
+                .filter(n -> children.stream()
+                        .noneMatch(treeModel -> treeModel.getNode().equals(n))).map(TreeModel::new).collect(Collectors.toList()));
+
+        //todo why stream doesn't work?!!!!!!
+        for (TreeModel t : children) {
+            t.update();
+        }
     }
 
     private class MyEntry implements Map.Entry<String, String> {
@@ -101,6 +109,8 @@ public class TreeModel {
         }
     }
 
+
+    //todo create normal toString
     @Override
     public String toString() {
         return node.getName();

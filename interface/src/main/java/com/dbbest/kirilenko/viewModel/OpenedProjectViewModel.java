@@ -8,11 +8,9 @@ import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.*;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class OpenedProjectViewModel {
@@ -71,15 +69,6 @@ public class OpenedProjectViewModel {
         return table;
     }
 
-//    private ListChangeListener<TreeModel> listener = c -> {
-//        while (c.next()) {
-//            for (TreeModel model : c.getAddedSubList()) {
-//                System.out.println(model.getNode());
-//            }
-//        }
-//        System.out.println();
-//    };
-
     public OpenedProjectViewModel() {
         loaderManager = LoaderManager.getInstance();
         printerManager = new PrinterManager(loaderManager.getType());
@@ -94,7 +83,6 @@ public class OpenedProjectViewModel {
             selectedTreeModel = newValue.getValue();
             Node selectedNode = selectedTreeModel.getNode();
             table.setValue(newValue.getValue().getTableElements());
-//            selectedTreeModel.getChildren().addListener(listener);
 
             fullyLoadedItem.bind(selectedTreeModel.fullyLoadedProperty());
             lazyLoadedItem.bind(selectedTreeModel.lazyLoadedProperty());
@@ -106,7 +94,6 @@ public class OpenedProjectViewModel {
             } catch (NullPointerException e) {
                 ddl.setValue("nothing to show");
             }
-
             //todo create mechanism to ignoring container node
 //            String name = selectedNode.getName();
 //            if (name.equals("tables")||name.equals(MySQLConstants.NodeNames)) {
@@ -122,10 +109,9 @@ public class OpenedProjectViewModel {
         try {
             loaderManager.fullLoadElement(nodeForLoading);
             selectedTreeModel.update();
-        } catch (LoadingException e) {
-            return;
+            service.createTreeItems(selectedItem.getValue());
+        } catch (LoadingException ignored) {
         }
-        service.createTreeItems(selectedItem.getValue());
         String ddlOfNode = printerManager.printDDL(nodeForLoading);
         ddl.set(ddlOfNode);
     }
@@ -135,10 +121,9 @@ public class OpenedProjectViewModel {
         try {
             loaderManager.lazyChildrenLoad(nodeForLoading);
             selectedTreeModel.update();
-        } catch (LoadingException e) {
-            return;
+            service.createTreeItems(selectedItem.getValue());
+        } catch (LoadingException ignored) {
         }
-        service.createTreeItems(selectedItem.getValue());
     }
 
     public void loadElement() {
