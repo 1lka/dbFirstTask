@@ -61,7 +61,7 @@ public class NewProjectViewModel {
     public LoaderManager connect() {
         if (manager == null) {
             try {
-                manager = LoaderManager.getInstance(DBType.MYSQL, getUrl(), getLogin(), getPassword());
+                manager = LoaderManager.getInstance(DBType.MYSQL, getDbName(), getUrl(), getLogin(), getPassword());
                 System.err.println("connected");
             } catch (SQLException e) {
                 System.err.println("not connected");

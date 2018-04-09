@@ -1,7 +1,6 @@
 package com.dbbest.kirilenko.view;
 
 import com.dbbest.kirilenko.model.TreeModel;
-import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
 import javafx.beans.property.SimpleStringProperty;
@@ -13,7 +12,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.util.Map;
@@ -31,7 +29,12 @@ public class OpenedProjectView {
 
     @FXML
     public MenuItem FL;
+
+    @FXML
     public MenuItem LL;
+
+    @FXML
+    public MenuItem LE;
 
     @FXML
     private TableView<Map.Entry<String, String>> attrTable;
@@ -62,6 +65,7 @@ public class OpenedProjectView {
 
         FL.disableProperty().bind(viewModel.fullyLoadedItemProperty());
         LL.disableProperty().bind(viewModel.lazyLoadedItemProperty());
+        LE.disableProperty().bind(viewModel.elementLoadedProperty());
 
         treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
             if (!viewModel.isShowContext() || event.getTarget().getClass() != LabeledText.class) {
@@ -71,8 +75,7 @@ public class OpenedProjectView {
 
     }
 
-
-    public void show(ActionEvent event, TextField dbName) throws Exception {
+    public void show(ActionEvent event) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
         Node source = (Node) event.getSource();
         Scene scene = source.getScene();
@@ -90,10 +93,10 @@ public class OpenedProjectView {
     }
 
     public void loadElement(ActionEvent actionEvent) {
-
+        viewModel.loadElement();
     }
 
     public void fullyLoad(ActionEvent actionEvent) {
-        viewModel.fullyLoad();
+        viewModel.fullLoad();
     }
 }

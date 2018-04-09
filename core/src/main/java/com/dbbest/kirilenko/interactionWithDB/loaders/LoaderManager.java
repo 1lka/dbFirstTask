@@ -13,11 +13,21 @@ import java.util.Map;
 
 public class LoaderManager {
 
-    private final static String ELEMENT_LOADED = "elementLoaded";
-    private final static String FULLY_LOADED = "fullyLoaded";
-    private final static String LAZILY_LOADED = "lazilyLoaded";
+    public final static String ELEMENT_LOADED = "elementLoaded";
+    public final static String FULLY_LOADED = "fullyLoaded";
+    public final static String LAZILY_LOADED = "lazilyLoaded";
 
     private DBType type;
+
+    private String DBName;
+
+    public String getDBName() {
+        return DBName;
+    }
+
+    public void setDBName(String DBName) {
+        this.DBName = DBName;
+    }
 
     public DBType getType() {
         return type;
@@ -29,9 +39,11 @@ public class LoaderManager {
 
     private static LoaderManager instance;
 
-    public static synchronized LoaderManager getInstance(DBType type, String url, String login, String pass) throws SQLException {
+    public static synchronized LoaderManager getInstance(DBType type, String DBName, String url, String login, String pass) throws SQLException {
+
         if (instance == null) {
             instance = new LoaderManager(type, url, login, pass);
+            instance.DBName = DBName;
         }
         return instance;
     }
@@ -86,9 +98,18 @@ public class LoaderManager {
             node.getAttrs().put(FULLY_LOADED, String.valueOf(true));
             node.getAttrs().put(ELEMENT_LOADED, String.valueOf(true));
             node.getAttrs().put(LAZILY_LOADED, String.valueOf(true));
-
+            updateChildren(node);
         }
         return node;
+    }
+
+    private void updateChildren(Node parent) {
+        for (Node child : parent.getChildren()) {
+            child.getAttrs().put(FULLY_LOADED, String.valueOf(true));
+            child.getAttrs().put(ELEMENT_LOADED, String.valueOf(true));
+            child.getAttrs().put(LAZILY_LOADED, String.valueOf(true));
+            updateChildren(child);
+        }
     }
 
     /**

@@ -38,7 +38,7 @@
                                 <ContextMenu fx:id="contextMenu">
                                     <items>
                                         <MenuItem fx:id="LL" mnemonicParsing="false" onAction="#lazyLoad" text="lazy load" />
-                                        <MenuItem mnemonicParsing="false" onAction="#loadElement" text="load element" />
+                                        <MenuItem fx:id="LE" mnemonicParsing="false" onAction="#loadElement" text="load element" />
                                         <MenuItem fx:id="FL" mnemonicParsing="false" onAction="#fullyLoad" text="fully load" />
                                     </items>
                                 </ContextMenu>

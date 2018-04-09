@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.model;
 
+import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -9,16 +10,17 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TreeModel {
 
     private Node node;
 
-    private TreeModel parent;
+    private BooleanProperty lazyLoaded = new SimpleBooleanProperty();
 
-    private BooleanProperty lazyLoaded = new SimpleBooleanProperty(false);
+    private BooleanProperty fullyLoaded = new SimpleBooleanProperty();
 
-    private BooleanProperty fullyLoaded = new SimpleBooleanProperty(false);
+    private BooleanProperty elementLoaded = new SimpleBooleanProperty();
 
     private ObservableMap<String, String> attrs = FXCollections.observableHashMap();
 
@@ -31,29 +33,16 @@ public class TreeModel {
         return tableElements;
     }
 
-    public ObservableMap<String, String> getAttrs() {
-        return attrs;
-    }
-
     public ObservableList<TreeModel> getChildren() {
         return children;
     }
 
-    public TreeModel getParent() {
-        return parent;
-    }
-
-    private void setParent(TreeModel parent) {
-        this.parent = parent;
-        bindLoadedProperties();
-    }
-
-    public boolean isLazyLoaded() {
-        return lazyLoaded.get();
-    }
-
     public BooleanProperty lazyLoadedProperty() {
         return lazyLoaded;
+    }
+
+    public BooleanProperty elementLoadedProperty() {
+        return elementLoaded;
     }
 
     public BooleanProperty fullyLoadedProperty() {
@@ -72,28 +61,16 @@ public class TreeModel {
                 tableElements.add(entry);
             }
         });
-
-        if (getParent() != null) {
-            bindLoadedProperties();
-        }
         update();
     }
 
-    private void bindLoadedProperties() {
-        this.fullyLoaded.bind(getParent().fullyLoadedProperty());
-        this.lazyLoaded.bind(getParent().fullyLoadedProperty());
-    }
 
     public void update() {
         attrs.putAll(node.getAttrs());
-//      todo change loop for stream
-//      List<TreeModel> list = node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList());
-        children.clear();
-        for (Node child : node.getChildren()) {
-            TreeModel treeModel = new TreeModel(child);
-            treeModel.setParent(this);
-            children.add(treeModel);
-        }
+        fullyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.FULLY_LOADED)));
+        lazyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.LAZILY_LOADED)));
+        elementLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.ELEMENT_LOADED)));
+        children = FXCollections.observableList(node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList()));
     }
 
     private class MyEntry implements Map.Entry<String, String> {

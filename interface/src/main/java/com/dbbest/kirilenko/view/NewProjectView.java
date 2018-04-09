@@ -52,7 +52,7 @@ public class NewProjectView {
         LoaderManager manager = newProjectViewModel.connect();
         if (manager != null) {
             OpenedProjectView openedProject = new OpenedProjectView();
-            openedProject.show(actionEvent, dbName);
+            openedProject.show(actionEvent);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");

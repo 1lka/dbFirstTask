@@ -32,8 +32,7 @@ public class TestDB {
         root.setAttrs(attrs);
         root2.setAttrs(attrs2);
 
-        LoaderManager manager = LoaderManager.getInstance(type, url, login, pass);
-        manager.loadElement(root);
+        LoaderManager manager = LoaderManager.getInstance(type,schemaName, url, login, pass);
         manager.lazyChildrenLoad(root);
         manager.fullLoadElement(root);
 
