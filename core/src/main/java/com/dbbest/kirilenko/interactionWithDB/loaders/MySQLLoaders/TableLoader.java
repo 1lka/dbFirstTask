@@ -113,6 +113,8 @@ public class TableLoader extends Loader {
             for (Node table : tablesList) {
                 fullLoadElement(table);
             }
+            tables.getAttrs().put("childrenCount", String.valueOf(tablesList.size()));
+
         }
         return node;
     }

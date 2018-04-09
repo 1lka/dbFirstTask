@@ -64,13 +64,13 @@ public class TreeModel {
         update();
     }
 
-
     public void update() {
         attrs.putAll(node.getAttrs());
         fullyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.FULLY_LOADED)));
         lazyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.LAZILY_LOADED)));
         elementLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.ELEMENT_LOADED)));
-        children = FXCollections.observableList(node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList()));
+        children.clear();
+        children.addAll(FXCollections.observableList(node.getChildren().stream().map(TreeModel::new).collect(Collectors.toList())));
     }
 
     private class MyEntry implements Map.Entry<String, String> {

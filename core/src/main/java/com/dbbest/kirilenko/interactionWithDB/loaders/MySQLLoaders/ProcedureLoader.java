@@ -60,6 +60,7 @@ public class ProcedureLoader extends Loader {
             for (Node procedure : procedureList) {
                 fullLoadElement(procedure);
             }
+            procedures.getAttrs().put("childrenCount", String.valueOf(procedureList.size()));
         }
         return node;
     }

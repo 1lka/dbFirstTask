@@ -8,6 +8,7 @@ import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.*;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
@@ -70,6 +71,15 @@ public class OpenedProjectViewModel {
         return table;
     }
 
+//    private ListChangeListener<TreeModel> listener = c -> {
+//        while (c.next()) {
+//            for (TreeModel model : c.getAddedSubList()) {
+//                System.out.println(model.getNode());
+//            }
+//        }
+//        System.out.println();
+//    };
+
     public OpenedProjectViewModel() {
         loaderManager = LoaderManager.getInstance();
         printerManager = new PrinterManager(loaderManager.getType());
@@ -84,6 +94,7 @@ public class OpenedProjectViewModel {
             selectedTreeModel = newValue.getValue();
             Node selectedNode = selectedTreeModel.getNode();
             table.setValue(newValue.getValue().getTableElements());
+//            selectedTreeModel.getChildren().addListener(listener);
 
             fullyLoadedItem.bind(selectedTreeModel.fullyLoadedProperty());
             lazyLoadedItem.bind(selectedTreeModel.lazyLoadedProperty());

@@ -55,6 +55,7 @@ public class ViewLoader extends Loader{
             for (Node view : viewsList) {
                 fullLoadElement(view);
             }
+            views.getAttrs().put("childrenCount", String.valueOf(viewsList.size()));
         }
         return node;
     }

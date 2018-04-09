@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @EntityLoader(element = MySQLConstants.DBEntity.FUNCTION)
-public class FunctionLoader extends Loader{
+public class FunctionLoader extends Loader {
 
     private static final String SQL_QUERY =
             "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
@@ -59,7 +59,9 @@ public class FunctionLoader extends Loader{
             for (Node procedure : functionList) {
                 fullLoadElement(procedure);
             }
+            functions.getAttrs().put("childrenCount", String.valueOf(functionList.size()));
         }
+
         return node;
     }
 
