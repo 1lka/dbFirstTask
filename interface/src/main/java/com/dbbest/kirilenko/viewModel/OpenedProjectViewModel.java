@@ -1,10 +1,13 @@
 package com.dbbest.kirilenko.viewModel;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.model.TreeModel;
+import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
+import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.*;
@@ -13,6 +16,12 @@ import javafx.scene.control.TreeItem;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -181,7 +190,16 @@ public class OpenedProjectViewModel {
 
     }
 
-    public void saveProject(File file) {
+    public void saveProject(File file) throws SerializationException, IOException {
+        SerializationStrategy strategy = new XMLStrategyImpl();
+        String pathToFolder = file.getAbsolutePath() + "\\" + loaderManager.getDBName();
 
+        Path path = Paths.get(pathToFolder);
+        Files.createDirectories(path);
+
+        File file1 = new File(pathToFolder + "\\project.xml");
+        System.out.println(file1.createNewFile());
+
+        strategy.serialize(rootItemProperty.getValue().getValue().getNode(), file1.getAbsolutePath());
     }
 }

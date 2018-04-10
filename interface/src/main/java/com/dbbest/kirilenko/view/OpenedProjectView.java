@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.view;
 
+import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
@@ -18,6 +19,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public class OpenedProjectView {
@@ -146,7 +148,16 @@ public class OpenedProjectView {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("save");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        viewModel.saveProject(chooser.showDialog(primaryStage));
+        try {
+            File file = chooser.showDialog(primaryStage);
+            viewModel.saveProject(file);
+        } catch (SerializationException|IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("problems with saving");
+            alert.setHeaderText("Look, an Error Dialog");
+            alert.setContentText(e.toString());
 
+            alert.showAndWait();
+        }
     }
 }
