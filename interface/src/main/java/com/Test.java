@@ -7,6 +7,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
+import java.io.File;
+
 public class Test {
     static ObjectProperty o = new SimpleObjectProperty();
     static ObjectProperty e = new SimpleObjectProperty();
@@ -19,13 +21,7 @@ public class Test {
     };
     public static void main(String[] args) {
 
-        o.addListener(listener);
-        e.addListener(listener);
-        o.setValue("asd");
-        e.setValue("asdas");
-
-
-        o.setValue("asdss");
+        System.out.println(System.getProperty("user.home"));
 
     }
 }

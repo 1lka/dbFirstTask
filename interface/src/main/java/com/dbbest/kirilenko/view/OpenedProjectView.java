@@ -3,8 +3,10 @@ package com.dbbest.kirilenko.view;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -12,9 +14,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
+import java.io.File;
 import java.util.Map;
 
 public class OpenedProjectView {
@@ -38,6 +41,21 @@ public class OpenedProjectView {
     public MenuItem LE;
 
     @FXML
+    public Button saveDDLbtn;
+
+    @FXML
+    public TextField searchText;
+
+    @FXML
+    public MenuBar menuBar;
+
+    @FXML
+    public Menu projectMenu;
+
+    @FXML
+    public MenuItem saveProjMenuItem;
+
+    @FXML
     private TableView<Map.Entry<String, String>> attrTable;
 
     @FXML
@@ -47,15 +65,17 @@ public class OpenedProjectView {
     private TreeView<TreeModel> treeView;
 
     private OpenedProjectViewModel viewModel;
-    private Stage primaryStage;
+
+    private static Stage primaryStage;
 
     @FXML
     private void initialize() {
+        primaryStage = new Stage();
         viewModel = new OpenedProjectViewModel();
 
         treeView.setEditable(true);
         treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
-        treeView.getSelectionModel().select(0);
+        treeView.getSelectionModel().selectFirst();
         viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
 
         attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
@@ -67,26 +87,31 @@ public class OpenedProjectView {
         FL.disableProperty().bind(viewModel.fullyLoadedItemProperty());
         LL.disableProperty().bind(viewModel.lazyLoadedItemProperty());
         LE.disableProperty().bind(viewModel.elementLoadedProperty());
+//        FL.textProperty()
+
+        viewModel.foundItemProperty().addListener((observable, oldValue, newValue) -> {
+            treeView.getSelectionModel().select(newValue);
+        });
+
 
         treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
             if (!viewModel.isShowContext() || event.getTarget().getClass() != LabeledText.class) {
                 event.consume();
             }
         });
-
     }
 
     public void show(ActionEvent event) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
         Node source = (Node) event.getSource();
-        Scene scene = source.getScene();
-        scene.setRoot(root);
-        scene.getWindow().setHeight(600);
-        scene.getWindow().setWidth(600);
-        Stage stage = (Stage) scene.getWindow();
-        stage.setResizable(true);
-        stage.setMinHeight(400);
-        stage.setMinWidth(400);
+        Scene scene1 = source.getScene();
+        Stage primaryStage1 = (Stage) scene1.getWindow();
+        Stage s = (Stage) primaryStage1.getOwner();
+        s.close();
+        Scene scene = new Scene(root);
+        primaryStage = new Stage();
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public void lazyLoad(ActionEvent actionEvent) {
@@ -99,5 +124,29 @@ public class OpenedProjectView {
 
     public void fullyLoad(ActionEvent actionEvent) {
         viewModel.fullLoad();
+    }
+
+    public void saveDDL(ActionEvent actionEvent) {
+        viewModel.saveDDL();
+    }
+
+    public void searchElement(ActionEvent actionEvent) {
+        viewModel.searchElement(searchText.getText());
+    }
+
+    public void previousElement(ActionEvent actionEvent) {
+        viewModel.previousElement();
+    }
+
+    public void nextElement(ActionEvent actionEvent) {
+        viewModel.nextElement();
+    }
+
+    public void saveProject(ActionEvent actionEvent) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("save");
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        viewModel.saveProject(chooser.showDialog(primaryStage));
+
     }
 }

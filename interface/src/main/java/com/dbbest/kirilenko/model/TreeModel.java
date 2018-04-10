@@ -109,7 +109,6 @@ public class TreeModel {
         }
     }
 
-
     //todo create normal toString
     @Override
     public String toString() {

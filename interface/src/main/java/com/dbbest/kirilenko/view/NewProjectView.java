@@ -79,7 +79,7 @@ public class NewProjectView {
             Window mainStage = source.getScene().getWindow();
             stage.initOwner(mainStage);
         }
-        stage.showAndWait();
+        stage.show();
     }
 }
 
