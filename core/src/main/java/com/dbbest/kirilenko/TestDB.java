@@ -23,17 +23,15 @@ public class TestDB {
         String pass = "root";
 
         Node root = new Node(MySQLConstants.DBEntity.SCHEMA);
-        Node root2 = new Node(MySQLConstants.DBEntity.SCHEMA);
         String schemaName = "sakila";
         Map<String, String> attrs = new HashMap<>();
-        attrs.put(MySQLConstants.AttributeName.SCHEMA_NAME, schemaName);
-        Map<String, String> attrs2 = new HashMap<>(attrs);
-
+        attrs.put(MySQLConstants.AttributeName.NAME, schemaName);
         root.setAttrs(attrs);
-        root2.setAttrs(attrs2);
 
-        LoaderManager manager = LoaderManager.getInstance(type,schemaName, url, login, pass);
+
+        LoaderManager manager = LoaderManager.getInstance(type, schemaName, url, login, pass);
         manager.lazyChildrenLoad(root);
+        System.out.println(root + "\n");
         manager.fullLoadElement(root);
 
         PrinterManager printerManager = new PrinterManager(type);

@@ -97,7 +97,7 @@ public class OpenedProjectViewModel {
         printerManager = new PrinterManager(loaderManager.getType());
 
         Node rootNode = new Node(MySQLConstants.DBEntity.SCHEMA);
-        rootNode.getAttrs().put(MySQLConstants.AttributeName.SCHEMA_NAME, loaderManager.getDBName());
+        rootNode.getAttrs().put(MySQLConstants.AttributeName.NAME, loaderManager.getDBName());
 
         TreeModel root = new TreeModel(rootNode);
         rootItemProperty.set(new TreeItem<>(root));

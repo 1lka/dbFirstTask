@@ -112,6 +112,7 @@ public class OpenedProjectView {
         s.close();
         Scene scene = new Scene(root);
         primaryStage = new Stage();
+        primaryStage.setTitle("DBBest");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

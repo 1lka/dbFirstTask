@@ -1,13 +1,14 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
-import com.dbbest.kirilenko.tree.ChildrenList;
-import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
+import com.dbbest.kirilenko.tree.Node;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -68,10 +69,12 @@ public class SchemaLoader extends Loader {
      */
     @Override
     public Node loadElement(Node node) throws SQLException {
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.SCHEMA_NAME);
+        String schema = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(SQL_QUERY, schema);
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.SCHEMA_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
             return node;
         } else {
@@ -102,7 +105,7 @@ public class SchemaLoader extends Loader {
     }
 
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
+    public List<Node> loadCategory(Node node) {
         return null;
     }
 }

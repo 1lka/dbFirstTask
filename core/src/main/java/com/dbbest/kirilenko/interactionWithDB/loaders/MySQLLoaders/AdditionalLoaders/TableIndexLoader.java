@@ -14,10 +14,14 @@ import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.At
 
 public class TableIndexLoader extends Loader {
 
+//    private static final String LOAD_ELEMENT_QUERY =
+//            "select TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, NON_UNIQUE, INDEX_SCHEMA, INDEX_NAME ,group_concat(COLUMN_NAME separator ', ') " +
+//                    "as COLUMNS_NAME, CARDINALITY, SUB_PART, PACKED, NULLABLE, INDEX_TYPE, COMMENT, INDEX_COMMENT " +
+//                    " from INFORMATION_SCHEMA.STATISTICS where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME != 'PRIMARY' group by INDEX_NAME";
+
     private static final String LOAD_ELEMENT_QUERY =
-            "select TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, NON_UNIQUE, INDEX_SCHEMA, INDEX_NAME ,group_concat(COLUMN_NAME separator ', ') " +
-                    "as COLUMNS_NAME, CARDINALITY, SUB_PART, PACKED, NULLABLE, INDEX_TYPE, COMMENT, INDEX_COMMENT " +
-                    " from INFORMATION_SCHEMA.STATISTICS where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME != 'PRIMARY' group by INDEX_NAME";
+            "select INDEX_NAME from INFORMATION_SCHEMA.STATISTICS " +
+                    "where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME != 'PRIMARY' group by INDEX_NAME";
 
     public TableIndexLoader() {
     }
@@ -44,13 +48,15 @@ public class TableIndexLoader extends Loader {
     @Override
     public List<Node> loadCategory(Node table) throws SQLException {
         String schemaName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
-        String tableName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+        String tableName = table.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         List<Node> indexesList = new ChildrenList<>();
         while (resultSet.next()) {
             Node index = new Node(MySQLConstants.DBEntity.INDEX);
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.INDEX_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             index.setAttrs(attrs);
             indexesList.add(index);
         }

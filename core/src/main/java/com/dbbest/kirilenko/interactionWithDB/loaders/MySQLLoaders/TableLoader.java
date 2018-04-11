@@ -14,11 +14,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-@EntityLoader(element = MySQLConstants.DBEntity.TABLE)
+@EntityLoader(element = {MySQLConstants.DBEntity.TABLE, MySQLConstants.NodeNames.TABLES})
 public class TableLoader extends Loader {
 
     private static final String All_TABLES_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.TABLES " +
+            "SELECT TABLE_NAME,TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES " +
                     "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' order by TABLE_NAME";
 
     private static final String TABLE_QUERY =
@@ -34,6 +34,35 @@ public class TableLoader extends Loader {
 
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
+        Loader columnLoader = new TableColumnLoader(getConnection());
+        List<Node> columnsList = columnLoader.loadCategory(node);
+        Node columns = new Node(MySQLConstants.NodeNames.COLUMNS);
+        columns.addChildren(columnsList);
+        node.addChild(columns);
+
+        Loader indexLoader = new TableIndexLoader(getConnection());
+        List<Node> indexesList = indexLoader.loadCategory(node);
+        Node indexes = new Node(MySQLConstants.NodeNames.INDEXES);
+        indexes.addChildren(indexesList);
+        node.addChild(indexes);
+
+        Loader FKLoader = new TableForeignKeyLoader(getConnection());
+        List<Node> FKList = FKLoader.loadCategory(node);
+        Node FKs = new Node(MySQLConstants.NodeNames.FOREIGN_KEYS);
+        FKs.addChildren(FKList);
+        node.addChild(FKs);
+
+        Loader PKLoader = new TablePrimaryKeyLoader(getConnection());
+        List<Node> PKList = PKLoader.loadCategory(node);
+        Node PKs = new Node(MySQLConstants.NodeNames.PRIMARY_KEYS);
+        PKs.addChildren(PKList);
+        node.addChild(PKs);
+
+        Loader triggerLoader = new TableTriggerLoader(getConnection());
+        List<Node> triggersList = triggerLoader.loadCategory(node);
+        Node triggers = new Node(MySQLConstants.NodeNames.TRIGGERS);
+        triggers.addChildren(triggersList);
+        node.addChild(triggers);
         return node;
     }
 
@@ -45,11 +74,13 @@ public class TableLoader extends Loader {
      */
     @Override
     public Node loadElement(Node node) throws SQLException {
-        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
         ResultSet resultSet = executeQuery(TABLE_QUERY, schemaName, tableName);
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.TABLE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
             return node;
         }
@@ -128,11 +159,13 @@ public class TableLoader extends Loader {
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
         List<Node> tables = new ChildrenList<>();
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.SCHEMA_NAME);
-        ResultSet resultSet = executeQuery(All_TABLES_QUERY, schema);
+        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(All_TABLES_QUERY, schemaName);
         while (resultSet.next()) {
             Node table = new Node(MySQLConstants.DBEntity.TABLE);
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.TABLE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             table.setAttrs(attrs);
             tables.add(table);
         }

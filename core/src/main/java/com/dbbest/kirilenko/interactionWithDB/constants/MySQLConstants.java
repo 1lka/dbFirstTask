@@ -42,6 +42,7 @@ public class MySQLConstants {
      * class contains INFORMATION_SCHEMA column names
      */
     public static class AttributeName{
+        public final static String NAME = "NAME";
         public final static String SCHEMA_NAME = "SCHEMA_NAME";
         public final static String TABLE_SCHEMA = "TABLE_SCHEMA";
         public final static String DEFAULT_CHARACTER_SET_NAME = "DEFAULT_CHARACTER_SET_NAME";
@@ -80,6 +81,7 @@ public class MySQLConstants {
         public final static String COLUMN_DEFAULT = "COLUMN_DEFAULT";
         public final static String EXTRA = "EXTRA";
         public final static String DATA_TYPE = "DATA_TYPE";
+        public final static String ROUTINE_SCHEMA = "ROUTINE_SCHEMA";
     }
     /**
      * class contains delimiters for printers

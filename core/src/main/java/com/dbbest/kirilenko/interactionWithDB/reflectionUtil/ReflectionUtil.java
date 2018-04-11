@@ -67,9 +67,11 @@ public class ReflectionUtil {
             if (a != null) {
                 Class<?> type = a.annotationType();
                 Method m = type.getMethod("element");
-                String key = (String) m.invoke(a);
+                String[] keys = (String[]) m.invoke(a);
                 Object value = c.newInstance();
-                map.put(key, value);
+                for (String k : keys) {
+                    map.put(k, value);
+                }
             }
         }
         return map;

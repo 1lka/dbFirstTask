@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
 
+import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
@@ -13,11 +14,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-@EntityLoader(element = MySQLConstants.DBEntity.FUNCTION)
+@EntityLoader(element = {MySQLConstants.DBEntity.FUNCTION, MySQLConstants.NodeNames.FUNCTIONS})
 public class FunctionLoader extends Loader {
 
-    private static final String SQL_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
+    private static final String SQL_LAZY_QUERY =
+            "SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
+
+    private static final String SQL_FULL_ELEMENT_QUERY =
+            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_NAME = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
 
     public FunctionLoader() {
     }
@@ -28,12 +32,26 @@ public class FunctionLoader extends Loader {
 
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
+        Loader paramsLoader = new RoutineParamsLoader(getConnection());
+        List<Node> paramsList = paramsLoader.loadCategory(node);
+        Node columns = new Node(MySQLConstants.NodeNames.PARAMETERS);
+        columns.addChildren(paramsList);
+        node.addChild(columns);
         return node;
     }
 
     @Override
     public Node loadElement(Node node) throws SQLException {
-        return node;
+        String procedureName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String schema = node.getAttrs().get(MySQLConstants.AttributeName.ROUTINE_SCHEMA);
+        ResultSet resultSet = executeQuery(SQL_FULL_ELEMENT_QUERY, schema, procedureName);
+        if (resultSet.next()) {
+            Map<String, String> attrs = fillAttributes(resultSet);
+            node.setAttrs(attrs);
+            return node;
+        } else {
+            throw new LoadingException("there is no such function: " + procedureName);
+        }
     }
 
     @Override
@@ -68,11 +86,13 @@ public class FunctionLoader extends Loader {
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
         List<Node> functions = new ChildrenList<>();
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.SCHEMA_NAME);
-        ResultSet resultSet = executeQuery(SQL_QUERY, schema);
+        String schema = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(SQL_LAZY_QUERY, schema);
         while (resultSet.next()) {
             Node function = new Node(MySQLConstants.DBEntity.FUNCTION);
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             function.setAttrs(attrs);
             functions.add(function);
         }

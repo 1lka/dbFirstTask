@@ -19,7 +19,7 @@ public class TableColumnLoader extends Loader {
 //                    "(SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS where TABLE_SCHEMA = ?) order by TABLE_NAME";
 
     private static final String LOAD_ELEMENT_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? and TABLE_NAME = ?";
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? and TABLE_NAME = ?";
 
     public TableColumnLoader() {
     }
@@ -35,6 +35,7 @@ public class TableColumnLoader extends Loader {
 
     @Override
     public Node loadElement(Node node) throws SQLException {
+        //todo
         return null;
     }
 
@@ -46,13 +47,15 @@ public class TableColumnLoader extends Loader {
     @Override
     public List<Node> loadCategory(Node table) throws SQLException {
         String schemaName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
-        String tableName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+        String tableName = table.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         List<Node> columnList = new ChildrenList<>();
         while (resultSet.next()) {
             Node column = new Node(MySQLConstants.DBEntity.COLUMN);
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.COLUMN_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             column.setAttrs(attrs);
             columnList.add(column);
         }

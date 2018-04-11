@@ -1,4 +1,4 @@
-package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders;
+package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Connection4Test;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProcedureLoaderTest {
+public class RoutineParamsLoaderTest {
 
     private static Node root;
     private static Loader loader;
@@ -21,44 +21,34 @@ public class ProcedureLoaderTest {
     @BeforeClass
     public static void init() {
         Connection connection = Connection4Test.getConnection();
-        loader = new ProcedureLoader(connection);
+        loader = new RoutineParamsLoader(connection);
     }
 
     @Before
     public void before() {
-        root = new Node(MySQLConstants.DBEntity.PROCEDURE);
+        root = new Node(MySQLConstants.DBEntity.FUNCTION);
         String schemaName = "sakila";
-        String name = "film_in_stock";
+        String functionName = "get_customer_balance";
         Map<String, String> attrs = new HashMap<>();
         attrs.put(MySQLConstants.AttributeName.ROUTINE_SCHEMA, schemaName);
-        attrs.put(MySQLConstants.AttributeName.NAME, name);
+        attrs.put(MySQLConstants.AttributeName.NAME, functionName);
         root.setAttrs(attrs);
     }
 
     @Test
-    public void lazyChildrenLoad() throws SQLException {
-        System.out.println(loader.lazyChildrenLoad(root));
+    public void loadElement() {
     }
 
     @Test
-    public void loadElement() throws SQLException {
-        System.out.println(loader.loadElement(root));
-    }
-
-    @Test
-    public void loadElement1() {
-    }
-
-    @Test
-    public void fullLoadElement() throws SQLException {
-        System.out.println(loader.fullLoadElement(root));
+    public void fullLoadElement() {
     }
 
     @Test
     public void loadCategory() throws SQLException {
-        Node node = new Node(MySQLConstants.DBEntity.SCHEMA);
-        Map<String, String> attrs = new HashMap<>();
-        attrs.put("NAME", "sakila");
+        Node node = new Node(MySQLConstants.DBEntity.FUNCTION);
+        Map<String,String> attrs = new HashMap<String, String>();
+        attrs.put(MySQLConstants.AttributeName.ROUTINE_SCHEMA, "sakila");
+        attrs.put(MySQLConstants.AttributeName.NAME, "get_customer_balance");
         node.setAttrs(attrs);
         System.out.println(loader.loadCategory(node));
     }

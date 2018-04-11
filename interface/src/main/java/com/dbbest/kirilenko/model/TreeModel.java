@@ -112,6 +112,9 @@ public class TreeModel {
     //todo create normal toString
     @Override
     public String toString() {
-        return node.getName();
+        if (node.getAttrs().get("NAME") == null) {
+            return node.getName();
+        }
+        return node.getAttrs().get("NAME");
     }
 }

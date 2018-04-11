@@ -15,7 +15,7 @@ public class TableTriggerLoader extends Loader {
 //            "select * from INFORMATION_SCHEMA.TRIGGERS where TRIGGER_SCHEMA = ?";
 
     private static final String LOAD_ELEMENT_QUERY =
-            "select * from INFORMATION_SCHEMA.TRIGGERS where TRIGGER_SCHEMA = ? and EVENT_OBJECT_TABLE = ?";
+            "select TRIGGER_NAME from INFORMATION_SCHEMA.TRIGGERS where TRIGGER_SCHEMA = ? and EVENT_OBJECT_TABLE = ?";
 
     public TableTriggerLoader() {
     }
@@ -42,7 +42,7 @@ public class TableTriggerLoader extends Loader {
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
         String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
-        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         List<Node> triggerList = new ChildrenList<>();
@@ -50,6 +50,8 @@ public class TableTriggerLoader extends Loader {
         while (resultSet.next()) {
             Node trigger = new Node(MySQLConstants.DBEntity.TRIGGER);
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.TRIGGER_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             trigger.setAttrs(attrs);
             triggerList.add(trigger);
         }

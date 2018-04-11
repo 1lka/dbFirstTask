@@ -16,7 +16,7 @@ public class TablePrimaryKeyLoader extends Loader {
 //                    "where CONSTRAINT_SCHEMA = ? and CONSTRAINT_NAME = 'PRIMARY' order by TABLE_NAME";
 
     private static final String LOAD_ELEMENT_QUERY =
-            "select * from INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
+            "select COLUMN_NAME from INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
                     "where CONSTRAINT_NAME = 'PRIMARY' and TABLE_SCHEMA = ? and TABLE_NAME = ?";
 
     public TablePrimaryKeyLoader() {
@@ -44,7 +44,7 @@ public class TablePrimaryKeyLoader extends Loader {
     @Override
     public List<Node> loadCategory(Node node) throws SQLException {
         String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
-        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_NAME);
+        String tableName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
 
         List<Node> PKeys = new ChildrenList<>();
@@ -52,6 +52,8 @@ public class TablePrimaryKeyLoader extends Loader {
         while (resultSet.next()) {
             Node pKey = new Node(MySQLConstants.DBEntity.PRIMARY_KEY);
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.COLUMN_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             pKey.setAttrs(attrs);
             PKeys.add(pKey);
         }
