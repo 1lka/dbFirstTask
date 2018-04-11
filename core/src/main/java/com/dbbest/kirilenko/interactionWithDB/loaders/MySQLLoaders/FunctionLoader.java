@@ -18,7 +18,8 @@ import java.util.Map;
 public class FunctionLoader extends Loader {
 
     private static final String SQL_LAZY_QUERY =
-            "SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
+            "SELECT ROUTINE_NAME ,ROUTINE_SCHEMA FROM INFORMATION_SCHEMA.ROUTINES " +
+                    "where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
 
     private static final String SQL_FULL_ELEMENT_QUERY =
             "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_NAME = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
@@ -57,11 +58,9 @@ public class FunctionLoader extends Loader {
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         if (MySQLConstants.DBEntity.FUNCTION.equals(node.getName())) {
+            loadElement(node);
             Loader paramsLoader = new RoutineParamsLoader(getConnection());
-            List<Node> paramList = paramsLoader.loadCategory(node);
-            Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
-            parameters.addChildren(paramList);
-            node.addChild(parameters);
+            paramsLoader.fullLoadElement(node);
             return node;
         } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
             Node functions = node.wideSearch(MySQLConstants.NodeNames.FUNCTIONS);

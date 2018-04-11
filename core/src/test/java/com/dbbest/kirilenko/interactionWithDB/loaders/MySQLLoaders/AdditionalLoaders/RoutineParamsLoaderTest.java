@@ -46,10 +46,12 @@ public class RoutineParamsLoaderTest {
     @Test
     public void loadCategory() throws SQLException {
         Node node = new Node(MySQLConstants.DBEntity.FUNCTION);
-        Map<String,String> attrs = new HashMap<String, String>();
+        Map<String, String> attrs = new HashMap<String, String>();
         attrs.put(MySQLConstants.AttributeName.ROUTINE_SCHEMA, "sakila");
         attrs.put(MySQLConstants.AttributeName.NAME, "get_customer_balance");
         node.setAttrs(attrs);
-        System.out.println(loader.loadCategory(node));
+        Node param = loader.loadCategory(node).get(2);
+        System.out.println(param);
+        System.out.println(loader.loadElement(param));
     }
 }

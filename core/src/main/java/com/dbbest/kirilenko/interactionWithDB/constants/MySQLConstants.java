@@ -82,6 +82,7 @@ public class MySQLConstants {
         public final static String EXTRA = "EXTRA";
         public final static String DATA_TYPE = "DATA_TYPE";
         public final static String ROUTINE_SCHEMA = "ROUTINE_SCHEMA";
+        public final static String SPECIFIC_NAME = "SPECIFIC_NAME";
     }
     /**
      * class contains delimiters for printers

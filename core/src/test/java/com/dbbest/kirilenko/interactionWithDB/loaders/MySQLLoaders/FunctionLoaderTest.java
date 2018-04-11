@@ -45,7 +45,8 @@ public class FunctionLoaderTest {
     }
 
     @Test
-    public void fullLoadElement() {
+    public void fullLoadElement() throws SQLException {
+        loader.fullLoadElement(root);
 
     }
 
