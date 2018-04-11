@@ -4,7 +4,7 @@ import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.*;
+import com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders.RoutineParamsLoader;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
@@ -32,16 +32,6 @@ public class ProcedureLoader extends Loader {
     }
 
     @Override
-    public Node lazyChildrenLoad(Node node) throws SQLException {
-        Loader paramsLoader = new RoutineParamsLoader(getConnection());
-        List<Node> paramsList = paramsLoader.loadCategory(node);
-        Node columns = new Node(MySQLConstants.NodeNames.PARAMETERS);
-        columns.addChildren(paramsList);
-        node.addChild(columns);
-        return node;
-    }
-
-    @Override
     public Node loadElement(Node node) throws SQLException {
         String procedureName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         String schema = node.getAttrs().get(MySQLConstants.AttributeName.ROUTINE_SCHEMA);
@@ -53,6 +43,16 @@ public class ProcedureLoader extends Loader {
         } else {
             throw new LoadingException("there is no such procedure: " + procedureName);
         }
+    }
+
+    @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        Loader paramsLoader = new RoutineParamsLoader(getConnection());
+        List<Node> paramsList = paramsLoader.loadCategory(node);
+        Node columns = new Node(MySQLConstants.NodeNames.PARAMETERS);
+        columns.addChildren(paramsList);
+        node.addChild(columns);
+        return node;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ProcedureLoader extends Loader {
     }
 
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
+    public Node loadCategory(Node node) throws SQLException {
         List<Node> procedures = new ChildrenList<>();
         String schema = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(SQL_LAZY_QUERY, schema);
@@ -100,5 +100,10 @@ public class ProcedureLoader extends Loader {
             procedures.add(procedure);
         }
         return procedures;
+    }
+
+    @Override
+    public Node fullLoadCategory(Node node) throws SQLException {
+        return null;
     }
 }

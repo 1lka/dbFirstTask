@@ -27,20 +27,20 @@ public abstract class Loader {
     }
 
     /**
-     * Loads children for current node
-     *
-     * @param node for children loading
-     * @return node with children
-     */
-    public abstract Node lazyChildrenLoad(Node node) throws SQLException;
-
-    /**
      * Fully loads node (fill it's attributes)
      *
      * @param node for attribute loading
      * @return loaded node
      */
     public abstract Node loadElement(Node node) throws SQLException;
+
+    /**
+     * Loads children for current node
+     *
+     * @param node for children loading
+     * @return node with children
+     */
+    public abstract Node lazyChildrenLoad(Node node) throws SQLException;
 
     /**
      * Loads attributes for node and loads it's children
@@ -56,7 +56,9 @@ public abstract class Loader {
      * @param node contains required parameters
      * @return List of Nodes
      */
-    public abstract List<Node> loadCategory(Node node) throws SQLException;
+    public abstract Node loadCategory(Node node) throws SQLException;
+
+    public abstract Node fullLoadCategory(Node node) throws SQLException;
 
     /**
      * Executes sql query with params

@@ -38,11 +38,13 @@ public class SchemaLoaderTest {
 
     @Test
     public void lazyChildrenLoad() throws SQLException {
+        System.out.println(root);
         System.out.println(schemaLoader.lazyChildrenLoad(root));
     }
 
     @Test
     public void loadElement() throws SQLException {
+        System.out.println(root);
         System.out.println(schemaLoader.loadElement(root));
     }
 

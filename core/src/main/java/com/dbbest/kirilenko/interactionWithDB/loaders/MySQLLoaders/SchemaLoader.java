@@ -9,6 +9,7 @@ import com.dbbest.kirilenko.tree.Node;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,42 +24,6 @@ public class SchemaLoader extends Loader {
 
     public SchemaLoader(Connection connection) {
         super(connection);
-    }
-
-    /**
-     * loads tables, views and routines attributes for schema
-     *
-     * @param node for children loading
-     * @return node with lazy loaded children
-     */
-    @Override
-    public Node lazyChildrenLoad(Node node) throws SQLException {
-        Loader tableLoader = new TableLoader(getConnection());
-        Loader viewLoader = new ViewLoader(getConnection());
-        Loader procedureLoader = new ProcedureLoader(getConnection());
-        Loader functionLoader = new FunctionLoader(getConnection());
-
-        List<Node> tablesList = tableLoader.loadCategory(node);
-        Node tables = new Node(MySQLConstants.NodeNames.TABLES);
-        tables.addChildren(tablesList);
-        node.addChild(tables);
-
-        List<Node> viewList = viewLoader.loadCategory(node);
-        Node views = new Node(MySQLConstants.NodeNames.VIEWS);
-        views.addChildren(viewList);
-        node.addChild(views);
-
-        List<Node> procedureList = procedureLoader.loadCategory(node);
-        Node procedures = new Node(MySQLConstants.NodeNames.PROCEDURES);
-        procedures.addChildren(procedureList);
-        node.addChild(procedures);
-
-        List<Node> funcList = functionLoader.loadCategory(node);
-        Node functions = new Node(MySQLConstants.NodeNames.FUNCTIONS);
-        functions.addChildren(funcList);
-        node.addChild(functions);
-
-        return node;
     }
 
     /**
@@ -80,6 +45,27 @@ public class SchemaLoader extends Loader {
         } else {
             throw new LoadingException("there is no such schema: " + schema);
         }
+    }
+
+    /**
+     * loads tables, views and routines attributes for schema
+     *
+     * @param node for children loading
+     * @return node with lazy loaded children
+     */
+    @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        Loader tableLoader = new TableLoader(getConnection());
+        Loader viewLoader = new ViewLoader(getConnection());
+        Loader procedureLoader = new ProcedureLoader(getConnection());
+        Loader functionLoader = new FunctionLoader(getConnection());
+
+        tableLoader.loadCategory(node);
+        viewLoader.loadCategory(node);
+        procedureLoader.loadCategory(node);
+        functionLoader.loadCategory(node);
+
+        return node;
     }
 
     /**
@@ -105,7 +91,13 @@ public class SchemaLoader extends Loader {
     }
 
     @Override
-    public List<Node> loadCategory(Node node) {
+    public Node loadCategory(Node node) {
         return null;
     }
+
+    @Override
+    public Node fullLoadCategory(Node node)  {
+        return null;
+    }
+
 }
