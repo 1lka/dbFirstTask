@@ -32,7 +32,7 @@ public class IndexPrinter extends Printer {
             String indexType = attrs.get(MySQLConstants.AttributeName.INDEX_TYPE);
             sb.append("BTREE".equals(indexType) ? "" : indexType + " ")
                     .append("KEY ")
-                    .append(attrs.get(MySQLConstants.AttributeName.INDEX_NAME))
+                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
                     .append(" (")
                     .append(attrs.get(MySQLConstants.AttributeName.COLUMNS_NAME))
                     .append("),")

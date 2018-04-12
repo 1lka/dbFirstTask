@@ -20,11 +20,11 @@ public class ForeignKeyPrinter extends Printer {
         for (Node fKey : fKeys) {
             Map<String, String> attrs = fKey.getAttrs();
             sb.append("CONSTRAINT ")
-                    .append(attrs.get(MySQLConstants.AttributeName.CONSTRAINT_NAME))
+                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
                     .append(" ")
                     .append("FOREIGN KEY")
                     .append(" (")
-                    .append(attrs.get(MySQLConstants.AttributeName.COLUMN_NAME))
+                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
                     .append(") REFERENCES ")
                     .append(attrs.get(MySQLConstants.AttributeName.REFERENCED_TABLE_NAME))
                     .append(" (")

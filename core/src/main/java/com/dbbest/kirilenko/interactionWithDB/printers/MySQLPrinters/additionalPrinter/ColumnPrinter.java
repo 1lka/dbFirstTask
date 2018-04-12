@@ -21,7 +21,7 @@ public class ColumnPrinter extends Printer {
         for (Node column : columns) {
             Map<String, String> attrs = column.getAttrs();
 
-            sb.append(attrs.get(MySQLConstants.AttributeName.COLUMN_NAME))
+            sb.append(attrs.get(MySQLConstants.AttributeName.NAME))
                     .append(" ")
                     .append(attrs.get(MySQLConstants.AttributeName.COLUMN_TYPE));
 

@@ -13,37 +13,42 @@ public class FunctionPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
-        Map<String, String> attrs = node.getAttrs();
+        if (Boolean.valueOf(node.getAttrs().get("fullyLoaded"))) {
 
-        Node paramsNode = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
-        List<Node> params = paramsNode.getChildren();
+            Map<String, String> attrs = node.getAttrs();
 
-        sb.append(MySQLConstants.Delimiters.NEW_DELIMITER)
-                .append(System.lineSeparator())
-                .append("CREATE FUNCTION ")
-                .append(attrs.get(MySQLConstants.AttributeName.ROUTINE_NAME))
-                .append("(");
-        for (int i = 1; i < params.size(); i++) {
-            sb.append(params.get(i).getAttrs().get(MySQLConstants.AttributeName.PARAMETER_NAME))
-                    .append(" ")
-                    .append(params.get(i).getAttrs().get(MySQLConstants.AttributeName.DTD_IDENTIFIER));
-            if (!(i + 1 == params.size())) {
-                sb.append(MySQLConstants.Delimiters.COMA);
+            Node paramsNode = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
+            List<Node> params = paramsNode.getChildren();
+
+            sb.append(MySQLConstants.Delimiters.NEW_DELIMITER)
+                    .append(System.lineSeparator())
+                    .append("CREATE FUNCTION ")
+                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
+                    .append("(");
+            for (int i = 1; i < params.size(); i++) {
+                sb.append(params.get(i).getAttrs().get(MySQLConstants.AttributeName.NAME))
+                        .append(" ")
+                        .append(params.get(i).getAttrs().get(MySQLConstants.AttributeName.DTD_IDENTIFIER));
+                if (!(i + 1 == params.size())) {
+                    sb.append(MySQLConstants.Delimiters.COMA);
+                }
             }
-        }
-        sb.append(") RETURNS ")
-                .append(params.get(0).getAttrs().get(MySQLConstants.AttributeName.DTD_IDENTIFIER))
-                .append(System.lineSeparator());
-        if ("YES".equals(attrs.get(MySQLConstants.AttributeName.IS_DETERMINISTIC))) {
-            sb.append("DETERMINISTIC")
+            sb.append(") RETURNS ")
+                    .append(params.get(0).getAttrs().get(MySQLConstants.AttributeName.DTD_IDENTIFIER))
                     .append(System.lineSeparator());
+            if ("YES".equals(attrs.get(MySQLConstants.AttributeName.IS_DETERMINISTIC))) {
+                sb.append("DETERMINISTIC")
+                        .append(System.lineSeparator());
+            }
+            sb.append(attrs.get(MySQLConstants.AttributeName.SQL_DATA_ACCESS))
+                    .append(System.lineSeparator())
+                    .append(attrs.get(MySQLConstants.AttributeName.ROUTINE_DEFINITION))
+                    .append(MySQLConstants.Delimiters.DELIMITER)
+                    .append(System.lineSeparator())
+                    .append(MySQLConstants.Delimiters.OLD_DELIMITER);
+        } else {
+            sb.append("Fully load the node to see its DLL");
         }
-        sb.append(attrs.get(MySQLConstants.AttributeName.SQL_DATA_ACCESS))
-                .append(System.lineSeparator())
-                .append(attrs.get(MySQLConstants.AttributeName.ROUTINE_DEFINITION))
-                .append(MySQLConstants.Delimiters.DELIMITER)
-                .append(System.lineSeparator())
-                .append(MySQLConstants.Delimiters.OLD_DELIMITER);
         return sb.toString();
     }
 }

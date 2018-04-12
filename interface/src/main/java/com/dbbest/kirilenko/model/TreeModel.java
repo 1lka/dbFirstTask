@@ -73,7 +73,7 @@ public class TreeModel {
         //todo change to flatMap
         children.addAll(node.getChildren().stream()
                 .filter(n -> children.stream()
-                        .noneMatch(treeModel -> treeModel.getNode().equals(n))).map(TreeModel::new).collect(Collectors.toList()));
+                        .noneMatch(treeModel -> treeModel.getNode().getAttrs().get("NAME").equals(n.getAttrs().get("NAME")))).map(TreeModel::new).collect(Collectors.toList()));
 
         //todo why stream doesn't work?!!!!!!
         for (TreeModel t : children) {

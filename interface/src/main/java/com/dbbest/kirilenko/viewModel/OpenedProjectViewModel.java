@@ -137,7 +137,7 @@ public class OpenedProjectViewModel {
             service.createTreeItems(selectedItem.getValue());
             String ddlOfNode = printerManager.printDDL(nodeForLoading);
             ddl.set(ddlOfNode);
-        } catch (LoadingException ignored) {
+        } catch (LoadingException|NullPointerException ignored) {
         }
     }
 
@@ -187,7 +187,7 @@ public class OpenedProjectViewModel {
     }
 
     public void saveDDL() {
-
+        //todo
     }
 
     public void saveProject(File file) throws SerializationException, IOException {

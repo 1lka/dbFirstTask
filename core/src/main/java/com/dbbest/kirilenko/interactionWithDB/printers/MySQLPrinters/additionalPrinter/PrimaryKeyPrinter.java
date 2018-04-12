@@ -20,7 +20,7 @@ public class PrimaryKeyPrinter extends Printer {
             sb.append("PRIMARY KEY (");
             for (Node pKey : pKeys) {
                 Map<String, String> attrs = pKey.getAttrs();
-                sb.append(attrs.get(MySQLConstants.AttributeName.COLUMN_NAME))
+                sb.append(attrs.get(MySQLConstants.AttributeName.NAME))
                         .append(MySQLConstants.Delimiters.COMA);
             }
             int last = sb.lastIndexOf(",");
@@ -33,3 +33,4 @@ public class PrimaryKeyPrinter extends Printer {
         return sb.toString();
     }
 }
+

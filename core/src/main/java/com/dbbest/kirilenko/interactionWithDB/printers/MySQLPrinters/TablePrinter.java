@@ -14,44 +14,47 @@ public class TablePrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
-        Map<String, String> attrs = node.getAttrs();
+        if (Boolean.valueOf(node.getAttrs().get("fullyLoaded"))) {
+            Map<String, String> attrs = node.getAttrs();
 
-        Printer columnsPrinter = new ColumnPrinter();
-        Printer pKeyPrinter = new PrimaryKeyPrinter();
-        Printer indexPrinter = new IndexPrinter();
-        Printer fKeyPrinter = new ForeignKeyPrinter();
-        Printer triggerPrinter = new TriggerPrinter();
+            Printer columnsPrinter = new ColumnPrinter();
+            Printer pKeyPrinter = new PrimaryKeyPrinter();
+            Printer indexPrinter = new IndexPrinter();
+            Printer fKeyPrinter = new ForeignKeyPrinter();
+            Printer triggerPrinter = new TriggerPrinter();
 
-        String columns = columnsPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.COLUMNS));
-        String pKeys = pKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.PRIMARY_KEYS));
-        String indexes = indexPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.INDEXES));
-        String fKeys = fKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.FOREIGN_KEYS));
-        String triggers = triggerPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.TRIGGERS));
+            String columns = columnsPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.COLUMNS));
+            String pKeys = pKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.PRIMARY_KEYS));
+            String indexes = indexPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.INDEXES));
+            String fKeys = fKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.FOREIGN_KEYS));
+            String triggers = triggerPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.TRIGGERS));
 
-        sb.append("CREATE TABLE ")
-                .append(attrs.get(MySQLConstants.AttributeName.TABLE_NAME))
-                .append("(")
-                .append(System.lineSeparator())
-                .append(columns)
-                .append(pKeys)
-                .append(System.lineSeparator())
-                .append(indexes)
-                .append(fKeys);
+            sb.append("CREATE TABLE ")
+                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
+                    .append("(")
+                    .append(System.lineSeparator())
+                    .append(columns)
+                    .append(pKeys)
+                    .append(System.lineSeparator())
+                    .append(indexes)
+                    .append(fKeys);
 
-        int last = sb.lastIndexOf(",");
-        if (last > 0) {
-            sb = new StringBuilder(sb.substring(0, last));
+            int last = sb.lastIndexOf(",");
+            if (last > 0) {
+                sb = new StringBuilder(sb.substring(0, last));
+            }
+
+            sb.append(System.lineSeparator())
+                    .append(")ENGINE=")
+                    .append(attrs.get(MySQLConstants.AttributeName.ENGINE))
+                    .append(" DEFAULT COLLATE=")
+                    .append(attrs.get(MySQLConstants.AttributeName.TABLE_COLLATION))
+                    .append(MySQLConstants.Delimiters.SEMICOLON)
+                    .append(System.lineSeparator())
+                    .append(triggers);
+        } else {
+            sb.append("Fully load the node to see its DLL");
         }
-
-        sb.append(System.lineSeparator())
-                .append(")ENGINE=")
-                .append(attrs.get(MySQLConstants.AttributeName.ENGINE))
-                .append(" DEFAULT COLLATE=")
-                .append(attrs.get(MySQLConstants.AttributeName.TABLE_COLLATION))
-                .append(MySQLConstants.Delimiters.SEMICOLON)
-                .append(System.lineSeparator())
-                .append(triggers);
-
         return sb.toString();
     }
 }

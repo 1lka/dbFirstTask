@@ -12,21 +12,25 @@ public class ViewPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
-        Map<String, String> attrs = node.getAttrs();
+        if (Boolean.valueOf(node.getAttrs().get("fullyLoaded"))) {
 
-        sb.append("CREATE ");
-        if ("INVOKER".equals(attrs.get(MySQLConstants.AttributeName.SECURITY_TYPE))) {
-            sb.append("DEFINER=CURRENT_USER SQL SECURITY INVOKER ");
+            Map<String, String> attrs = node.getAttrs();
+
+            sb.append("CREATE ");
+            if ("INVOKER".equals(attrs.get(MySQLConstants.AttributeName.SECURITY_TYPE))) {
+                sb.append("DEFINER=CURRENT_USER SQL SECURITY INVOKER ");
+            }
+
+            sb.append("VIEW ")
+                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
+                    .append(System.lineSeparator())
+                    .append("AS")
+                    .append(System.lineSeparator())
+                    .append(attrs.get(MySQLConstants.AttributeName.VIEW_DEFINITION))
+                    .append(MySQLConstants.Delimiters.SEMICOLON);
+        } else {
+            sb.append("Fully load the node to see its DLL");
         }
-
-        sb.append("VIEW ")
-                .append(attrs.get(MySQLConstants.AttributeName.TABLE_NAME))
-                .append(System.lineSeparator())
-                .append("AS")
-                .append(System.lineSeparator())
-                .append(attrs.get(MySQLConstants.AttributeName.VIEW_DEFINITION))
-                .append(MySQLConstants.Delimiters.SEMICOLON);
-
         return sb.toString();
     }
 }

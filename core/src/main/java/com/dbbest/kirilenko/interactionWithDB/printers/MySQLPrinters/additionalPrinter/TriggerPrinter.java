@@ -22,7 +22,7 @@ public class TriggerPrinter extends Printer {
 
                 sb.append(System.lineSeparator())
                         .append("CREATE TRIGGER ")
-                        .append(attrs.get(MySQLConstants.AttributeName.TRIGGER_NAME))
+                        .append(attrs.get(MySQLConstants.AttributeName.NAME))
                         .append(" ")
                         .append(attrs.get(MySQLConstants.AttributeName.ACTION_TIMING))
                         .append(" ")
