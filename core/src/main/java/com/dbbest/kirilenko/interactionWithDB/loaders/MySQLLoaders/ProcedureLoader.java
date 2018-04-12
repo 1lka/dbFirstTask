@@ -48,9 +48,9 @@ public class ProcedureLoader extends Loader {
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
         Loader paramsLoader = new RoutineParamsLoader(getConnection());
-        List<Node> paramsList = paramsLoader.loadCategory(node);
+        paramsLoader.loadCategory(node);
         Node columns = new Node(MySQLConstants.NodeNames.PARAMETERS);
-        columns.addChildren(paramsList);
+
         node.addChild(columns);
         return node;
     }
@@ -60,9 +60,9 @@ public class ProcedureLoader extends Loader {
         if (MySQLConstants.DBEntity.PROCEDURE.equals(node.getName())) {
             this.loadElement(node);
             Loader paramsLoader = new RoutineParamsLoader(getConnection());
-            List<Node> paramList = paramsLoader.loadCategory(node);
+             paramsLoader.loadCategory(node);
             Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
-            parameters.addChildren(paramList);
+
             node.addChild(parameters);
             return node;
         } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
@@ -71,15 +71,15 @@ public class ProcedureLoader extends Loader {
             if (procedures == null) {
                 procedures = new Node(MySQLConstants.NodeNames.PROCEDURES);
                 node.addChild(procedures);
-                procedureList = loadCategory(node);
-                procedures.addChildren(procedureList);
+//                procedureList = loadCategory(node);
+//                procedures.addChildren(procedureList);
             } else {
                 procedureList = procedures.getChildren();
             }
-            for (Node procedure : procedureList) {
-                fullLoadElement(procedure);
-            }
-            procedures.getAttrs().put("childrenCount", String.valueOf(procedureList.size()));
+//            for (Node procedure : procedureList) {
+//                fullLoadElement(procedure);
+//            }
+//            procedures.getAttrs().put("childrenCount", String.valueOf(procedureList.size()));
         }
         return node;
     }
@@ -99,7 +99,7 @@ public class ProcedureLoader extends Loader {
             procedure.setAttrs(attrs);
             procedures.add(procedure);
         }
-        return procedures;
+        return node;
     }
 
     @Override

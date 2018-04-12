@@ -11,65 +11,66 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class RoutineParamsLoaderTest {
+public class TablePrimaryKeyLoaderTest {
 
     private static Loader loader;
 
     @BeforeClass
     public static void init() {
         Connection connection = Connection4Test.getConnection();
-        loader = new RoutineParamsLoader(connection);
+        loader = new TablePrimaryKeyLoader(connection);
     }
 
     @Before
     public void start() {
         Node schema = new Node(MySQLConstants.DBEntity.SCHEMA);
         schema.getAttrs().put("NAME", "sakila");
-        Node functions = new Node(MySQLConstants.NodeNames.FUNCTIONS);
-        function = new Node(MySQLConstants.DBEntity.FUNCTION);
-        params = new Node(MySQLConstants.NodeNames.PARAMETERS);
-        function.getAttrs().put("NAME", "get_customer_balance");
-        schema.addChild(functions);
-        functions.addChild(function);
-        function.addChild(params);
+        Node tables = new Node(MySQLConstants.NodeNames.TABLES);
+        table = new Node(MySQLConstants.DBEntity.TABLE);
+        PKs = new Node(MySQLConstants.NodeNames.PRIMARY_KEYS);
+        table.getAttrs().put("NAME", "actor");
+        schema.addChild(tables);
+        tables.addChild(table);
+        table.addChild(PKs);
     }
 
-    private Node function;
-    private Node params;
+    private Node table;
+    private Node PKs;
 
     @Test
     public void loadElement() throws SQLException {
-        Node param = new Node(MySQLConstants.DBEntity.PARAMETER);
-        params.addChild(param);
-        param.getAttrs().put("NAME", null);
-        System.out.println(loader.loadElement(param));
+        Node pk = new Node(MySQLConstants.DBEntity.PRIMARY_KEY);
+        PKs.addChild(pk);
+        pk.getAttrs().put("NAME", "actor_id");
+        System.out.println(loader.loadElement(pk));
     }
 
     @Test
     public void fullLoadElement() throws SQLException {
-        Node param = new Node(MySQLConstants.DBEntity.PARAMETER);
-        params.addChild(param);
-        param.getAttrs().put("NAME", null);
-        System.out.println(loader.fullLoadElement(param));
+        Node pk = new Node(MySQLConstants.DBEntity.PRIMARY_KEY);
+        PKs.addChild(pk);
+        pk.getAttrs().put("NAME", "actor_id");
+        System.out.println(loader.fullLoadElement(pk));
     }
 
     @Test
     public void fullLoadElement2() throws SQLException {
-        System.out.println(loader.fullLoadElement(function));
+        System.out.println(loader.fullLoadElement(table));
     }
 
     @Test
     public void fullLoadElement3() throws SQLException {
-        System.out.println(loader.fullLoadElement(params));
+        System.out.println(loader.fullLoadElement(PKs));
     }
 
     @Test
     public void loadCategory() throws SQLException {
-        System.out.println(loader.loadCategory(function));
+        System.out.println(loader.loadCategory(table));
     }
 
     @Test
     public void fullLoadCategory() throws SQLException {
-        System.out.println(loader.fullLoadCategory(function));
+        System.out.println(loader.fullLoadCategory(table));
     }
+
 }

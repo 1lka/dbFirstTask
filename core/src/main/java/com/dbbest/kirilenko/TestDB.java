@@ -38,6 +38,6 @@ public class TestDB {
         System.out.println(printerManager.printDDL(root));
 
         XMLStrategyImpl strategy = new XMLStrategyImpl();
-        strategy.serialize(root, "afterRefactoring.xml");
+//        strategy.serialize(root, "afterRefactoring.xml");
     }
 }

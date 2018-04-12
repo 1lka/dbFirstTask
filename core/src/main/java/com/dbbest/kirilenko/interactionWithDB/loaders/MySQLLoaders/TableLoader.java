@@ -100,15 +100,15 @@ public class TableLoader extends Loader {
             Loader PKLoader = new TablePrimaryKeyLoader(getConnection());
             Loader triggerLoader = new TableTriggerLoader(getConnection());
 
-            columnLoader.fullLoadCategory(node);
-            indexLoader.fullLoadCategory(node);
-            FKLoader.fullLoadCategory(node);
-            PKLoader.fullLoadCategory(node);
-            triggerLoader.fullLoadCategory(node);
+            columnLoader.fullLoadElement(node);
+            indexLoader.fullLoadElement(node);
+            FKLoader.fullLoadElement(node);
+            PKLoader.fullLoadElement(node);
+            triggerLoader.fullLoadElement(node);
         } else {
-            Node nodeForLoading = findTables(node);
-            fullLoadCategory(nodeForLoading);
-            for (Node table : nodeForLoading.getChildren()) {
+            Node tables = findTables(node);
+            fullLoadCategory(tables);
+            for (Node table : tables.getChildren()) {
                 fullLoadElement(table);
             }
         }

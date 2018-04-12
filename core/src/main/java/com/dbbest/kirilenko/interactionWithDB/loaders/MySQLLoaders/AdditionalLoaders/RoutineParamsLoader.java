@@ -16,23 +16,22 @@ import java.util.Map;
 @EntityLoader(element = {MySQLConstants.DBEntity.PARAMETER, MySQLConstants.NodeNames.PARAMETERS})
 public class RoutineParamsLoader extends Loader {
 
-    private static final String SQL_QUERY_ALL_PARAMS_QUERY =
+    private static final String FULL_LOAD_CATEGORY_QUERY =
             "select * from INFORMATION_SCHEMA.PARAMETERS " +
                     "where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? " +
                     "order by ROUTINE_TYPE,SPECIFIC_NAME,ORDINAL_POSITION";
 
-    private static final String SQL_LAZY_QUERY =
-            "select PARAMETER_NAME,SPECIFIC_NAME from INFORMATION_SCHEMA.PARAMETERS " +
+    private static final String LOAD_CATEGORY_QUERY =
+            "select PARAMETER_NAME from INFORMATION_SCHEMA.PARAMETERS " +
                     "where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? order by ORDINAL_POSITION";
 
-    private static final String SQL_FULL_ELEMENT_QUERY =
+    private static final String ELEMENT_QUERY =
             "select * from INFORMATION_SCHEMA.PARAMETERS " +
-                    "where SPECIFIC_NAME = ? and PARAMETER_NAME = ? order by ORDINAL_POSITION";
+                    "where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? and PARAMETER_NAME = ?";
 
-    private static final String SQL_FULL_ELEMENT_QUERY_WITH_NULL =
+    private static final String ELEMENT_QUERY_WITH_NULL =
             "select * from INFORMATION_SCHEMA.PARAMETERS " +
-                    "where SPECIFIC_NAME = ? and PARAMETER_NAME is NULL order by ORDINAL_POSITION";
-
+                    "where SPECIFIC_SCHEMA = ? and SPECIFIC_NAME = ? and PARAMETER_NAME is NULL";
 
     public RoutineParamsLoader() {
     }
@@ -42,20 +41,18 @@ public class RoutineParamsLoader extends Loader {
     }
 
     @Override
-    public Node lazyChildrenLoad(Node node) throws SQLException {
-        return node;
-    }
-
-    @Override
     public Node loadElement(Node node) throws SQLException {
-        String routineName = node.getAttrs().get(MySQLConstants.AttributeName.SPECIFIC_NAME);
-        String param = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
-
+        if (MySQLConstants.NodeNames.PARAMETERS.equals(node.getName())) {
+            return node;
+        }
+        String parameterName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String specificName = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String schemaName = node.getParent().getParent().getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet;
-        if (param == null) {
-            resultSet = executeQuery(SQL_FULL_ELEMENT_QUERY_WITH_NULL, routineName);
+        if (parameterName == null) {
+            resultSet = executeQuery(ELEMENT_QUERY_WITH_NULL,schemaName, specificName);
         } else {
-            resultSet = executeQuery(SQL_FULL_ELEMENT_QUERY, routineName, param);
+            resultSet = executeQuery(ELEMENT_QUERY, schemaName, specificName , parameterName);
         }
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
@@ -63,64 +60,69 @@ public class RoutineParamsLoader extends Loader {
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
             return node;
-        } else {
-            throw new LoadingException("there is no such parameter: " + routineName);
         }
+        throw new LoadingException("cant load parameter " + parameterName + " in " + schemaName + " schema");
+    }
+
+    @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        return node;
     }
 
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         String nodeName = node.getName();
-        if (node.equals(MySQLConstants.DBEntity.PARAMETER)) {
-            return loadElement(node);
-        } else if (nodeName.equals(MySQLConstants.DBEntity.FUNCTION) || nodeName.equals(MySQLConstants.DBEntity.PROCEDURE)) {
-            Node parameters = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
-            List<Node> paramsList;
-            if (parameters == null) {
-                parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
-                node.addChild(parameters);
-            }
-            paramsList = loadAllParams(node);
-            parameters.setChildren(paramsList);
+        if (MySQLConstants.DBEntity.PARAMETER.equals(nodeName)) {
+            loadElement(node);
+        } else {
+            Node params = findParams(node);
+            fullLoadCategory(params.getParent());
         }
         return node;
     }
 
-    private List<Node> loadAllParams(Node node) throws SQLException {
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.ROUTINE_SCHEMA);
-        String routinrName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
-        List<Node> list = new ChildrenList<>();
-        ResultSet resultSet = executeQuery(SQL_QUERY_ALL_PARAMS_QUERY, schema, routinrName);
-        while (resultSet.next()) {
-            Node parameter = new Node(MySQLConstants.DBEntity.PARAMETER);
-            Map<String, String> attrs = fillAttributes(resultSet);
-
-            String name = attrs.remove(MySQLConstants.AttributeName.PARAMETER_NAME);
-            attrs.put(MySQLConstants.AttributeName.NAME, name);
-
-            parameter.setAttrs(attrs);
-            list.add(parameter);
-        }
-        return list;
+    @Override
+    public Node loadCategory(Node routine) throws SQLException {
+        return loadAll(LOAD_CATEGORY_QUERY, routine);
     }
 
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
-        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.ROUTINE_SCHEMA);
-        String routineName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+    public Node fullLoadCategory(Node routine) throws SQLException {
+        return loadAll(FULL_LOAD_CATEGORY_QUERY, routine);
+    }
 
+    private Node loadAll(String query, Node routine) throws SQLException {
+        String schemaName = routine.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String routineName = routine.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(query, schemaName, routineName);
+
+        Node params = findParams(routine);
+        if (params == null) {
+            params = new Node(MySQLConstants.NodeNames.PARAMETERS);
+            routine.addChild(params);
+        }
+        params.getChildren().clear();
         List<Node> paramList = new ChildrenList<>();
-        ResultSet resultSet = executeQuery(SQL_LAZY_QUERY, schemaName, routineName);
-        while (resultSet.next()) {
-            Node parameter = new Node(MySQLConstants.DBEntity.PARAMETER);
-            Map<String, String> attrs = fillAttributes(resultSet);
 
+        while (resultSet.next()) {
+            Node param = new Node(MySQLConstants.DBEntity.PARAMETER);
+            Map<String, String> attrs = fillAttributes(resultSet);
             String name = attrs.remove(MySQLConstants.AttributeName.PARAMETER_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
-
-            parameter.setAttrs(attrs);
-            paramList.add(parameter);
+            param.setAttrs(attrs);
+            paramList.add(param);
         }
-        return paramList;
+        params.addChildren(paramList);
+        return routine;
+    }
+
+    private Node findParams(Node node) {
+        Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
+        if (nodeForLoading == null) {
+            Node params = new Node(MySQLConstants.NodeNames.PARAMETERS);
+            node.addChild(params);
+            nodeForLoading = params;
+        }
+        return nodeForLoading;
     }
 }

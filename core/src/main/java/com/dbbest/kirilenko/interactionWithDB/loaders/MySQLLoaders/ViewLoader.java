@@ -90,7 +90,7 @@ public class ViewLoader extends Loader {
      * @return list of views
      */
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
+    public Node loadCategory(Node node) throws SQLException {
         List<Node> viewList = new ChildrenList<>();
         String schema = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(SQL_LAZY_QUERY, schema);
@@ -102,6 +102,11 @@ public class ViewLoader extends Loader {
             view.setAttrs(attrs);
             viewList.add(view);
         }
-        return viewList;
+        return node;
+    }
+
+    @Override
+    public Node fullLoadCategory(Node node) throws SQLException {
+        return null;
     }
 }

@@ -1,27 +1,37 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
+import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.AttributeName.TABLE_NAME;
 import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.AttributeName.TABLE_SCHEMA;
 
+@EntityLoader(element = {MySQLConstants.DBEntity.INDEX, MySQLConstants.NodeNames.INDEXES})
 public class TableIndexLoader extends Loader {
 
-//    private static final String LOAD_ELEMENT_QUERY =
-//            "select TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, NON_UNIQUE, INDEX_SCHEMA, INDEX_NAME ,group_concat(COLUMN_NAME separator ', ') " +
-//                    "as COLUMNS_NAME, CARDINALITY, SUB_PART, PACKED, NULLABLE, INDEX_TYPE, COMMENT, INDEX_COMMENT " +
-//                    " from INFORMATION_SCHEMA.STATISTICS where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME != 'PRIMARY' group by INDEX_NAME";
+    private static final String ELEMENT_QUERY =
+            "select TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, NON_UNIQUE, INDEX_SCHEMA, INDEX_NAME ,group_concat(COLUMN_NAME separator ', ') " +
+                    "as COLUMNS_NAME, CARDINALITY, SUB_PART, PACKED, NULLABLE, INDEX_TYPE, COMMENT, INDEX_COMMENT " +
+                    " from INFORMATION_SCHEMA.STATISTICS where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME = ? group by INDEX_NAME";
 
-    private static final String LOAD_ELEMENT_QUERY =
+    private static final String LOAD_CATEGORY_QUERY =
             "select INDEX_NAME from INFORMATION_SCHEMA.STATISTICS " +
                     "where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME != 'PRIMARY' group by INDEX_NAME";
+
+    private static final String FULL_LOAD_CATEGORY_QUERY =
+            "select TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, NON_UNIQUE, INDEX_SCHEMA, INDEX_NAME ,group_concat(COLUMN_NAME separator ', ') " +
+                    "as COLUMNS_NAME, CARDINALITY, SUB_PART, PACKED, NULLABLE, INDEX_TYPE, COMMENT, INDEX_COMMENT " +
+                    " from INFORMATION_SCHEMA.STATISTICS where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME != 'PRIMARY' group by INDEX_NAME";
+
 
     public TableIndexLoader() {
     }
@@ -31,51 +41,83 @@ public class TableIndexLoader extends Loader {
     }
 
     @Override
+    public Node loadElement(Node node) throws SQLException {
+        if (MySQLConstants.NodeNames.INDEXES.equals(node.getName())) {
+            return node;
+        }
+        String indexName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String tableName = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String schemaName = node.getParent().getParent().getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(ELEMENT_QUERY, schemaName, tableName, indexName);
+        if (resultSet.next()) {
+            Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.INDEX_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
+            node.setAttrs(attrs);
+            return node;
+        }
+        throw new LoadingException("cant load index " + indexName + " in " + schemaName + " schema");
+    }
+
+    @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
         return null;
     }
 
     @Override
-    public Node loadElement(Node node) throws SQLException {
-        return null;
+    public Node fullLoadElement(Node node) throws SQLException {
+        String nodeName = node.getName();
+        if (MySQLConstants.DBEntity.INDEX.equals(nodeName)) {
+            loadElement(node);
+        } else {
+            Node columns = findIndexes(node);
+            fullLoadCategory(columns.getParent());
+        }
+        return node;
     }
 
     @Override
-    public Node fullLoadElement(Node node) {
-        return null;
+    public Node loadCategory(Node table) throws SQLException {
+        return loadAll(LOAD_CATEGORY_QUERY, table);
     }
 
     @Override
-    public List<Node> loadCategory(Node table) throws SQLException {
-        String schemaName = table.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
+    public Node fullLoadCategory(Node table) throws SQLException {
+        return loadAll(FULL_LOAD_CATEGORY_QUERY, table);
+    }
+
+    private Node loadAll(String query, Node table) throws SQLException {
+        String schemaName = table.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         String tableName = table.getAttrs().get(MySQLConstants.AttributeName.NAME);
-        ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
+        ResultSet resultSet = executeQuery(query, schemaName, tableName);
 
-        List<Node> indexesList = new ChildrenList<>();
+        Node indexes = findIndexes(table);
+        if (indexes == null) {
+            indexes = new Node(MySQLConstants.NodeNames.INDEXES);
+            table.addChild(indexes);
+        }
+        indexes.getChildren().clear();
+        List<Node> indexList = new ArrayList<>();
+
         while (resultSet.next()) {
             Node index = new Node(MySQLConstants.DBEntity.INDEX);
             Map<String, String> attrs = fillAttributes(resultSet);
             String name = attrs.remove(MySQLConstants.AttributeName.INDEX_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             index.setAttrs(attrs);
-            indexesList.add(index);
+            indexList.add(index);
         }
-        return indexesList;
+        indexes.addChildren(indexList);
+        return table;
     }
 
-    public void loadDetails(Node node) throws SQLException {
-        Node indexes = new Node(MySQLConstants.NodeNames.INDEXES);
-        node.addChild(indexes);
-
-        String schemaName = node.getAttrs().get(TABLE_SCHEMA);
-        String tableName = node.getAttrs().get(TABLE_NAME);
-        ResultSet resultSet = executeQuery(LOAD_ELEMENT_QUERY, schemaName, tableName);
-
-        while (resultSet.next()) {
-            Node index = new Node(MySQLConstants.DBEntity.INDEX);
-            Map<String, String> attrs = fillAttributes(resultSet);
-            index.setAttrs(attrs);
-            indexes.addChild(index);
+    private Node findIndexes(Node node) {
+        Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.INDEXES);
+        if (nodeForLoading == null) {
+            Node columns = new Node(MySQLConstants.NodeNames.INDEXES);
+            node.addChild(columns);
+            nodeForLoading = columns;
         }
+        return nodeForLoading;
     }
 }

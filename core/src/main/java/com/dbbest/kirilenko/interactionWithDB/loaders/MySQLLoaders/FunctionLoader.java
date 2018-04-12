@@ -34,9 +34,9 @@ public class FunctionLoader extends Loader {
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
         Loader paramsLoader = new RoutineParamsLoader(getConnection());
-        List<Node> paramsList = paramsLoader.loadCategory(node);
+//        paramsLoader.loadCategory(node);
         Node columns = new Node(MySQLConstants.NodeNames.PARAMETERS);
-        columns.addChildren(paramsList);
+//        columns.addChildren(paramsList);
         node.addChild(columns);
         return node;
     }
@@ -68,22 +68,18 @@ public class FunctionLoader extends Loader {
             if (functions == null) {
                 functions = new Node(MySQLConstants.NodeNames.FUNCTIONS);
                 node.addChild(functions);
-                functionList = loadCategory(node);
-                functions.addChildren(functionList);
+//                functionList = loadCategory(node);
+//                functions.addChildren(functionList);
             } else {
                 functionList = functions.getChildren();
             }
-            for (Node procedure : functionList) {
-                fullLoadElement(procedure);
-            }
-            functions.getAttrs().put("childrenCount", String.valueOf(functionList.size()));
         }
 
         return node;
     }
 
     @Override
-    public List<Node> loadCategory(Node node) throws SQLException {
+    public Node loadCategory(Node node) throws SQLException {
         List<Node> functions = new ChildrenList<>();
         String schema = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(SQL_LAZY_QUERY, schema);
@@ -95,6 +91,11 @@ public class FunctionLoader extends Loader {
             function.setAttrs(attrs);
             functions.add(function);
         }
-        return functions;
+        return node;
+    }
+
+    @Override
+    public Node fullLoadCategory(Node node) throws SQLException {
+        return null;
     }
 }
