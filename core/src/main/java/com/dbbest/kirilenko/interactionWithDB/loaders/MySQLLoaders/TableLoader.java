@@ -22,7 +22,7 @@ public class TableLoader extends Loader {
                     "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' and TABLE_NAME = ?";
 
     private static final String LOAD_CATEGORY_QUERY =
-            "SELECT TABLE_NAME,TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES " +
+            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
                     "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' ";
 
 
@@ -49,7 +49,7 @@ public class TableLoader extends Loader {
             return node;
         }
         String tableName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
-        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.TABLE_SCHEMA);
+        String schemaName = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(ELEMENT_QUERY, schemaName, tableName);
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
@@ -126,7 +126,6 @@ public class TableLoader extends Loader {
         Node nodeForLoading = findTables(node);
         List<Node> tables = loadAll(LOAD_CATEGORY_QUERY, nodeForLoading);
         nodeForLoading.addChildren(tables);
-
         return node;
     }
 
@@ -135,7 +134,6 @@ public class TableLoader extends Loader {
         Node nodeForLoading = findTables(node);
         List<Node> tables = loadAll(FULL_LOAD_CATEGORY_QUERY, nodeForLoading);
         nodeForLoading.addChildren(tables);
-
         return node;
     }
 
@@ -154,9 +152,9 @@ public class TableLoader extends Loader {
         return nodeForLoading;
     }
 
-    private List<Node> loadAll(String query, Node node) throws SQLException {
+    private List<Node> loadAll(String query, Node tablesNode) throws SQLException {
         List<Node> tables = new ChildrenList<>();
-        String schemaName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String schemaName = tablesNode.getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(query, schemaName);
         while (resultSet.next()) {
             Node table = new Node(MySQLConstants.DBEntity.TABLE);

@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 
 public class SchemaLoaderTest {
 
-    private static Node root;
+    private Node root;
     private static Loader schemaLoader;
 
     @BeforeClass
@@ -30,27 +30,21 @@ public class SchemaLoaderTest {
     @Before
     public void before() {
         root = new Node(MySQLConstants.DBEntity.SCHEMA);
-        String schemaName = "sakila";
-        Map<String, String> attrs = new HashMap<>();
-        attrs.put(MySQLConstants.AttributeName.NAME, schemaName);
-        root.setAttrs(attrs);
+        root.getAttrs().put("NAME", "sakila");
     }
 
     @Test
     public void lazyChildrenLoad() throws SQLException {
-        System.out.println(root);
         System.out.println(schemaLoader.lazyChildrenLoad(root));
     }
 
     @Test
     public void loadElement() throws SQLException {
-        System.out.println(root);
         System.out.println(schemaLoader.loadElement(root));
     }
 
     @Test
     public void fullLoad() throws SQLException {
-        System.out.println("full");
         System.out.println(schemaLoader.fullLoadElement(root));
     }
 }

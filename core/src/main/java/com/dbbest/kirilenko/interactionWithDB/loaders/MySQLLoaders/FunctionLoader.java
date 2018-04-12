@@ -17,12 +17,16 @@ import java.util.Map;
 @EntityLoader(element = {MySQLConstants.DBEntity.FUNCTION, MySQLConstants.NodeNames.FUNCTIONS})
 public class FunctionLoader extends Loader {
 
-    private static final String SQL_LAZY_QUERY =
-            "SELECT ROUTINE_NAME ,ROUTINE_SCHEMA FROM INFORMATION_SCHEMA.ROUTINES " +
+    private static final String ELEMENT_QUERY =
+            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_NAME = ? and ROUTINE_TYPE = 'FUNCTION'";
+
+    private static final String LOAD_CATEGORY_QUERY =
+            "SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES " +
                     "where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
 
-    private static final String SQL_FULL_ELEMENT_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_NAME = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
+    private static final String FULL_LOAD_CATEGORY_QUERY =
+            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES " +
+                    "where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME";
 
     public FunctionLoader() {
     }
@@ -32,27 +36,29 @@ public class FunctionLoader extends Loader {
     }
 
     @Override
-    public Node lazyChildrenLoad(Node node) throws SQLException {
-        Loader paramsLoader = new RoutineParamsLoader(getConnection());
-//        paramsLoader.loadCategory(node);
-        Node columns = new Node(MySQLConstants.NodeNames.PARAMETERS);
-//        columns.addChildren(paramsList);
-        node.addChild(columns);
-        return node;
-    }
-
-    @Override
     public Node loadElement(Node node) throws SQLException {
-        String procedureName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.ROUTINE_SCHEMA);
-        ResultSet resultSet = executeQuery(SQL_FULL_ELEMENT_QUERY, schema, procedureName);
+        String functionName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
+        String schema = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(ELEMENT_QUERY, schema, functionName);
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
             return node;
         } else {
-            throw new LoadingException("there is no such function: " + procedureName);
+            throw new LoadingException("there is no such function: " + functionName);
         }
+    }
+
+    @Override
+    public Node lazyChildrenLoad(Node node) throws SQLException {
+        if (!MySQLConstants.DBEntity.FUNCTION.equals(node.getName())) {
+            return node;
+        }
+        Loader paramsLoader = new RoutineParamsLoader(getConnection());
+        paramsLoader.loadCategory(node);
+        return node;
     }
 
     @Override
@@ -62,40 +68,55 @@ public class FunctionLoader extends Loader {
             Loader paramsLoader = new RoutineParamsLoader(getConnection());
             paramsLoader.fullLoadElement(node);
             return node;
-        } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
-            Node functions = node.wideSearch(MySQLConstants.NodeNames.FUNCTIONS);
-            List<Node> functionList;
-            if (functions == null) {
-                functions = new Node(MySQLConstants.NodeNames.FUNCTIONS);
-                node.addChild(functions);
-//                functionList = loadCategory(node);
-//                functions.addChildren(functionList);
-            } else {
-                functionList = functions.getChildren();
+        } else {
+            Node functions = findFunctions(node);
+            fullLoadCategory(functions);
+            for (Node function : functions.getChildren()) {
+                fullLoadElement(function);
             }
         }
-
         return node;
     }
 
     @Override
     public Node loadCategory(Node node) throws SQLException {
-        List<Node> functions = new ChildrenList<>();
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
-        ResultSet resultSet = executeQuery(SQL_LAZY_QUERY, schema);
-        while (resultSet.next()) {
-            Node function = new Node(MySQLConstants.DBEntity.FUNCTION);
-            Map<String, String> attrs = fillAttributes(resultSet);
-            String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
-            attrs.put(MySQLConstants.AttributeName.NAME, name);
-            function.setAttrs(attrs);
-            functions.add(function);
-        }
+        Node nodeForLoading = findFunctions(node);
+        List<Node> tables = loadAll(LOAD_CATEGORY_QUERY, nodeForLoading);
+        nodeForLoading.addChildren(tables);
         return node;
     }
 
     @Override
     public Node fullLoadCategory(Node node) throws SQLException {
-        return null;
+        Node nodeForLoading = findFunctions(node);
+        List<Node> functions = loadAll(FULL_LOAD_CATEGORY_QUERY, nodeForLoading);
+        nodeForLoading.addChildren(functions);
+        return node;
+    }
+
+    private List<Node> loadAll(String query, Node functionsNode) throws SQLException {
+        List<Node> functions = new ChildrenList<>();
+        String schemaName = functionsNode.getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(query, schemaName);
+        while (resultSet.next()) {
+            Node func = new Node(MySQLConstants.DBEntity.FUNCTION);
+            Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
+            func.setAttrs(attrs);
+            functions.add(func);
+        }
+        return functions;
+    }
+
+    private Node findFunctions(Node node) {
+        Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.FUNCTIONS);
+        if (nodeForLoading == null) {
+            Node tables = new Node(MySQLConstants.NodeNames.FUNCTIONS);
+            node.addChild(tables);
+            nodeForLoading = tables;
+        }
+        nodeForLoading.getChildren().clear();
+        return nodeForLoading;
     }
 }

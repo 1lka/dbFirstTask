@@ -10,11 +10,8 @@ import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FunctionLoaderTest {
-    private static Node root;
     private static Loader loader;
 
     @BeforeClass
@@ -23,39 +20,55 @@ public class FunctionLoaderTest {
         loader = new FunctionLoader(connection);
     }
 
+    private Node func;
+    private Node functions;
+    private Node schema;
+
     @Before
     public void before() {
-        root = new Node(MySQLConstants.DBEntity.FUNCTION);
-        String schemaName = "sakila";
-        String functionName = "get_customer_balance";
-        Map<String, String> attrs = new HashMap<>();
-        attrs.put(MySQLConstants.AttributeName.ROUTINE_SCHEMA, schemaName);
-        attrs.put(MySQLConstants.AttributeName.NAME, functionName);
-        root.setAttrs(attrs);
-    }
+        schema = new Node(MySQLConstants.DBEntity.SCHEMA);
+        schema.getAttrs().put("NAME", "sakila");
 
-    @Test
-    public void lazyChildrenLoad() throws SQLException {
-        System.out.println(loader.lazyChildrenLoad(root));
+        functions = new Node(MySQLConstants.NodeNames.FUNCTIONS);
+        schema.addChild(functions);
+
+        func = new Node(MySQLConstants.DBEntity.FUNCTION);
+        functions.addChild(func);
+        func.getAttrs().put("NAME", "get_customer_balance");
     }
 
     @Test
     public void loadElement() throws SQLException {
-        System.out.println(loader.loadElement(root));
+        System.out.println(loader.loadElement(func));
+    }
+
+    @Test
+    public void lazyChildrenLoad() throws SQLException {
+        System.out.println(loader.lazyChildrenLoad(func));
     }
 
     @Test
     public void fullLoadElement() throws SQLException {
-        loader.fullLoadElement(root);
+        System.out.println(loader.fullLoadElement(func));
+    }
 
+    @Test
+    public void fullLoadElement2() throws SQLException {
+        System.out.println(loader.fullLoadElement(functions));
+    }
+
+    @Test
+    public void fullLoadElement3() throws SQLException {
+        System.out.println(loader.fullLoadElement(schema));
     }
 
     @Test
     public void loadCategory() throws SQLException {
-        Node node = new Node(MySQLConstants.DBEntity.SCHEMA);
-        Map<String, String> attrs = new HashMap<String, String>();
-        attrs.put("NAME", "sakila");
-        node.setAttrs(attrs);
-        System.out.println(loader.loadCategory(node));
+        System.out.println(loader.loadCategory(functions));
+    }
+
+    @Test
+    public void loadCategory2() throws SQLException {
+        System.out.println(loader.loadCategory(schema));
     }
 }

@@ -17,11 +17,17 @@ import java.util.Map;
 @EntityLoader(element = {MySQLConstants.DBEntity.PROCEDURE, MySQLConstants.NodeNames.PROCEDURES})
 public class ProcedureLoader extends Loader {
 
-    private static final String SQL_LAZY_QUERY =
-            "SELECT ROUTINE_NAME,ROUTINE_SCHEMA  FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'PROCEDURE' order by SPECIFIC_NAME";
+    private static final String ELEMENT_QUERY =
+            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES " +
+                    "where ROUTINE_SCHEMA = ? and ROUTINE_NAME = ? and ROUTINE_TYPE = 'PROCEDURE' order by SPECIFIC_NAME";
 
-    private static final String SQL_FULL_ELEMENT_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES where ROUTINE_SCHEMA = ? and ROUTINE_NAME = ? and ROUTINE_TYPE = 'PROCEDURE' order by SPECIFIC_NAME";
+    private static final String LOAD_CATEGORY_QUERY =
+            "SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES " +
+                    "where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'PROCEDURE' order by SPECIFIC_NAME";
+
+    private static final String FULL_LOAD_CATEGORY_QUERY =
+            "SELECT * FROM INFORMATION_SCHEMA.ROUTINES " +
+                    "where ROUTINE_SCHEMA = ? and ROUTINE_TYPE = 'PROCEDURE' order by SPECIFIC_NAME";
 
 
     public ProcedureLoader() {
@@ -34,10 +40,12 @@ public class ProcedureLoader extends Loader {
     @Override
     public Node loadElement(Node node) throws SQLException {
         String procedureName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.ROUTINE_SCHEMA);
-        ResultSet resultSet = executeQuery(SQL_FULL_ELEMENT_QUERY, schema, procedureName);
+        String schema = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(ELEMENT_QUERY, schema, procedureName);
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
             return node;
         } else {
@@ -47,63 +55,70 @@ public class ProcedureLoader extends Loader {
 
     @Override
     public Node lazyChildrenLoad(Node node) throws SQLException {
+        if (!MySQLConstants.DBEntity.PROCEDURE.equals(node.getName())) {
+            return node;
+        }
         Loader paramsLoader = new RoutineParamsLoader(getConnection());
         paramsLoader.loadCategory(node);
-        Node columns = new Node(MySQLConstants.NodeNames.PARAMETERS);
-
-        node.addChild(columns);
         return node;
     }
 
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         if (MySQLConstants.DBEntity.PROCEDURE.equals(node.getName())) {
-            this.loadElement(node);
+            loadElement(node);
             Loader paramsLoader = new RoutineParamsLoader(getConnection());
-             paramsLoader.loadCategory(node);
-            Node parameters = new Node(MySQLConstants.NodeNames.PARAMETERS);
-
-            node.addChild(parameters);
+            paramsLoader.fullLoadElement(node);
             return node;
-        } else if (MySQLConstants.DBEntity.SCHEMA.equals(node.getName())) {
-            Node procedures = node.wideSearch(MySQLConstants.NodeNames.PROCEDURES);
-            List<Node> procedureList;
-            if (procedures == null) {
-                procedures = new Node(MySQLConstants.NodeNames.PROCEDURES);
-                node.addChild(procedures);
-//                procedureList = loadCategory(node);
-//                procedures.addChildren(procedureList);
-            } else {
-                procedureList = procedures.getChildren();
+        } else {
+            Node procedures = findProcedures(node);
+            fullLoadCategory(procedures);
+            for (Node procedure : procedures.getChildren()) {
+                fullLoadElement(procedure);
             }
-//            for (Node procedure : procedureList) {
-//                fullLoadElement(procedure);
-//            }
-//            procedures.getAttrs().put("childrenCount", String.valueOf(procedureList.size()));
         }
         return node;
     }
 
     @Override
     public Node loadCategory(Node node) throws SQLException {
-        List<Node> procedures = new ChildrenList<>();
-        String schema = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
-        ResultSet resultSet = executeQuery(SQL_LAZY_QUERY, schema);
-        while (resultSet.next()) {
-            Node procedure = new Node(MySQLConstants.DBEntity.PROCEDURE);
-            Map<String, String> attrs = fillAttributes(resultSet);
-
-            String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
-            attrs.put(MySQLConstants.AttributeName.NAME, name);
-
-            procedure.setAttrs(attrs);
-            procedures.add(procedure);
-        }
+        Node nodeForLoading = findProcedures(node);
+        List<Node> tables = loadAll(LOAD_CATEGORY_QUERY, nodeForLoading);
+        nodeForLoading.addChildren(tables);
         return node;
     }
 
     @Override
     public Node fullLoadCategory(Node node) throws SQLException {
-        return null;
+        Node nodeForLoading = findProcedures(node);
+        List<Node> procedures = loadAll(FULL_LOAD_CATEGORY_QUERY, nodeForLoading);
+        nodeForLoading.addChildren(procedures);
+        return node;
+    }
+
+    private List<Node> loadAll(String query, Node procedureNode) throws SQLException {
+        List<Node> procedures = new ChildrenList<>();
+        String schemaName = procedureNode.getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
+        ResultSet resultSet = executeQuery(query, schemaName);
+        while (resultSet.next()) {
+            Node func = new Node(MySQLConstants.DBEntity.PROCEDURE);
+            Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
+            func.setAttrs(attrs);
+            procedures.add(func);
+        }
+        return procedures;
+    }
+
+    private Node findProcedures(Node node) {
+        Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.PROCEDURES);
+        if (nodeForLoading == null) {
+            Node tables = new Node(MySQLConstants.NodeNames.PROCEDURES);
+            node.addChild(tables);
+            nodeForLoading = tables;
+        }
+        nodeForLoading.getChildren().clear();
+        return nodeForLoading;
     }
 }
