@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 public class TableTriggerLoaderTest {
 
-    private static Loader loader;
+    private static TableTriggerLoader loader;
 
     @BeforeClass
     public static void init() {

@@ -13,10 +13,6 @@ import java.util.Map;
 
 public class LoaderManager {
 
-    public final static String ELEMENT_LOADED = "elementLoaded";
-    public final static String FULLY_LOADED = "fullyLoaded";
-    public final static String LAZILY_LOADED = "lazilyLoaded";
-
     private DBType type;
 
     private String DBName;
@@ -77,10 +73,10 @@ public class LoaderManager {
      * @return node
      */
     public Node loadElement(Node node) {
-        if (!Boolean.valueOf(node.getAttrs().get(ELEMENT_LOADED))) {
+        if (!Boolean.valueOf(node.getAttrs().get(Loader.ELEMENT_LOADED))) {
             load((n, l) ->
                     l.loadElement(n), node);
-            node.getAttrs().put(ELEMENT_LOADED, String.valueOf(true));
+            node.getAttrs().put(Loader.ELEMENT_LOADED, String.valueOf(true));
         }
         return node;
     }
@@ -92,24 +88,12 @@ public class LoaderManager {
      * @return fully loaded node
      */
     public Node fullLoadElement(Node node) {
-        if (!fullLoadingCheck(node)) {
+        if (!Boolean.valueOf(node.getAttrs().get(Loader.FULLY_LOADED))) {
             load((n, l) ->
                     l.fullLoadElement(n), node);
-            node.getAttrs().put(FULLY_LOADED, String.valueOf(true));
-            node.getAttrs().put(ELEMENT_LOADED, String.valueOf(true));
-            node.getAttrs().put(LAZILY_LOADED, String.valueOf(true));
-            updateChildren(node);
+
         }
         return node;
-    }
-
-    private void updateChildren(Node parent) {
-        for (Node child : parent.getChildren()) {
-            child.getAttrs().put(FULLY_LOADED, String.valueOf(true));
-            child.getAttrs().put(ELEMENT_LOADED, String.valueOf(true));
-            child.getAttrs().put(LAZILY_LOADED, String.valueOf(true));
-            updateChildren(child);
-        }
     }
 
     /**
@@ -119,10 +103,9 @@ public class LoaderManager {
      * @return node with loaded children
      */
     public Node lazyChildrenLoad(Node node) {
-        if (!Boolean.valueOf(node.getAttrs().get(LAZILY_LOADED))) {
+        if (!Boolean.valueOf(node.getAttrs().get(Loader.LAZILY_LOADED))) {
             load((n, l) ->
                     l.lazyChildrenLoad(n), node);
-            node.getAttrs().put(LAZILY_LOADED, String.valueOf(true));
         }
         return node;
     }
@@ -136,15 +119,6 @@ public class LoaderManager {
             throw new LoadingException("can't get loader for " + node.getName() + " node");
         } catch (SQLException e) {
             throw new LoadingException("can't load " + node, e);
-        }
-    }
-
-    private boolean fullLoadingCheck(Node node) {
-        if (Boolean.valueOf(node.getAttrs().get(FULLY_LOADED))) {
-            return true;
-        } else {
-            Node parent = node.getParent();
-            return parent != null && fullLoadingCheck(parent);
         }
     }
 

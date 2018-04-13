@@ -41,6 +41,7 @@ public class SchemaLoader extends Loader {
             String name = attrs.remove(MySQLConstants.AttributeName.SCHEMA_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         } else {
             throw new LoadingException("there is no such schema: " + schema);
@@ -65,6 +66,7 @@ public class SchemaLoader extends Loader {
         procedureLoader.loadCategory(node);
         functionLoader.loadCategory(node);
 
+        markElementLazilyLoaded(node);
         return node;
     }
 
@@ -87,6 +89,7 @@ public class SchemaLoader extends Loader {
         procedureLoader.fullLoadElement(node);
         functionLoader.fullLoadElement(node);
 
+        markElementFullyLoaded(node);
         return node;
     }
 

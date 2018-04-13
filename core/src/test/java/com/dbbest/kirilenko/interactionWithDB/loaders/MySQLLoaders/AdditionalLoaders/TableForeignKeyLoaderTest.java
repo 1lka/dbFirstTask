@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 public class TableForeignKeyLoaderTest {
 
-    private static Loader loader;
+    private static TableForeignKeyLoader loader;
 
     @BeforeClass
     public static void init() {

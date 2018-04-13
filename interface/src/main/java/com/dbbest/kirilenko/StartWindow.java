@@ -1,6 +1,5 @@
 package com.dbbest.kirilenko;
 
-import com.dbbest.kirilenko.view.MainView;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

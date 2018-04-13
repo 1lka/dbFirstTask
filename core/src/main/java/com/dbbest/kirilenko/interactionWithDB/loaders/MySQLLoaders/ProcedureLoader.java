@@ -39,6 +39,9 @@ public class ProcedureLoader extends Loader {
 
     @Override
     public Node loadElement(Node node) throws SQLException {
+        if (!MySQLConstants.DBEntity.PROCEDURE.equals(node.getName())) {
+            return node;
+        }
         String procedureName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         String schema = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(ELEMENT_QUERY, schema, procedureName);
@@ -46,6 +49,7 @@ public class ProcedureLoader extends Loader {
             Map<String, String> attrs = fillAttributes(resultSet);
             String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
+            markElementLoaded(node);
             node.setAttrs(attrs);
             return node;
         } else {
@@ -60,20 +64,24 @@ public class ProcedureLoader extends Loader {
         }
         Loader paramsLoader = new RoutineParamsLoader(getConnection());
         paramsLoader.loadCategory(node);
+        markElementLazilyLoaded(node);
         return node;
     }
-
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         if (MySQLConstants.DBEntity.PROCEDURE.equals(node.getName())) {
-            loadElement(node);
+            if (!Boolean.valueOf(node.getAttrs().get(Loader.ELEMENT_LOADED))) {
+                loadElement(node);
+            }
             Loader paramsLoader = new RoutineParamsLoader(getConnection());
             paramsLoader.fullLoadElement(node);
+            markElementFullyLoaded(node);
             return node;
         } else {
             Node procedures = findProcedures(node);
             fullLoadCategory(procedures);
             for (Node procedure : procedures.getChildren()) {
+                markElementLoaded(procedure);
                 fullLoadElement(procedure);
             }
         }
@@ -115,6 +123,7 @@ public class ProcedureLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.PROCEDURES);
         if (nodeForLoading == null) {
             Node tables = new Node(MySQLConstants.NodeNames.PROCEDURES);
+            tables.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.PROCEDURES);
             node.addChild(tables);
             nodeForLoading = tables;
         }

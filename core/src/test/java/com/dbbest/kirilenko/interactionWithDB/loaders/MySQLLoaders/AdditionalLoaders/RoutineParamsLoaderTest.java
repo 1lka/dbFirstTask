@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 public class RoutineParamsLoaderTest {
 
-    private static Loader loader;
+    private static RoutineParamsLoader loader;
 
     @BeforeClass
     public static void init() {

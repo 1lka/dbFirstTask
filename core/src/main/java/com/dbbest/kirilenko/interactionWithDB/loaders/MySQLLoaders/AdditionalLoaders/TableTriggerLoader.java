@@ -44,6 +44,7 @@ public class TableTriggerLoader extends Loader {
             String name = attrs.remove(MySQLConstants.AttributeName.TRIGGER_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         }
         throw new LoadingException("cant load trigger " + triggerName + " in " + schemaName + " schema");
@@ -59,9 +60,13 @@ public class TableTriggerLoader extends Loader {
         String nodeName = node.getName();
         if (MySQLConstants.DBEntity.TRIGGER.equals(nodeName)) {
             loadElement(node);
+            markElementFullyLoaded(node);
         } else {
             Node triggers = findTriggers(node);
             fullLoadCategory(triggers.getParent());
+            for (Node n : triggers.getChildren()) {
+                markElementFullyLoaded(n);
+            }
         }
         return node;
     }
@@ -84,6 +89,7 @@ public class TableTriggerLoader extends Loader {
         Node triggers = findTriggers(table);
         if (triggers == null) {
             triggers = new Node(MySQLConstants.NodeNames.TRIGGERS);
+            triggers.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.TRIGGERS);
             table.addChild(triggers);
         }
         triggers.getChildren().clear();
@@ -105,6 +111,7 @@ public class TableTriggerLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.TRIGGERS);
         if (nodeForLoading == null) {
             Node triggers = new Node(MySQLConstants.NodeNames.TRIGGERS);
+            triggers.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.TRIGGERS);
             node.addChild(triggers);
             nodeForLoading = triggers;
         }

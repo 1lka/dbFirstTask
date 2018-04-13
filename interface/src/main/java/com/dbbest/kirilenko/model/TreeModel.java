@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.model;
 
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.BooleanProperty;
@@ -24,7 +25,6 @@ public class TreeModel {
 
     private ObservableMap<String, String> attrs = FXCollections.observableHashMap();
 
-    //для отслеживания изменения аттрибутов
     private ObservableList<Map.Entry<String, String>> tableElements = FXCollections.observableArrayList();
 
     private ObservableList<TreeModel> children = FXCollections.observableArrayList();
@@ -66,18 +66,13 @@ public class TreeModel {
 
     public void update() {
         attrs.putAll(node.getAttrs());
-        fullyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.FULLY_LOADED)));
-        lazyLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.LAZILY_LOADED)));
-        elementLoaded.set(Boolean.valueOf(attrs.get(LoaderManager.ELEMENT_LOADED)));
+        fullyLoaded.set(Boolean.valueOf(attrs.get(Loader.FULLY_LOADED)));
+        lazyLoaded.set(Boolean.valueOf(attrs.get(Loader.LAZILY_LOADED)));
+        elementLoaded.set(Boolean.valueOf(attrs.get(Loader.ELEMENT_LOADED)));
 
-        //todo change to flatMap
-        children.addAll(node.getChildren().stream()
-                .filter(n -> children.stream()
-                        .noneMatch(treeModel -> treeModel.getNode().getAttrs().get("NAME").equals(n.getAttrs().get("NAME")))).map(TreeModel::new).collect(Collectors.toList()));
-
-        //todo why stream doesn't work?!!!!!!
-        for (TreeModel t : children) {
-            t.update();
+        children.clear();
+        for (Node n : node.getChildren()) {
+            children.add(new TreeModel(n));
         }
     }
 
@@ -109,12 +104,8 @@ public class TreeModel {
         }
     }
 
-    //todo create normal toString
     @Override
     public String toString() {
-        if (node.getAttrs().get("NAME") == null) {
-            return node.getName();
-        }
         return node.getAttrs().get("NAME");
     }
 }

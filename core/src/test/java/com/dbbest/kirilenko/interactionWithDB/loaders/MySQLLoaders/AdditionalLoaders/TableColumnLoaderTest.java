@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 public class TableColumnLoaderTest {
 
-    private static Loader loader;
+    private static TableColumnLoader loader;
 
     @BeforeClass
     public static void init() {

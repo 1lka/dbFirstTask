@@ -54,6 +54,7 @@ public class TableIndexLoader extends Loader {
             String name = attrs.remove(MySQLConstants.AttributeName.INDEX_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         }
         throw new LoadingException("cant load index " + indexName + " in " + schemaName + " schema");
@@ -69,9 +70,13 @@ public class TableIndexLoader extends Loader {
         String nodeName = node.getName();
         if (MySQLConstants.DBEntity.INDEX.equals(nodeName)) {
             loadElement(node);
+            markElementFullyLoaded(node);
         } else {
             Node columns = findIndexes(node);
             fullLoadCategory(columns.getParent());
+            for (Node n : columns.getChildren()) {
+                markElementFullyLoaded(n);
+            }
         }
         return node;
     }
@@ -94,6 +99,7 @@ public class TableIndexLoader extends Loader {
         Node indexes = findIndexes(table);
         if (indexes == null) {
             indexes = new Node(MySQLConstants.NodeNames.INDEXES);
+            indexes.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.INDEXES);
             table.addChild(indexes);
         }
         indexes.getChildren().clear();
@@ -115,6 +121,7 @@ public class TableIndexLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.INDEXES);
         if (nodeForLoading == null) {
             Node columns = new Node(MySQLConstants.NodeNames.INDEXES);
+            columns.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.INDEXES);
             node.addChild(columns);
             nodeForLoading = columns;
         }

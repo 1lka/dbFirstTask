@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 public class TablePrimaryKeyLoaderTest {
 
-    private static Loader loader;
+    private static TablePrimaryKeyLoader loader;
 
     @BeforeClass
     public static void init() {

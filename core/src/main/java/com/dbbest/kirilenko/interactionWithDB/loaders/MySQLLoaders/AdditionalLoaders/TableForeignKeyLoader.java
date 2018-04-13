@@ -59,6 +59,7 @@ public class TableForeignKeyLoader extends Loader {
             String name = attrs.remove(MySQLConstants.AttributeName.CONSTRAINT_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         }
         throw new LoadingException("cant load foreign key " + columnName + " in " + schemaName + " schema");
@@ -74,9 +75,13 @@ public class TableForeignKeyLoader extends Loader {
         String nodeName = node.getName();
         if (MySQLConstants.DBEntity.FOREIGN_KEY.equals(nodeName)) {
             loadElement(node);
+            markElementFullyLoaded(node);
         } else {
             Node fKeys = findFKeys(node);
             fullLoadCategory(fKeys.getParent());
+            for (Node n : fKeys.getChildren()) {
+                markElementFullyLoaded(n);
+            }
         }
         return node;
     }
@@ -99,6 +104,7 @@ public class TableForeignKeyLoader extends Loader {
         Node fKeys = findFKeys(table);
         if (fKeys == null) {
             fKeys = new Node(MySQLConstants.NodeNames.FOREIGN_KEYS);
+            fKeys.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.FOREIGN_KEYS);
             table.addChild(fKeys);
         }
         fKeys.getChildren().clear();
@@ -121,6 +127,7 @@ public class TableForeignKeyLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.FOREIGN_KEYS);
         if (nodeForLoading == null) {
             Node FKs = new Node(MySQLConstants.NodeNames.FOREIGN_KEYS);
+            FKs.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.FOREIGN_KEYS);
             node.addChild(FKs);
             nodeForLoading = FKs;
         }

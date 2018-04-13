@@ -49,7 +49,7 @@ public class RoutineParamsLoader extends Loader {
         String specificName = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         String schemaName = node.getParent().getParent().getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet;
-        if (parameterName == null) {
+        if (parameterName.equals("returned")) {
             resultSet = executeQuery(ELEMENT_QUERY_WITH_NULL,schemaName, specificName);
         } else {
             resultSet = executeQuery(ELEMENT_QUERY, schemaName, specificName , parameterName);
@@ -57,8 +57,12 @@ public class RoutineParamsLoader extends Loader {
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
             String name = attrs.remove(MySQLConstants.AttributeName.PARAMETER_NAME);
+            if (name == null) {
+                name = "returned";
+            }
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         }
         throw new LoadingException("cant load parameter " + parameterName + " in " + schemaName + " schema");
@@ -72,11 +76,14 @@ public class RoutineParamsLoader extends Loader {
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         String nodeName = node.getName();
-        if (MySQLConstants.DBEntity.PARAMETER.equals(nodeName)) {
+        if (MySQLConstants.DBEntity.PARAMETER.equals(nodeName) && !Boolean.valueOf(node.getAttrs().get(Loader.ELEMENT_LOADED))) {
             loadElement(node);
         } else {
             Node params = findParams(node);
             fullLoadCategory(params.getParent());
+            for (Node param : params.getChildren()) {
+                markElementLoaded(param);
+            }
         }
         return node;
     }
@@ -99,6 +106,8 @@ public class RoutineParamsLoader extends Loader {
         Node params = findParams(routine);
         if (params == null) {
             params = new Node(MySQLConstants.NodeNames.PARAMETERS);
+            params.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.PARAMETERS);
+
             routine.addChild(params);
         }
         params.getChildren().clear();
@@ -108,6 +117,9 @@ public class RoutineParamsLoader extends Loader {
             Node param = new Node(MySQLConstants.DBEntity.PARAMETER);
             Map<String, String> attrs = fillAttributes(resultSet);
             String name = attrs.remove(MySQLConstants.AttributeName.PARAMETER_NAME);
+            if (name == null) {
+                name = "returned";
+            }
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             param.setAttrs(attrs);
             paramList.add(param);
@@ -120,6 +132,7 @@ public class RoutineParamsLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
         if (nodeForLoading == null) {
             Node params = new Node(MySQLConstants.NodeNames.PARAMETERS);
+            params.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.PARAMETERS);
             node.addChild(params);
             nodeForLoading = params;
         }

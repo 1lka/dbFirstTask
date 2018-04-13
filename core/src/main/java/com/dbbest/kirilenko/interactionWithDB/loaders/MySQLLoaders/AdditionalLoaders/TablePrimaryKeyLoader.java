@@ -47,6 +47,7 @@ public class TablePrimaryKeyLoader extends Loader {
             String name = attrs.remove(MySQLConstants.AttributeName.COLUMN_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         }
         throw new LoadingException("cant load primary key " + PK + " in " + schemaName + " schema");
@@ -62,9 +63,13 @@ public class TablePrimaryKeyLoader extends Loader {
         String nodeName = node.getName();
         if (MySQLConstants.DBEntity.PRIMARY_KEY.equals(nodeName)) {
             loadElement(node);
+            markElementFullyLoaded(node);
         } else {
             Node columns = findPrimaries(node);
             fullLoadCategory(columns.getParent());
+            for (Node n : columns.getChildren()) {
+                markElementFullyLoaded(n);
+            }
         }
         return node;
     }
@@ -87,6 +92,7 @@ public class TablePrimaryKeyLoader extends Loader {
         Node PKs = findPrimaries(table);
         if (PKs == null) {
             PKs = new Node(MySQLConstants.NodeNames.PRIMARY_KEYS);
+            PKs.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.PRIMARY_KEYS);
             table.addChild(PKs);
         }
         PKs.getChildren().clear();
@@ -108,6 +114,7 @@ public class TablePrimaryKeyLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.PRIMARY_KEYS);
         if (nodeForLoading == null) {
             Node PKs = new Node(MySQLConstants.NodeNames.PRIMARY_KEYS);
+            PKs.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.PRIMARY_KEYS);
             node.addChild(PKs);
             nodeForLoading = PKs;
         }

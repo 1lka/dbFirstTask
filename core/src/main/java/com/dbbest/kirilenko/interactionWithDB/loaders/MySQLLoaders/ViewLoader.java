@@ -32,12 +32,19 @@ public class ViewLoader extends Loader {
 
     @Override
     public Node loadElement(Node node) throws SQLException {
+        if (!MySQLConstants.DBEntity.VIEW.equals(node.getName())) {
+            return node;
+        }
         String viewName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         String schema = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(ELEMENT_QUERY, schema, viewName);
         if (resultSet.next()) {
             Map<String, String> attrs = fillAttributes(resultSet);
+            String name = attrs.remove(MySQLConstants.AttributeName.TABLE_NAME);
+            attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
+            markElementFullyLoaded(node);
             return node;
         } else {
             throw new LoadingException("there is no such view: " + viewName);
@@ -52,10 +59,13 @@ public class ViewLoader extends Loader {
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         if (MySQLConstants.DBEntity.VIEW.equals(node.getName())) {
-            return loadElement(node);
+            loadElement(node);
         } else {
             Node views = findViews(node);
             fullLoadCategory(views);
+            for (Node view : views.getChildren()) {
+                markElementFullyLoaded(view);
+            }
         }
         return node;
     }
@@ -101,6 +111,7 @@ public class ViewLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.VIEWS);
         if (nodeForLoading == null) {
             Node tables = new Node(MySQLConstants.NodeNames.VIEWS);
+            tables.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.VIEWS);
             node.addChild(tables);
             nodeForLoading = tables;
         }

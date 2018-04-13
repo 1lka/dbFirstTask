@@ -131,34 +131,24 @@ public class OpenedProjectViewModel {
 
     public void fullLoad() {
         Node nodeForLoading = selectedTreeModel.getNode();
-        try {
-            loaderManager.fullLoadElement(nodeForLoading);
-            selectedTreeModel.update();
-            service.createTreeItems(selectedItem.getValue());
-            String ddlOfNode = printerManager.printDDL(nodeForLoading);
-            ddl.set(ddlOfNode);
-        } catch (LoadingException|NullPointerException ignored) {
-        }
+        loaderManager.fullLoadElement(nodeForLoading);
+        selectedTreeModel.update();
+        service.createTreeItems(selectedItem.getValue());
+        String ddlOfNode = printerManager.printDDL(nodeForLoading);
+        ddl.set(ddlOfNode);
     }
 
     public void lazyLoad() {
         Node nodeForLoading = selectedTreeModel.getNode();
-        try {
-            loaderManager.lazyChildrenLoad(nodeForLoading);
-            selectedTreeModel.update();
-            service.createTreeItems(selectedItem.getValue());
-        } catch (LoadingException ignored) {
-        }
+        loaderManager.lazyChildrenLoad(nodeForLoading);
+        selectedTreeModel.update();
+        service.createTreeItems(selectedItem.getValue());
     }
 
     public void loadElement() {
         Node nodeForLoading = selectedTreeModel.getNode();
-        try {
-            loaderManager.loadElement(nodeForLoading);
-            selectedTreeModel.update();
-        } catch (LoadingException e) {
-            return;
-        }
+        loaderManager.loadElement(nodeForLoading);
+        selectedTreeModel.update();
         String ddlOfNode = printerManager.printDDL(nodeForLoading);
         ddl.set(ddlOfNode);
     }

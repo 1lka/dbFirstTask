@@ -9,6 +9,10 @@ import java.util.Map;
 
 public abstract class Loader {
 
+    public final static String ELEMENT_LOADED = "elementLoaded";
+    public final static String FULLY_LOADED = "fullyLoaded";
+    public final static String LAZILY_LOADED = "lazilyLoaded";
+
     private Connection connection;
 
     public Loader() {
@@ -58,8 +62,19 @@ public abstract class Loader {
      */
     public abstract Node loadCategory(Node node) throws SQLException;
 
-    public abstract Node fullLoadCategory(Node node) throws SQLException;
+    protected abstract Node fullLoadCategory(Node node) throws SQLException;
 
+    protected void markElementLoaded(Node node) {
+        node.getAttrs().put(ELEMENT_LOADED, String.valueOf(true));
+    }
+
+    protected void markElementFullyLoaded(Node node) {
+        node.getAttrs().put(FULLY_LOADED, String.valueOf(true));
+    }
+
+    protected void markElementLazilyLoaded(Node node) {
+        node.getAttrs().put(LAZILY_LOADED, String.valueOf(true));
+    }
     /**
      * Executes sql query with params
      *

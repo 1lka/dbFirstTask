@@ -48,6 +48,7 @@ public class TableColumnLoader extends Loader {
             String name = attrs.remove(MySQLConstants.AttributeName.COLUMN_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         }
         throw new LoadingException("cant load parameter " + columnName + " in " + schemaName + " schema");
@@ -63,9 +64,13 @@ public class TableColumnLoader extends Loader {
         String nodeName = node.getName();
         if (MySQLConstants.DBEntity.COLUMN.equals(nodeName)) {
             loadElement(node);
+            markElementFullyLoaded(node);
         } else {
             Node columns = findColumns(node);
             fullLoadCategory(columns.getParent());
+            for (Node n : columns.getChildren()) {
+                markElementFullyLoaded(n);
+            }
         }
         return node;
     }
@@ -88,6 +93,7 @@ public class TableColumnLoader extends Loader {
         Node columns = findColumns(table);
         if (columns == null) {
             columns = new Node(MySQLConstants.NodeNames.COLUMNS);
+            columns.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.COLUMNS);
             table.addChild(columns);
         }
         columns.getChildren().clear();
@@ -109,6 +115,7 @@ public class TableColumnLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.COLUMNS);
         if (nodeForLoading == null) {
             Node columns = new Node(MySQLConstants.NodeNames.COLUMNS);
+            columns.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.COLUMNS);
             node.addChild(columns);
             nodeForLoading = columns;
         }

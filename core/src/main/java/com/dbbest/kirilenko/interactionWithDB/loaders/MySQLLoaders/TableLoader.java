@@ -56,6 +56,7 @@ public class TableLoader extends Loader {
             String name = attrs.remove(MySQLConstants.AttributeName.TABLE_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
             node.setAttrs(attrs);
+            markElementLoaded(node);
             return node;
         }
         throw new LoadingException("cant load " + tableName + " table in " + schemaName + " schema");
@@ -78,6 +79,7 @@ public class TableLoader extends Loader {
         PKLoader.loadCategory(node);
         triggerLoader.loadCategory(node);
 
+        markElementLazilyLoaded(node);
         return node;
     }
 
@@ -92,7 +94,9 @@ public class TableLoader extends Loader {
     public Node fullLoadElement(Node node) throws SQLException {
         String nodeName = node.getName();
         if (MySQLConstants.DBEntity.TABLE.equals(nodeName)) {
-            loadElement(node);
+            if (!Boolean.valueOf(node.getAttrs().get(Loader.ELEMENT_LOADED))) {
+                loadElement(node);
+            }
 
             Loader columnLoader = new TableColumnLoader(getConnection());
             Loader indexLoader = new TableIndexLoader(getConnection());
@@ -105,10 +109,13 @@ public class TableLoader extends Loader {
             FKLoader.fullLoadElement(node);
             PKLoader.fullLoadElement(node);
             triggerLoader.fullLoadElement(node);
+
+            markElementFullyLoaded(node);
         } else {
             Node tables = findTables(node);
             fullLoadCategory(tables);
             for (Node table : tables.getChildren()) {
+                markElementLoaded(table);
                 fullLoadElement(table);
             }
         }
@@ -145,6 +152,7 @@ public class TableLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.TABLES);
         if (nodeForLoading == null) {
             Node tables = new Node(MySQLConstants.NodeNames.TABLES);
+            tables.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.TABLES);
             node.addChild(tables);
             nodeForLoading = tables;
         }
@@ -166,5 +174,4 @@ public class TableLoader extends Loader {
         }
         return tables;
     }
-
 }

@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 public class TableIndexLoaderTest {
 
-    private static Loader loader;
+    private static TableIndexLoader loader;
 
     @BeforeClass
     public static void init() {

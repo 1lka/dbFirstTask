@@ -37,6 +37,9 @@ public class FunctionLoader extends Loader {
 
     @Override
     public Node loadElement(Node node) throws SQLException {
+        if (!MySQLConstants.DBEntity.FUNCTION.equals(node.getName())) {
+            return node;
+        }
         String functionName = node.getAttrs().get(MySQLConstants.AttributeName.NAME);
         String schema = node.getParent().getParent().getAttrs().get(MySQLConstants.AttributeName.NAME);
         ResultSet resultSet = executeQuery(ELEMENT_QUERY, schema, functionName);
@@ -44,6 +47,7 @@ public class FunctionLoader extends Loader {
             Map<String, String> attrs = fillAttributes(resultSet);
             String name = attrs.remove(MySQLConstants.AttributeName.ROUTINE_NAME);
             attrs.put(MySQLConstants.AttributeName.NAME, name);
+            markElementLoaded(node);
             node.setAttrs(attrs);
             return node;
         } else {
@@ -58,20 +62,25 @@ public class FunctionLoader extends Loader {
         }
         Loader paramsLoader = new RoutineParamsLoader(getConnection());
         paramsLoader.loadCategory(node);
+        markElementLazilyLoaded(node);
         return node;
     }
 
     @Override
     public Node fullLoadElement(Node node) throws SQLException {
         if (MySQLConstants.DBEntity.FUNCTION.equals(node.getName())) {
-            loadElement(node);
+            if (!Boolean.valueOf(node.getAttrs().get(Loader.ELEMENT_LOADED))) {
+                loadElement(node);
+            }
             Loader paramsLoader = new RoutineParamsLoader(getConnection());
             paramsLoader.fullLoadElement(node);
+            markElementFullyLoaded(node);
             return node;
         } else {
             Node functions = findFunctions(node);
             fullLoadCategory(functions);
             for (Node function : functions.getChildren()) {
+                markElementLoaded(function);
                 fullLoadElement(function);
             }
         }
@@ -113,6 +122,7 @@ public class FunctionLoader extends Loader {
         Node nodeForLoading = node.wideSearch(MySQLConstants.NodeNames.FUNCTIONS);
         if (nodeForLoading == null) {
             Node tables = new Node(MySQLConstants.NodeNames.FUNCTIONS);
+            tables.getAttrs().put(MySQLConstants.AttributeName.NAME, MySQLConstants.NodeNames.FUNCTIONS);
             node.addChild(tables);
             nodeForLoading = tables;
         }
