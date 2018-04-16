@@ -1,7 +1,8 @@
 package com.dbbest.kirilenko.viewModel;
 
-import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
+import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
@@ -9,19 +10,18 @@ import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 import com.dbbest.kirilenko.service.TreeItemService;
+import com.dbbest.kirilenko.service.TreeStateSerialization;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-import javafx.stage.DirectoryChooser;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +30,17 @@ public class OpenedProjectViewModel {
 
     private LoaderManager loaderManager;
 
+    private Node settingsNode;
+
     private PrinterManager printerManager;
 
     private TreeModel selectedTreeModel;
 
     private List<TreeItem<TreeModel>> found = new ArrayList<>();
+
+    private BooleanProperty onlineMode = new SimpleBooleanProperty();
+
+    private BooleanProperty needToConnect = new SimpleBooleanProperty();
 
     private ObjectProperty<TreeItem<TreeModel>> rootItemProperty = new SimpleObjectProperty<>();
 
@@ -51,6 +57,10 @@ public class OpenedProjectViewModel {
     private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
 
     private BooleanProperty showContext = new SimpleBooleanProperty(true);
+
+    public BooleanProperty needToConnectProperty() {
+        return needToConnect;
+    }
 
     private StringProperty ddl = new SimpleStringProperty();
 
@@ -92,15 +102,31 @@ public class OpenedProjectViewModel {
         return table;
     }
 
-    public OpenedProjectViewModel() {
-        loaderManager = LoaderManager.getInstance();
-        printerManager = new PrinterManager(loaderManager.getType());
+    public OpenedProjectViewModel(String pathToFolder) throws SerializationException {
+        if (pathToFolder == null) {
+            onlineMode.set(true);
 
-        Node rootNode = new Node(MySQLConstants.DBEntity.SCHEMA);
-        rootNode.getAttrs().put(MySQLConstants.AttributeName.NAME, loaderManager.getDBName());
+            loaderManager = LoaderManager.getInstance();
+            printerManager = new PrinterManager(loaderManager.getType());
+            Node rootNode = new Node(MySQLConstants.DBEntity.SCHEMA);
+            rootNode.getAttrs().put(MySQLConstants.AttributeName.NAME, loaderManager.getDBName());
+            TreeModel root = new TreeModel(rootNode);
+            rootItemProperty.set(new TreeItem<>(root));
+        } else {
+            SerializationStrategy strategy = new XMLStrategyImpl();
+            String project = pathToFolder + "\\project.xml";
+            String projectSettings = pathToFolder + "\\settings.xml";
 
-        TreeModel root = new TreeModel(rootNode);
-        rootItemProperty.set(new TreeItem<>(root));
+            Node root = strategy.deserialize(project);
+            TreeModel rootModel = new TreeModel(root);
+            TreeItem<TreeModel> rootTreeItem = new TreeItem<>(rootModel);
+            service.createTreeItems(rootTreeItem);
+            rootItemProperty.setValue(rootTreeItem);
+
+            settingsNode = strategy.deserialize(projectSettings);
+            DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
+            printerManager = new PrinterManager(type);
+        }
 
         selectedItem.addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -108,27 +134,21 @@ public class OpenedProjectViewModel {
                 Node selectedNode = selectedTreeModel.getNode();
                 table.setValue(newValue.getValue().getTableElements());
 
-                fullyLoadedItem.bind(selectedTreeModel.fullyLoadedProperty());
-                lazyLoadedItem.bind(selectedTreeModel.lazyLoadedProperty());
-                elementLoaded.bind(selectedTreeModel.elementLoadedProperty());
+//                fullyLoadedItem.bind(selectedTreeModel.fullyLoadedProperty());
+//                lazyLoadedItem.bind(selectedTreeModel.lazyLoadedProperty());
+//                elementLoaded.bind(selectedTreeModel.elementLoadedProperty());
 
                 try {
                     String ddlOfNode = printerManager.printDDL(selectedNode);
                     ddl.set(ddlOfNode);
                 } catch (NullPointerException e) {
-                    ddl.setValue("nothing to show");
-                }
-
-                //todo create mechanism to ignoring container node
-                if (selectedNode.getAttrs().get("childrenCount") != null) {
-                    showContext.set(false);
-                } else {
-                    showContext.set(true);
+                    ddl.setValue("nothing to showNew");
                 }
             }
         });
     }
 
+    //todo change to lambda
     public void fullLoad() {
         Node nodeForLoading = selectedTreeModel.getNode();
         loaderManager.fullLoadElement(nodeForLoading);
@@ -138,6 +158,7 @@ public class OpenedProjectViewModel {
         ddl.set(ddlOfNode);
     }
 
+    //todo change to lambda
     public void lazyLoad() {
         Node nodeForLoading = selectedTreeModel.getNode();
         loaderManager.lazyChildrenLoad(nodeForLoading);
@@ -146,11 +167,37 @@ public class OpenedProjectViewModel {
     }
 
     public void loadElement() {
-        Node nodeForLoading = selectedTreeModel.getNode();
-        loaderManager.loadElement(nodeForLoading);
-        selectedTreeModel.update();
-        String ddlOfNode = printerManager.printDDL(nodeForLoading);
+        load(() ->
+        {
+            loaderManager.loadElement(selectedTreeModel.getNode());
+            selectedTreeModel.update();
+        });
+        String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
         ddl.set(ddlOfNode);
+    }
+
+    private void load(LoadInterface lambda) {
+        if (onlineMode.get()) {
+            lambda.load();
+        } else needToConnect.set(true);
+    }
+
+    public void reconnect(String password) throws WrongCredentialsException {
+        String login = settingsNode.getAttrs().get("login");
+        String url = settingsNode.getAttrs().get("url");
+        String name = settingsNode.getAttrs().get("dbName");
+        DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
+        try {
+            loaderManager = LoaderManager.getInstance(type, name, url, login, password);
+            onlineMode.set(true);
+        } catch (SQLException e) {
+            throw new WrongCredentialsException(e);
+        }
+    }
+
+    @FunctionalInterface
+    private interface LoadInterface {
+        void load();
     }
 
     public void searchElement(String s) {
@@ -187,9 +234,19 @@ public class OpenedProjectViewModel {
         Path path = Paths.get(pathToFolder);
         Files.createDirectories(path);
 
-        File file1 = new File(pathToFolder + "\\project.xml");
-        System.out.println(file1.createNewFile());
+        File project = new File(pathToFolder + "\\project.xml");
+        strategy.serialize(rootItemProperty.getValue().getValue().getNode(), project.getAbsolutePath());
 
-        strategy.serialize(rootItemProperty.getValue().getValue().getNode(), file1.getAbsolutePath());
+        File settings = new File(pathToFolder + "\\settings.xml");
+        Node state = TreeStateSerialization.convert(rootItemProperty.getValue(), selectedItem.getValue());
+
+        Node projectSettings = new Node("project");
+        projectSettings.addChild(state);
+        projectSettings.getAttrs().put("dbType", String.valueOf(loaderManager.getType()));
+        projectSettings.getAttrs().put("url", loaderManager.getUrl());
+        projectSettings.getAttrs().put("dbName", loaderManager.getDBName());
+        projectSettings.getAttrs().put("login", loaderManager.getLogin());
+
+        strategy.serialize(projectSettings, settings.getAbsolutePath());
     }
 }

@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -32,9 +31,6 @@ public class NewProjectView {
     @FXML
     private TextField password;
 
-    @FXML
-    private Button btnConnect;
-
     private NewProjectViewModel newProjectViewModel;
 
     private Stage stage;
@@ -50,9 +46,14 @@ public class NewProjectView {
 
     public void connect(ActionEvent actionEvent) throws Exception {
         LoaderManager manager = newProjectViewModel.connect();
+
         if (manager != null) {
             OpenedProjectView openedProject = new OpenedProjectView();
-            openedProject.show(actionEvent);
+            Button button = (Button) actionEvent.getSource();
+            Scene scene = button.getScene();
+            Stage stage = (Stage) scene.getWindow();
+            stage.close();
+            openedProject.showNew(actionEvent);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");

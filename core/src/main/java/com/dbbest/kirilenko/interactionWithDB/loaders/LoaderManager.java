@@ -17,6 +17,17 @@ public class LoaderManager {
 
     private String DBName;
 
+    private String url;
+    private String login;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
     public String getDBName() {
         return DBName;
     }
@@ -36,11 +47,8 @@ public class LoaderManager {
     private static LoaderManager instance;
 
     public static synchronized LoaderManager getInstance(DBType type, String DBName, String url, String login, String pass) throws SQLException {
-
-        if (instance == null) {
-            instance = new LoaderManager(type, url, login, pass);
-            instance.DBName = DBName;
-        }
+        instance = new LoaderManager(type, url, login, pass);
+        instance.DBName = DBName;
         return instance;
     }
 
@@ -55,6 +63,8 @@ public class LoaderManager {
 
     private LoaderManager(DBType type, String url, String login, String pass) throws SQLException {
         this.type = type;
+        this.url = url;
+        this.login = login;
         initConnection(url, login, pass);
         loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
     }

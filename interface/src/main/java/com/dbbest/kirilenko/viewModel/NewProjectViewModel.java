@@ -16,9 +16,6 @@ public class NewProjectViewModel {
     private StringProperty login = new SimpleStringProperty();
     private StringProperty password = new SimpleStringProperty();
 
-    private StringProperty dbFullAddress = new SimpleStringProperty();
-
-
     private LoaderManager manager;
 
     //todo change later

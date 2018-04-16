@@ -4,10 +4,8 @@ import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -21,6 +19,8 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 
 public class OpenedProjectView {
 
@@ -55,7 +55,7 @@ public class OpenedProjectView {
     public Menu projectMenu;
 
     @FXML
-    public MenuItem saveProjMenuItem;
+    public MenuItem saveProjectMenuItem;
 
     @FXML
     private TableView<Map.Entry<String, String>> attrTable;
@@ -70,10 +70,14 @@ public class OpenedProjectView {
 
     private static Stage primaryStage;
 
+
+    private static String filePath;
+
     @FXML
-    private void initialize() {
+    private void initialize() throws SerializationException {
         primaryStage = new Stage();
-        viewModel = new OpenedProjectViewModel();
+
+        viewModel = new OpenedProjectViewModel(filePath);
 
         treeView.setEditable(true);
         treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
@@ -86,15 +90,26 @@ public class OpenedProjectView {
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
-        FL.disableProperty().bind(viewModel.fullyLoadedItemProperty());
-        LL.disableProperty().bind(viewModel.lazyLoadedItemProperty());
-        LE.disableProperty().bind(viewModel.elementLoadedProperty());
-//        FL.textProperty()
+        viewModel.needToConnectProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                TextInputDialog dialog = new TextInputDialog("");
+                dialog.setTitle("password required");
+                dialog.setHeaderText("To load this item you must enter the password");
+                dialog.setContentText("Please enter the password:");
+                Optional<String> result = dialog.showAndWait();
+//                result.ifPresent(s -> viewModel.reconnect(s));
+            }
+        });
+
+//        FL.disableProperty().bind(viewModel.fullyLoadedItemProperty());
+//        LL.disableProperty().bind(viewModel.lazyLoadedItemProperty());
+//        LE.disableProperty().bind(viewModel.elementLoadedProperty());
 
         viewModel.foundItemProperty().addListener((observable, oldValue, newValue) -> {
             treeView.getSelectionModel().select(newValue);
+            int index = treeView.getRow(newValue);
+            treeView.scrollTo(index);
         });
-
 
         treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
             if (!viewModel.isShowContext() || event.getTarget().getClass() != LabeledText.class) {
@@ -103,7 +118,7 @@ public class OpenedProjectView {
         });
     }
 
-    public void show(ActionEvent event) throws Exception {
+    public void showNew(ActionEvent event) throws IOException {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
         Node source = (Node) event.getSource();
         Scene scene1 = source.getScene();
@@ -111,7 +126,19 @@ public class OpenedProjectView {
         Stage s = (Stage) primaryStage1.getOwner();
         s.close();
         Scene scene = new Scene(root);
-        primaryStage = new Stage();
+        primaryStage.setTitle("DBBest");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public void showExisting(ActionEvent event, String file) throws IOException {
+        filePath = file;
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
+        Node source = (Button) event.getSource();
+        Scene scene1 = source.getScene();
+        Stage primaryStage1 = (Stage) scene1.getWindow();
+        primaryStage1.close();
+        Scene scene = new Scene(root);
         primaryStage.setTitle("DBBest");
         primaryStage.setScene(scene);
         primaryStage.show();

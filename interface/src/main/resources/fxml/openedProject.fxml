@@ -11,7 +11,7 @@
             <menus>
                 <Menu fx:id="projectMenu" mnemonicParsing="false" text="Project">
                     <items>
-                        <MenuItem fx:id="saveProjMenuItem" mnemonicParsing="false" onAction="#saveProject" text="save project" />
+                        <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#saveProject" text="save project" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Action">
