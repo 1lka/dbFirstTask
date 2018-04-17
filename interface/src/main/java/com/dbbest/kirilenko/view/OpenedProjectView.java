@@ -1,9 +1,11 @@
 package com.dbbest.kirilenko.view;
 
+import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,9 +22,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 
 public class OpenedProjectView {
+
+    @FXML
+    private TableView<Map.Entry<String, String>> attrTable;
 
     @FXML
     public TableColumn<Map.Entry<String, String>, String> attributeColumn;
@@ -58,9 +62,6 @@ public class OpenedProjectView {
     public MenuItem saveProjectMenuItem;
 
     @FXML
-    private TableView<Map.Entry<String, String>> attrTable;
-
-    @FXML
     private TextArea ddlArea;
 
     @FXML
@@ -79,9 +80,13 @@ public class OpenedProjectView {
 
         viewModel = new OpenedProjectViewModel(filePath);
 
-        treeView.setEditable(true);
+//        treeView.setEditable(true);
         treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
-        treeView.getSelectionModel().selectFirst();
+        if (viewModel.selectedItemProperty().getValue() != null) {
+            treeView.getSelectionModel().select(treeView.getRow(viewModel.selectedItemProperty().getValue()));
+        } else {
+            treeView.getSelectionModel().selectFirst();
+        }
         viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
 
         attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
@@ -92,12 +97,25 @@ public class OpenedProjectView {
 
         viewModel.needToConnectProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                TextInputDialog dialog = new TextInputDialog("");
+                TextInputDialog dialog = new TextInputDialog("password");
                 dialog.setTitle("password required");
-                dialog.setHeaderText("To load this item you must enter the password");
+                dialog.setHeaderText("Enter the password and try again");
                 dialog.setContentText("Please enter the password:");
                 Optional<String> result = dialog.showAndWait();
-//                result.ifPresent(s -> viewModel.reconnect(s));
+                result.ifPresent(s -> {
+                    try {
+                        viewModel.reconnect(s);
+                    } catch (WrongCredentialsException e) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error ");
+                        alert.setHeaderText("Wrong password");
+                        alert.setContentText("Ooops, there was an error!");
+                        alert.showAndWait();
+                    }
+                });
+                if (!result.isPresent()) {
+                    viewModel.needToConnectProperty().set(false);
+                }
             }
         });
 
@@ -153,7 +171,9 @@ public class OpenedProjectView {
     }
 
     public void fullyLoad(ActionEvent actionEvent) {
-        viewModel.fullLoad();
+        Platform.runLater(() -> {
+            viewModel.fullLoad();
+        });
     }
 
     public void saveDDL(ActionEvent actionEvent) {

@@ -118,12 +118,13 @@ public class OpenedProjectViewModel {
             String projectSettings = pathToFolder + "\\settings.xml";
 
             Node root = strategy.deserialize(project);
+            settingsNode = strategy.deserialize(projectSettings);
+
             TreeModel rootModel = new TreeModel(root);
             TreeItem<TreeModel> rootTreeItem = new TreeItem<>(rootModel);
-            service.createTreeItems(rootTreeItem);
+            service.restoreTreeState(rootTreeItem, selectedItem, settingsNode.getChildren().get(0));
             rootItemProperty.setValue(rootTreeItem);
 
-            settingsNode = strategy.deserialize(projectSettings);
             DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
             printerManager = new PrinterManager(type);
         }
@@ -148,27 +149,26 @@ public class OpenedProjectViewModel {
         });
     }
 
-    //todo change to lambda
     public void fullLoad() {
-        Node nodeForLoading = selectedTreeModel.getNode();
-        loaderManager.fullLoadElement(nodeForLoading);
-        selectedTreeModel.update();
+        load(() -> {
+            loaderManager.fullLoadElement(selectedTreeModel.getNode());
+            selectedTreeModel.update();
+        });
         service.createTreeItems(selectedItem.getValue());
-        String ddlOfNode = printerManager.printDDL(nodeForLoading);
+        String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
         ddl.set(ddlOfNode);
     }
 
-    //todo change to lambda
     public void lazyLoad() {
-        Node nodeForLoading = selectedTreeModel.getNode();
-        loaderManager.lazyChildrenLoad(nodeForLoading);
-        selectedTreeModel.update();
+        load(() -> {
+            loaderManager.lazyChildrenLoad(selectedTreeModel.getNode());
+            selectedTreeModel.update();
+        });
         service.createTreeItems(selectedItem.getValue());
     }
 
     public void loadElement() {
-        load(() ->
-        {
+        load(() -> {
             loaderManager.loadElement(selectedTreeModel.getNode());
             selectedTreeModel.update();
         });
@@ -182,6 +182,11 @@ public class OpenedProjectViewModel {
         } else needToConnect.set(true);
     }
 
+    @FunctionalInterface
+    private interface LoadInterface {
+        void load();
+    }
+
     public void reconnect(String password) throws WrongCredentialsException {
         String login = settingsNode.getAttrs().get("login");
         String url = settingsNode.getAttrs().get("url");
@@ -191,13 +196,9 @@ public class OpenedProjectViewModel {
             loaderManager = LoaderManager.getInstance(type, name, url, login, password);
             onlineMode.set(true);
         } catch (SQLException e) {
+            needToConnect.set(false);
             throw new WrongCredentialsException(e);
         }
-    }
-
-    @FunctionalInterface
-    private interface LoadInterface {
-        void load();
     }
 
     public void searchElement(String s) {

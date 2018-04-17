@@ -1,6 +1,9 @@
 package com.dbbest.kirilenko.service;
 
 import com.dbbest.kirilenko.model.TreeModel;
+import com.dbbest.kirilenko.tree.Node;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.TreeItem;
 
 import java.util.ArrayList;
@@ -15,6 +18,22 @@ public class TreeItemService {
         for (TreeModel child : item.getValue().getChildren()) {
             TreeItem<TreeModel> treeItem = new TreeItem<>(child);
             createTreeItems(treeItem);
+            item.getChildren().add(treeItem);
+        }
+    }
+
+    public void restoreTreeState(TreeItem<TreeModel> item, ObjectProperty<TreeItem<TreeModel>> selected, Node settingsNode) {
+        boolean isExpanded = Boolean.valueOf(settingsNode.getAttrs().get("isExpanded"));
+        boolean isSelected = Boolean.valueOf(settingsNode.getAttrs().get("selected"));
+
+        item.setExpanded(isExpanded);
+        if (isSelected) {
+            selected.setValue(item);
+        }
+
+        for (int i = 0; i < item.getValue().getChildren().size(); i++) {
+            TreeItem<TreeModel> treeItem = new TreeItem<>(item.getValue().getChildren().get(i));
+            restoreTreeState(treeItem,selected,settingsNode.getChildren().get(i));
             item.getChildren().add(treeItem);
         }
     }
