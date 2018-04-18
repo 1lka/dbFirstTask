@@ -7,6 +7,8 @@ import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -24,6 +27,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class OpenedProjectView {
+
+    @FXML
+    public ProgressIndicator progress;
 
     @FXML
     private TableView<Map.Entry<String, String>> attrTable;
@@ -119,6 +125,9 @@ public class OpenedProjectView {
             }
         });
 
+        treeView.disableProperty().bind(viewModel.treeIsBeenLoadingProperty());
+        progress.visibleProperty().bind(treeView.disableProperty());
+
 //        FL.disableProperty().bind(viewModel.fullyLoadedItemProperty());
 //        LL.disableProperty().bind(viewModel.lazyLoadedItemProperty());
 //        LE.disableProperty().bind(viewModel.elementLoadedProperty());
@@ -171,12 +180,18 @@ public class OpenedProjectView {
     }
 
     public void fullyLoad(ActionEvent actionEvent) {
-        Platform.runLater(() -> {
-            viewModel.fullLoad();
-        });
+        viewModel.fullLoad();
     }
 
     public void saveDDL(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save DDL path");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
+        fileChooser.getExtensionFilters().add(filter);
+        fileChooser.getExtensionFilters().add(filter1);
+        File saveFile = fileChooser.showSaveDialog(primaryStage);
         viewModel.saveDDL();
     }
 
@@ -199,7 +214,7 @@ public class OpenedProjectView {
         try {
             File file = chooser.showDialog(primaryStage);
             viewModel.saveProject(file);
-        } catch (SerializationException|IOException e) {
+        } catch (SerializationException | IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("problems with saving");
             alert.setHeaderText("Look, an Error Dialog");

@@ -12,6 +12,7 @@ import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.service.TreeStateSerialization;
 import com.dbbest.kirilenko.tree.Node;
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
@@ -27,6 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 public class OpenedProjectViewModel {
+
+    private BooleanProperty treeIsBeenLoading = new SimpleBooleanProperty();
+
+    public BooleanProperty treeIsBeenLoadingProperty() {
+        return treeIsBeenLoading;
+    }
 
     private LoaderManager loaderManager;
 
@@ -153,33 +160,39 @@ public class OpenedProjectViewModel {
         load(() -> {
             loaderManager.fullLoadElement(selectedTreeModel.getNode());
             selectedTreeModel.update();
+            service.createTreeItems(selectedItem.getValue());
+            String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
+            ddl.set(ddlOfNode);
         });
-        service.createTreeItems(selectedItem.getValue());
-        String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
-        ddl.set(ddlOfNode);
     }
 
     public void lazyLoad() {
         load(() -> {
             loaderManager.lazyChildrenLoad(selectedTreeModel.getNode());
             selectedTreeModel.update();
+            service.createTreeItems(selectedItem.getValue());
         });
-        service.createTreeItems(selectedItem.getValue());
     }
 
     public void loadElement() {
         load(() -> {
             loaderManager.loadElement(selectedTreeModel.getNode());
             selectedTreeModel.update();
+            String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
+            ddl.set(ddlOfNode);
         });
-        String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
-        ddl.set(ddlOfNode);
     }
 
     private void load(LoadInterface lambda) {
         if (onlineMode.get()) {
-            lambda.load();
-        } else needToConnect.set(true);
+            treeIsBeenLoading.set(true);
+            new Thread(() -> {
+                lambda.load();
+                Platform.runLater(()->{treeIsBeenLoading.set(false);});
+            }).start();
+        } else {
+            needToConnect.set(true);
+        }
     }
 
     @FunctionalInterface
@@ -225,6 +238,7 @@ public class OpenedProjectViewModel {
     }
 
     public void saveDDL() {
+
         //todo
     }
 
