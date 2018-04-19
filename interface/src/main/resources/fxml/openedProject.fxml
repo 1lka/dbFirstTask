@@ -16,20 +16,20 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Action">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="generate full ddl" />
-                  <MenuItem mnemonicParsing="false" text="load element" />
-                  <MenuItem mnemonicParsing="false" text="load all subtree" />
-                  <MenuItem mnemonicParsing="false" text="load all tree" />
+                        <MenuItem mnemonicParsing="false" onAction="#generateFullDDl" text="generate full ddl" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadElement" text="load element" />
+                  <MenuItem mnemonicParsing="false" onAction="#fullLoad" text="load all subtree" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadAll" text="load all tree" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
+                        <MenuItem mnemonicParsing="false" onAction="#showHelp" text="About" />
                     </items>
                 </Menu>
             <Menu mnemonicParsing="false" text="Options">
               <items>
-                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" onAction="#showProjectOptions" text="project options" />
               </items>
             </Menu>
             </menus>
@@ -49,7 +49,7 @@
                                           <items>
                                               <MenuItem fx:id="LL" mnemonicParsing="false" onAction="#lazyLoad" text="lazy load" />
                                               <MenuItem fx:id="LE" mnemonicParsing="false" onAction="#loadElement" text="load element" />
-                                              <MenuItem fx:id="FL" mnemonicParsing="false" onAction="#fullyLoad" text="fully load" />
+                                              <MenuItem fx:id="FL" mnemonicParsing="false" onAction="#fullLoad" text="full load" />
                                           </items>
                                       </ContextMenu>
                                   </contextMenu>

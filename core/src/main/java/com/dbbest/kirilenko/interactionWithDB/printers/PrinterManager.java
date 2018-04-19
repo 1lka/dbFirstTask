@@ -22,4 +22,21 @@ public class PrinterManager {
         }
         return printer.printElement(node);
     }
+
+    public String printAllNodes(Node root) {
+        return printAllNodes(root,new StringBuilder());
+    }
+
+    private String printAllNodes(Node node, StringBuilder sb) {
+        if (sb == null) {
+            sb = new StringBuilder();
+        }
+        sb.append(printDDL(node));
+        sb.append(System.lineSeparator());
+
+        StringBuilder finalSb = sb;
+        node.getChildren().forEach(n -> printAllNodes(n, finalSb));
+
+        return sb.toString();
+    }
 }

@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.viewModel;
 
+import com.dbbest.kirilenko.exception.DdlGenerationException;
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
@@ -18,6 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +36,8 @@ public class OpenedProjectViewModel {
     public BooleanProperty treeIsBeenLoadingProperty() {
         return treeIsBeenLoading;
     }
+
+    private String fullDDL;
 
     private LoaderManager loaderManager;
 
@@ -183,6 +187,14 @@ public class OpenedProjectViewModel {
         });
     }
 
+    public void loadAll() {
+        load(() -> {
+            loaderManager.fullLoadElement(rootItemProperty.getValue().getValue().getNode());
+            rootItemProperty.getValue().getValue().update();
+            service.createTreeItems(rootItemProperty.getValue());
+        });
+    }
+
     private void load(LoadInterface lambda) {
         if (onlineMode.get()) {
             treeIsBeenLoading.set(true);
@@ -237,11 +249,6 @@ public class OpenedProjectViewModel {
         foundItem.setValue(found.get(next));
     }
 
-    public void saveDDL() {
-
-        //todo
-    }
-
     public void saveProject(File file) throws SerializationException, IOException {
         SerializationStrategy strategy = new XMLStrategyImpl();
         String pathToFolder = file.getAbsolutePath() + "\\" + loaderManager.getDBName();
@@ -263,5 +270,33 @@ public class OpenedProjectViewModel {
         projectSettings.getAttrs().put("login", loaderManager.getLogin());
 
         strategy.serialize(projectSettings, settings.getAbsolutePath());
+    }
+
+    public void saveDDL(File saveFile) {
+        try(FileWriter writer = new FileWriter(saveFile, false))        {
+            writer.write(ddl.get());
+            writer.flush();
+        }
+        catch(IOException ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void generateFullDDl() throws DdlGenerationException {
+        Node root = rootItemProperty.getValue().getValue().getNode();
+        if (!Boolean.valueOf(root.getAttrs().get("fullyLoaded"))) {
+            throw new DdlGenerationException("load all tree to generate DDL");
+        }
+        fullDDL = printerManager.printAllNodes(root);
+    }
+
+    public void saveFullDdl(File saveFile) {
+        try(FileWriter writer = new FileWriter(saveFile, false))        {
+            writer.write(fullDDL);
+            writer.flush();
+        }
+        catch(IOException ex){
+            System.out.println(ex.getMessage());
+        }
     }
 }

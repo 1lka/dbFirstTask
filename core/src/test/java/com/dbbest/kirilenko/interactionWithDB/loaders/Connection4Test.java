@@ -5,6 +5,7 @@ import com.dbbest.kirilenko.interactionWithDB.connections.MySQLConnect;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class Connection4Test {
 
@@ -18,7 +19,7 @@ public class Connection4Test {
     private final static String login = "root";
     private final static String pass = "root";
 
-    static  {
+    static {
         Connect connect = new MySQLConnect();
         try {
             connect.initConnection(url, login, pass);

@@ -1,14 +1,12 @@
 package com.dbbest.kirilenko.view;
 
+import com.dbbest.kirilenko.exception.DdlGenerationException;
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -76,7 +74,6 @@ public class OpenedProjectView {
     private OpenedProjectViewModel viewModel;
 
     private static Stage primaryStage;
-
 
     private static String filePath;
 
@@ -179,20 +176,8 @@ public class OpenedProjectView {
         viewModel.loadElement();
     }
 
-    public void fullyLoad(ActionEvent actionEvent) {
+    public void fullLoad(ActionEvent actionEvent) {
         viewModel.fullLoad();
-    }
-
-    public void saveDDL(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save DDL path");
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-        FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
-        fileChooser.getExtensionFilters().add(filter);
-        fileChooser.getExtensionFilters().add(filter1);
-        File saveFile = fileChooser.showSaveDialog(primaryStage);
-        viewModel.saveDDL();
     }
 
     public void searchElement(ActionEvent actionEvent) {
@@ -222,5 +207,56 @@ public class OpenedProjectView {
 
             alert.showAndWait();
         }
+    }
+
+    public void saveDDL(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save DDL path");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
+        fileChooser.getExtensionFilters().add(filter);
+        fileChooser.getExtensionFilters().add(filter1);
+        File saveFile = fileChooser.showSaveDialog(primaryStage);
+        viewModel.saveDDL(saveFile);
+    }
+
+    public void generateFullDDl(ActionEvent actionEvent) {
+        try {
+            viewModel.generateFullDDl();
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save DDL path");
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+            FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
+            fileChooser.getExtensionFilters().add(filter);
+            fileChooser.getExtensionFilters().add(filter1);
+            File saveFile = fileChooser.showSaveDialog(primaryStage);
+            viewModel.saveFullDdl(saveFile);
+        } catch (DdlGenerationException e) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Something went wrong ...");
+            alert.setHeaderText(null);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    public void showHelp(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Help");
+        alert.setHeaderText(null);
+        // todo write help text
+        alert.setContentText("there will be text about program");
+
+        alert.showAndWait();
+    }
+
+    public void loadAll(ActionEvent actionEvent) {
+        viewModel.loadAll();
+    }
+
+    public void showProjectOptions(ActionEvent actionEvent) {
+
     }
 }
