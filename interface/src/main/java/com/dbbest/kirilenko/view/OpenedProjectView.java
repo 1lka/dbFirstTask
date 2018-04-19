@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -73,13 +74,13 @@ public class OpenedProjectView {
 
     private OpenedProjectViewModel viewModel;
 
-    private static Stage primaryStage;
+    private static Stage openedProjectStage;
 
     private static String filePath;
 
     @FXML
     private void initialize() throws SerializationException {
-        primaryStage = new Stage();
+        openedProjectStage = new Stage();
 
         viewModel = new OpenedProjectViewModel(filePath);
 
@@ -94,8 +95,8 @@ public class OpenedProjectView {
 
         attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
-
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
+
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
         viewModel.needToConnectProperty().addListener((observable, oldValue, newValue) -> {
@@ -142,17 +143,20 @@ public class OpenedProjectView {
         });
     }
 
-    public void showNew(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
-        Node source = (Node) event.getSource();
-        Scene scene1 = source.getScene();
-        Stage primaryStage1 = (Stage) scene1.getWindow();
-        Stage s = (Stage) primaryStage1.getOwner();
-        s.close();
-        Scene scene = new Scene(root);
-        primaryStage.setTitle("DBBest");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    public void show(ActionEvent event) throws IOException {
+        if (openedProjectStage == null) {
+            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
+            Node source = (Node) event.getSource();
+            Scene scene1 = source.getScene();
+            Stage primaryStage1 = (Stage) scene1.getWindow();
+            Stage mainStage = (Stage) primaryStage1.getOwner();
+            Scene scene = new Scene(root);
+            openedProjectStage.setTitle("DBBest");
+            openedProjectStage.setScene(scene);
+            openedProjectStage.initModality(Modality.WINDOW_MODAL);
+            openedProjectStage.initOwner(mainStage);
+        }
+        openedProjectStage.showAndWait();
     }
 
     public void showExisting(ActionEvent event, String file) throws IOException {
@@ -163,9 +167,9 @@ public class OpenedProjectView {
         Stage primaryStage1 = (Stage) scene1.getWindow();
         primaryStage1.close();
         Scene scene = new Scene(root);
-        primaryStage.setTitle("DBBest");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        openedProjectStage.setTitle("DBBest");
+        openedProjectStage.setScene(scene);
+        openedProjectStage.show();
     }
 
     public void lazyLoad(ActionEvent actionEvent) {
@@ -197,7 +201,7 @@ public class OpenedProjectView {
         chooser.setTitle("save");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         try {
-            File file = chooser.showDialog(primaryStage);
+            File file = chooser.showDialog(openedProjectStage);
             viewModel.saveProject(file);
         } catch (SerializationException | IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -217,7 +221,7 @@ public class OpenedProjectView {
         FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
         fileChooser.getExtensionFilters().add(filter);
         fileChooser.getExtensionFilters().add(filter1);
-        File saveFile = fileChooser.showSaveDialog(primaryStage);
+        File saveFile = fileChooser.showSaveDialog(openedProjectStage);
         viewModel.saveDDL(saveFile);
     }
 
@@ -231,7 +235,7 @@ public class OpenedProjectView {
             FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
             fileChooser.getExtensionFilters().add(filter);
             fileChooser.getExtensionFilters().add(filter1);
-            File saveFile = fileChooser.showSaveDialog(primaryStage);
+            File saveFile = fileChooser.showSaveDialog(openedProjectStage);
             viewModel.saveFullDdl(saveFile);
         } catch (DdlGenerationException e) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);

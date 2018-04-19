@@ -33,7 +33,7 @@ public class NewProjectView {
 
     private NewProjectViewModel newProjectViewModel;
 
-    private Stage stage;
+    private static Stage stage;
 
     @FXML
     private void initialize() {
@@ -49,11 +49,12 @@ public class NewProjectView {
 
         if (manager != null) {
             OpenedProjectView openedProject = new OpenedProjectView();
-            Button button = (Button) actionEvent.getSource();
-            Scene scene = button.getScene();
-            Stage stage = (Stage) scene.getWindow();
+//            Button button = (Button) actionEvent.getSource();
+//            Scene scene = button.getScene();
+//            Stage stage1 = (Stage) scene.getWindow();
+//            stage1.close();
             stage.close();
-            openedProject.showNew(actionEvent);
+            openedProject.show(actionEvent);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
@@ -80,7 +81,7 @@ public class NewProjectView {
             Window mainStage = source.getScene().getWindow();
             stage.initOwner(mainStage);
         }
-        stage.show();
+        stage.showAndWait();
     }
 }
 
