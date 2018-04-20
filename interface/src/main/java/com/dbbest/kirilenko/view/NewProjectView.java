@@ -34,6 +34,7 @@ public class NewProjectView {
     private NewProjectViewModel newProjectViewModel;
 
     private static Stage stage;
+    private static Stage owner;
 
     @FXML
     private void initialize() {
@@ -42,6 +43,8 @@ public class NewProjectView {
         newProjectViewModel.dbNameProperty().bind(dbName.textProperty());
         newProjectViewModel.loginProperty().bind(login.textProperty());
         newProjectViewModel.passwordProperty().bind(password.textProperty());
+
+        stage.setOnCloseRequest(event -> {owner.show();});
     }
 
     public void connect(ActionEvent actionEvent) throws Exception {
@@ -49,12 +52,8 @@ public class NewProjectView {
 
         if (manager != null) {
             OpenedProjectView openedProject = new OpenedProjectView();
-//            Button button = (Button) actionEvent.getSource();
-//            Scene scene = button.getScene();
-//            Stage stage1 = (Stage) scene.getWindow();
-//            stage1.close();
-            stage.close();
-            openedProject.show(actionEvent);
+            stage.hide();
+            openedProject.show(owner,null);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
@@ -78,9 +77,10 @@ public class NewProjectView {
             stage.initModality(Modality.WINDOW_MODAL);
 
             Node source = (Node) actionEvent.getSource();
-            Window mainStage = source.getScene().getWindow();
-            stage.initOwner(mainStage);
+            owner = (Stage) source.getScene().getWindow();
+            stage.initOwner(owner);
         }
+        owner.hide();
         stage.showAndWait();
     }
 }

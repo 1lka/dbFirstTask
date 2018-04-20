@@ -3,8 +3,12 @@ package com.dbbest.kirilenko.view;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.File;
@@ -14,6 +18,7 @@ public class MainView {
 
     private NewProjectView newProjectView;
     private OpenedProjectView openedProjectView;
+    private static Stage stage;
 
     @FXML
     private void initialize() {
@@ -35,12 +40,26 @@ public class MainView {
         File file = chooser.showDialog(theStage);
 
         if (file != null) {
-            openedProjectView.showExisting(actionEvent, file.getAbsolutePath());
+            openedProjectView.show(stage, file.getAbsolutePath());
         }
     }
 
     public void exit(ActionEvent actionEvent) {
-        System.out.println("exit");
         Platform.exit();
+    }
+
+    public void show(Stage primaryStage) throws IOException {
+        stage = primaryStage;
+        System.out.println("mainView " + stage);
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/main.fxml"));
+        Parent root = fxmlLoader.load();
+
+        Scene scene = new Scene(root);
+        primaryStage.setResizable(false);
+
+        primaryStage.setTitle("Welcome page");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 }

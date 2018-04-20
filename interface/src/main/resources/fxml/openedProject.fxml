@@ -11,7 +11,11 @@
             <menus>
                 <Menu fx:id="projectMenu" mnemonicParsing="false" text="Project">
                     <items>
-                        <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#saveProject" text="save project" />
+                  <MenuItem mnemonicParsing="false" text="Save" />
+                        <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#saveProject" text="Save As ..." />
+                  <MenuItem mnemonicParsing="false" onAction="#closeThisProject" text="Close" />
+                  <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open" />
+                  <MenuItem mnemonicParsing="false" onAction="#createNewProject" text="Create new" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Action">
@@ -20,6 +24,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#loadElement" text="load element" />
                   <MenuItem mnemonicParsing="false" onAction="#fullLoad" text="load all subtree" />
                   <MenuItem mnemonicParsing="false" onAction="#loadAll" text="load all tree" />
+                  <MenuItem mnemonicParsing="false" onAction="#reloadSelected" text="reload item" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -30,6 +35,7 @@
             <Menu mnemonicParsing="false" text="Options">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#showProjectOptions" text="project options" />
+                  <MenuItem mnemonicParsing="false" onAction="#showGeneralOptions" text="options" />
               </items>
             </Menu>
             </menus>

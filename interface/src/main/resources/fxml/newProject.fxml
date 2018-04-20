@@ -99,17 +99,19 @@
       </HBox>
       <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
          <children>
-            <Button fx:id="btnConnect" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#connect" prefWidth="200.0" text="Connect">
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="btnConnect" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#connect" prefWidth="200.0" text="Connect" AnchorPane.bottomAnchor="4.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <ProgressBar disable="true" layoutY="11.0" prefWidth="200.0" />
+               </children>
+            </AnchorPane>
          </children>
       </HBox>
    </children>

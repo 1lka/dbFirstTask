@@ -6,6 +6,7 @@ import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
+import javafx.beans.binding.Binding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -75,16 +76,19 @@ public class OpenedProjectView {
     private OpenedProjectViewModel viewModel;
 
     private static Stage openedProjectStage;
+    private static Stage mainViewScene;
 
     private static String filePath;
 
     @FXML
     private void initialize() throws SerializationException {
-        openedProjectStage = new Stage();
-
         viewModel = new OpenedProjectViewModel(filePath);
 
-//        treeView.setEditable(true);
+        mainViewScene.hide();
+        openedProjectStage.setOnCloseRequest(event -> {
+            mainViewScene.show();
+        });
+
         treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
         if (viewModel.selectedItemProperty().getValue() != null) {
             treeView.getSelectionModel().select(treeView.getRow(viewModel.selectedItemProperty().getValue()));
@@ -92,6 +96,8 @@ public class OpenedProjectView {
             treeView.getSelectionModel().selectFirst();
         }
         viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
+        treeView.disableProperty().bind(viewModel.treeIsBeenLoadingProperty());
+        progress.visibleProperty().bind(treeView.disableProperty());
 
         attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
@@ -123,13 +129,7 @@ public class OpenedProjectView {
             }
         });
 
-        treeView.disableProperty().bind(viewModel.treeIsBeenLoadingProperty());
-        progress.visibleProperty().bind(treeView.disableProperty());
-
-//        FL.disableProperty().bind(viewModel.fullyLoadedItemProperty());
-//        LL.disableProperty().bind(viewModel.lazyLoadedItemProperty());
-//        LE.disableProperty().bind(viewModel.elementLoadedProperty());
-
+        
         viewModel.foundItemProperty().addListener((observable, oldValue, newValue) -> {
             treeView.getSelectionModel().select(newValue);
             int index = treeView.getRow(newValue);
@@ -137,38 +137,22 @@ public class OpenedProjectView {
         });
 
         treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
-            if (!viewModel.isShowContext() || event.getTarget().getClass() != LabeledText.class) {
+            if (event.getTarget().getClass() != LabeledText.class) {
                 event.consume();
             }
         });
     }
 
-    public void show(ActionEvent event) throws IOException {
-        if (openedProjectStage == null) {
-            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
-            Node source = (Node) event.getSource();
-            Scene scene1 = source.getScene();
-            Stage primaryStage1 = (Stage) scene1.getWindow();
-            Stage mainStage = (Stage) primaryStage1.getOwner();
-            Scene scene = new Scene(root);
-            openedProjectStage.setTitle("DBBest");
-            openedProjectStage.setScene(scene);
-            openedProjectStage.initModality(Modality.WINDOW_MODAL);
-            openedProjectStage.initOwner(mainStage);
-        }
-        openedProjectStage.showAndWait();
-    }
-
-    public void showExisting(ActionEvent event, String file) throws IOException {
-        filePath = file;
+    public void show(Stage main, String path) throws IOException {
+        filePath = path;
+        mainViewScene = main;
+        openedProjectStage = new Stage();
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
-        Node source = (Button) event.getSource();
-        Scene scene1 = source.getScene();
-        Stage primaryStage1 = (Stage) scene1.getWindow();
-        primaryStage1.close();
-        Scene scene = new Scene(root);
+
+        Scene openedProjectScene = new Scene(root);
         openedProjectStage.setTitle("DBBest");
-        openedProjectStage.setScene(scene);
+        openedProjectStage.setScene(openedProjectScene);
+
         openedProjectStage.show();
     }
 
@@ -261,6 +245,24 @@ public class OpenedProjectView {
     }
 
     public void showProjectOptions(ActionEvent actionEvent) {
+
+    }
+
+    public void closeThisProject(ActionEvent actionEvent) {
+        
+    }
+
+    public void openProject(ActionEvent actionEvent) {
+    }
+
+    public void createNewProject(ActionEvent actionEvent) {
+    }
+
+    public void reloadSelected(ActionEvent actionEvent) {
+
+    }
+
+    public void showGeneralOptions(ActionEvent actionEvent) {
 
     }
 }

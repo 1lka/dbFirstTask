@@ -41,7 +41,7 @@ public class RoutineParamsLoaderTest {
     public void loadElement() throws SQLException {
         Node param = new Node(MySQLConstants.DBEntity.PARAMETER);
         params.addChild(param);
-        param.getAttrs().put("NAME", null);
+        param.getAttrs().put("NAME", "returned");
         System.out.println(loader.loadElement(param));
     }
 
@@ -49,7 +49,7 @@ public class RoutineParamsLoaderTest {
     public void fullLoadElement() throws SQLException {
         Node param = new Node(MySQLConstants.DBEntity.PARAMETER);
         params.addChild(param);
-        param.getAttrs().put("NAME", null);
+        param.getAttrs().put("NAME", "returned");
         System.out.println(loader.fullLoadElement(param));
     }
 
