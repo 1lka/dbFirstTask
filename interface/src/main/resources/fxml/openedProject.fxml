@@ -11,9 +11,9 @@
             <menus>
                 <Menu fx:id="projectMenu" mnemonicParsing="false" text="Project">
                     <items>
-                  <MenuItem mnemonicParsing="false" text="Save" />
-                        <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#saveProject" text="Save As ..." />
-                  <MenuItem mnemonicParsing="false" onAction="#closeThisProject" text="Close" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveCurrentProject" text="Save" />
+                        <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#saveProjectAs" text="Save As ..." />
+                  <MenuItem mnemonicParsing="false" onAction="#closeCurrentProject" text="Close" />
                   <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open" />
                   <MenuItem mnemonicParsing="false" onAction="#createNewProject" text="Create new" />
                     </items>

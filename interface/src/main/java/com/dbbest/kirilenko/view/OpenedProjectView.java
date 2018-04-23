@@ -153,6 +153,7 @@ public class OpenedProjectView {
         openedProjectStage.show();
     }
 
+    /////////////////////loading
     public void lazyLoad(ActionEvent actionEvent) {
         viewModel.lazyLoad();
     }
@@ -165,6 +166,15 @@ public class OpenedProjectView {
         viewModel.fullLoad();
     }
 
+    public void loadAll(ActionEvent actionEvent) {
+        viewModel.loadAll();
+    }
+
+    public void reloadSelected(ActionEvent actionEvent) {
+
+    }
+    /////////////////////searching
+
     public void searchElement(ActionEvent actionEvent) {
         viewModel.searchElement(searchText.getText());
     }
@@ -176,8 +186,15 @@ public class OpenedProjectView {
     public void nextElement(ActionEvent actionEvent) {
         viewModel.nextElement();
     }
+    /////////////////////menu
 
-    public void saveProject(ActionEvent actionEvent) {
+    public void saveCurrentProject(ActionEvent actionEvent) throws IOException, SerializationException {
+        if (viewModel.checkFolder()) {
+            viewModel.saveCurrent();
+        } else saveProjectAs(actionEvent);
+    }
+
+    public void saveProjectAs(ActionEvent actionEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("save");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -194,16 +211,14 @@ public class OpenedProjectView {
         }
     }
 
-    public void saveDDL(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save DDL path");
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-        FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
-        fileChooser.getExtensionFilters().add(filter);
-        fileChooser.getExtensionFilters().add(filter1);
-        File saveFile = fileChooser.showSaveDialog(openedProjectStage);
-        viewModel.saveDDL(saveFile);
+    public void closeCurrentProject(ActionEvent actionEvent) {
+
+    }
+
+    public void openProject(ActionEvent actionEvent) {
+    }
+
+    public void createNewProject(ActionEvent actionEvent) {
     }
 
     public void generateFullDDl(ActionEvent actionEvent) {
@@ -237,30 +252,23 @@ public class OpenedProjectView {
         alert.showAndWait();
     }
 
-    public void loadAll(ActionEvent actionEvent) {
-        viewModel.loadAll();
-    }
-
     public void showProjectOptions(ActionEvent actionEvent) {
-
-    }
-
-    public void closeThisProject(ActionEvent actionEvent) {
-        
-    }
-
-    public void openProject(ActionEvent actionEvent) {
-    }
-
-    public void createNewProject(ActionEvent actionEvent) {
-    }
-
-    public void reloadSelected(ActionEvent actionEvent) {
-
     }
 
     public void showGeneralOptions(ActionEvent actionEvent) throws IOException {
         ProgramSettingsView view = new ProgramSettingsView();
         view.show(openedProjectStage);
+    }
+
+    public void saveDDL(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save DDL path");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
+        fileChooser.getExtensionFilters().add(filter);
+        fileChooser.getExtensionFilters().add(filter1);
+        File saveFile = fileChooser.showSaveDialog(openedProjectStage);
+        viewModel.saveDDL(saveFile);
     }
 }

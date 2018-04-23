@@ -10,6 +10,7 @@ import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
+import com.dbbest.kirilenko.service.ProgramSettings;
 import com.dbbest.kirilenko.service.TreeItemService;
 import com.dbbest.kirilenko.service.TreeStateSerialization;
 import com.dbbest.kirilenko.tree.Node;
@@ -28,6 +29,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class OpenedProjectViewModel {
 
@@ -212,41 +214,17 @@ public class OpenedProjectViewModel {
         void load();
     }
 
-    public void reconnect(String password) throws WrongCredentialsException {
-        String login = settingsNode.getAttrs().get("login");
-        String url = settingsNode.getAttrs().get("url");
-        String name = settingsNode.getAttrs().get("dbName");
-        DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
-        try {
-            loaderManager = LoaderManager.getInstance(type, name, url, login, password);
-            onlineMode.set(true);
-        } catch (SQLException e) {
-            needToConnect.set(false);
-            throw new WrongCredentialsException(e);
-        }
+    ///////////////////////////////
+    public boolean checkFolder() {
+        String path = ProgramSettings.getProp().getProperty("project") + loaderManager.getDBName();
+        File file = new File(path);
+        return file.exists();
     }
 
-    public void searchElement(String s) {
-        found = service.search(rootItemProperty.getValue(), s);
-        if (found.size() > 0) {
-            foundItem.setValue(found.get(0));
-        }
-    }
-
-    public void previousElement() {
-        int next = found.indexOf(foundItem.get()) - 1;
-        if (next < 0) {
-            return;
-        }
-        foundItem.setValue(found.get(next));
-    }
-
-    public void nextElement() {
-        int next = found.indexOf(foundItem.get()) + 1;
-        if (found.size() == next) {
-            return;
-        }
-        foundItem.setValue(found.get(next));
+    public void saveCurrent() throws IOException, SerializationException {
+        String path = ProgramSettings.getProp().getProperty("project") + loaderManager.getDBName();
+        File file = new File(path);
+        saveProject(file);
     }
 
     public void saveProject(File file) throws SerializationException, IOException {
@@ -270,6 +248,31 @@ public class OpenedProjectViewModel {
         projectSettings.getAttrs().put("login", loaderManager.getLogin());
 
         strategy.serialize(projectSettings, settings.getAbsolutePath());
+    }
+
+
+    ////////////////////////////
+    public void searchElement(String s) {
+        found = service.search(rootItemProperty.getValue(), s);
+        if (found.size() > 0) {
+            foundItem.setValue(found.get(0));
+        }
+    }
+
+    public void previousElement() {
+        int next = found.indexOf(foundItem.get()) - 1;
+        if (next < 0) {
+            return;
+        }
+        foundItem.setValue(found.get(next));
+    }
+
+    public void nextElement() {
+        int next = found.indexOf(foundItem.get()) + 1;
+        if (found.size() == next) {
+            return;
+        }
+        foundItem.setValue(found.get(next));
     }
 
     public void saveDDL(File saveFile) {
@@ -297,6 +300,20 @@ public class OpenedProjectViewModel {
         }
         catch(IOException ex){
             System.out.println(ex.getMessage());
+        }
+    }
+
+    public void reconnect(String password) throws WrongCredentialsException {
+        String login = settingsNode.getAttrs().get("login");
+        String url = settingsNode.getAttrs().get("url");
+        String name = settingsNode.getAttrs().get("dbName");
+        DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
+        try {
+            loaderManager = LoaderManager.getInstance(type, name, url, login, password);
+            onlineMode.set(true);
+        } catch (SQLException e) {
+            needToConnect.set(false);
+            throw new WrongCredentialsException(e);
         }
     }
 }
