@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="216.0" prefWidth="371.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.ProgramSettingsView">
+   <children>
+      <TextField fx:id="projPath" layoutX="144.0" layoutY="46.0" />
+      <TextField fx:id="logPath" layoutX="144.0" layoutY="106.0" />
+      <Label layoutX="22.0" layoutY="51.0" text="Default project folder:" />
+      <Label layoutX="22.0" layoutY="110.0" text="Default logs file:" />
+      <Button layoutX="300.0" layoutY="47.0" mnemonicParsing="false" onAction="#chooseProjectFolder" text="Select" />
+      <Button layoutX="300.0" layoutY="106.0" mnemonicParsing="false" onAction="#chooseLogsFile" text="Select" />
+      <Button layoutX="244.0" layoutY="150.0" mnemonicParsing="false" onAction="#saveChanges" text="Save" />
+      <Button layoutX="300.0" layoutY="150.0" mnemonicParsing="false" onAction="#cancelChanges" text="Discard" />
+   </children>
+</AnchorPane>

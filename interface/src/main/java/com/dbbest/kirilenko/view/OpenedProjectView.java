@@ -6,19 +6,16 @@ import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
-import javafx.beans.binding.Binding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -262,7 +259,8 @@ public class OpenedProjectView {
 
     }
 
-    public void showGeneralOptions(ActionEvent actionEvent) {
-
+    public void showGeneralOptions(ActionEvent actionEvent) throws IOException {
+        ProgramSettingsView view = new ProgramSettingsView();
+        view.show(openedProjectStage);
     }
 }

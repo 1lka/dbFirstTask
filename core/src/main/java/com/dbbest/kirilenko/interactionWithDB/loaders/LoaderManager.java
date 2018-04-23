@@ -6,12 +6,15 @@ import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.ReflectionUtil;
 import com.dbbest.kirilenko.tree.Node;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
 public class LoaderManager {
+
+    private static final Logger logger = Logger.getLogger(LoaderManager.class);
 
     private DBType type;
 
@@ -67,6 +70,7 @@ public class LoaderManager {
         this.login = login;
         initConnection(url, login, pass);
         loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
+        logger.debug("Loader manager initialized correctly");
     }
 
     private void initConnection(String dbURL, String login, String pass) throws SQLException {
