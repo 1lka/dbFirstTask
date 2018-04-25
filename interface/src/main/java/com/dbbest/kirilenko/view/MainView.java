@@ -1,29 +1,28 @@
 package com.dbbest.kirilenko.view;
 
+import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.service.ProgramSettings;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
 
 public class MainView {
 
-    private NewProjectView newProjectView;
+    private ConnectView newProjectView;
     private OpenedProjectView openedProjectView;
     private static Stage stage;
 
     @FXML
     private void initialize() {
-        newProjectView = new NewProjectView();
+        newProjectView = new ConnectView();
         openedProjectView = new OpenedProjectView();
     }
 
@@ -31,7 +30,7 @@ public class MainView {
         newProjectView.show(actionEvent);
     }
 
-    public void openExistingProject(ActionEvent actionEvent) throws IOException {
+    public void openExistingProject(ActionEvent actionEvent) throws IOException, SerializationException {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("load");
         File folder = new File(ProgramSettings.getProp().getProperty("project"));
@@ -39,7 +38,7 @@ public class MainView {
         File file = chooser.showDialog(stage);
 
         if (file != null) {
-            openedProjectView.show(stage, file.getAbsolutePath());
+            openedProjectView.show(stage, null, file.getAbsolutePath());
         }
     }
 

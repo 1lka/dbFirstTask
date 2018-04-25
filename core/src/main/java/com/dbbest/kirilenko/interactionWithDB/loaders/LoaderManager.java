@@ -21,7 +21,14 @@ public class LoaderManager {
     private String DBName;
 
     private String url;
+
     private String login;
+
+    private Connection connection;
+
+    private Map<String, Loader> loaders;
+
+    private Connect connect;
 
     public String getUrl() {
         return url;
@@ -43,41 +50,46 @@ public class LoaderManager {
         return type;
     }
 
-    private Connection connection;
-
-    private final Map<String, Loader> loaders;
-
-    private static LoaderManager instance;
-
-    public static synchronized LoaderManager getInstance(DBType type, String DBName, String url, String login, String pass) throws SQLException {
-        instance = new LoaderManager(type, url, login, pass);
-        instance.DBName = DBName;
-        return instance;
-    }
-
-    public static synchronized LoaderManager getInstance() {
-        return instance;
-    }
-
-    public static void clearManager() throws SQLException {
-        instance.connection.close();
-        instance = null;
-    }
-
-    private LoaderManager(DBType type, String url, String login, String pass) throws SQLException {
+    public void setType(DBType type) {
         this.type = type;
-        this.url = url;
-        this.login = login;
-        initConnection(url, login, pass);
-        loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
-        logger.debug("Loader manager initialized correctly");
     }
 
-    private void initConnection(String dbURL, String login, String pass) throws SQLException {
-        Connect connect = ConnectFactory.getConnect(type);
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-        connect.initConnection(dbURL, login, pass);
-        connection = connect.getConnection();
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    public Map<String, Loader> getLoaders() {
+        return loaders;
+    }
+
+    public Connect getConnect() {
+        return connect;
+    }
+
+    public LoaderManager()  {
+        logger.debug("created instance of empty LoaderManeger");
+    }
+
+    public LoaderManager(Connect connect) {
+        this.connect = connect;
+        this.type = connect.getType();
+        this.url = connect.getUrl();
+        this.login = connect.getLogin();
+        this.DBName = connect.getDbName();
+        this.connection = connect.getConnection();
+        loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
     }
 
     /**

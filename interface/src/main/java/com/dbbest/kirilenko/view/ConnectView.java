@@ -1,7 +1,10 @@
 package com.dbbest.kirilenko.view;
 
-import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
-import com.dbbest.kirilenko.viewModel.NewProjectViewModel;
+import com.dbbest.kirilenko.exception.WrongCredentialsException;
+import com.dbbest.kirilenko.exceptions.SerializationException;
+import com.dbbest.kirilenko.interactionWithDB.DBType;
+import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
+import com.dbbest.kirilenko.viewModel.ConnectionViewModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,15 +12,17 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.io.IOException;
 
-public class NewProjectView {
+public class ConnectView {
+
+    @FXML
+    public ChoiceBox<DBType> choiceBox;
 
     @FXML
     private TextField url;
@@ -31,35 +36,39 @@ public class NewProjectView {
     @FXML
     private TextField password;
 
-    private NewProjectViewModel newProjectViewModel;
+    private static ConnectionViewModel connectionViewModel;
 
     private static Stage stage;
     private static Stage owner;
 
     @FXML
     private void initialize() {
-        newProjectViewModel = new NewProjectViewModel();
-        newProjectViewModel.urlProperty().bind(url.textProperty());
-        newProjectViewModel.dbNameProperty().bind(dbName.textProperty());
-        newProjectViewModel.loginProperty().bind(login.textProperty());
-        newProjectViewModel.passwordProperty().bind(password.textProperty());
-
-        stage.setOnCloseRequest(event -> {owner.show();});
+        connectionViewModel = new ConnectionViewModel();
+        connectionViewModel.urlProperty().bindBidirectional(url.textProperty());
+        connectionViewModel.dbNameProperty().bindBidirectional(dbName.textProperty());
+        connectionViewModel.loginProperty().bindBidirectional(login.textProperty());
+        connectionViewModel.passwordProperty().bindBidirectional(password.textProperty());
+        choiceBox.setItems(connectionViewModel.getChoicesList());
+        choiceBox.getSelectionModel().select(0);
+        stage.setOnCloseRequest(event -> {
+            owner.show();
+        });
     }
 
-    public void connect(ActionEvent actionEvent) throws Exception {
-        LoaderManager manager = newProjectViewModel.connect();
-
-        if (manager != null) {
+    public void connect(ActionEvent actionEvent) throws IOException {
+        try {
+            Connect connect = connectionViewModel.connect(choiceBox.getSelectionModel().getSelectedItem());
             OpenedProjectView openedProject = new OpenedProjectView();
+            openedProject.show(owner, connect, null);
             stage.hide();
-            openedProject.show(owner,null);
-        } else {
+        } catch (WrongCredentialsException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
             alert.setHeaderText("Wrong credentials");
             alert.setContentText("wrong credentials");
             alert.showAndWait();
+        } catch (SerializationException e) {
+            e.printStackTrace();
         }
     }
 

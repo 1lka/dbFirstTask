@@ -1,25 +1,32 @@
 package com.dbbest.kirilenko.viewModel;
 
+import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
+import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
+import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 
-public class NewProjectViewModel {
+public class ConnectionViewModel {
 
     private StringProperty url = new SimpleStringProperty();
     private StringProperty dbName = new SimpleStringProperty();
     private StringProperty login = new SimpleStringProperty();
     private StringProperty password = new SimpleStringProperty();
+    private ObservableList<DBType> choicesList = FXCollections.observableList(Arrays.asList(DBType.values()));
 
     private LoaderManager manager;
 
     //todo change later
-    public NewProjectViewModel() {
+    public ConnectionViewModel() {
 
     }
 
@@ -51,19 +58,22 @@ public class NewProjectViewModel {
         return dbName.get();
     }
 
+    public ObservableList<DBType> getChoicesList() {
+        return choicesList;
+    }
+
     public StringProperty dbNameProperty() {
         return dbName;
     }
 
-    public LoaderManager connect() {
-        if (manager == null) {
-            try {
-                manager = LoaderManager.getInstance(DBType.MYSQL, getDbName(), getUrl(), getLogin(), getPassword());
-                System.err.println("connected");
-            } catch (SQLException e) {
-                System.err.println("not connected");
-            }
+    public Connect connect(DBType selectedItem) throws WrongCredentialsException {
+        Connect connect = ConnectFactory.getConnect(selectedItem);
+        try {
+            connect.initConnection(url.get(), login.get(), password.get());
+            connect.setDbName(dbName.get());
+        } catch (SQLException e) {
+            throw new WrongCredentialsException("cant obtain connect for " + url.get() + " database");
         }
-        return manager;
+        return connect;
     }
 }

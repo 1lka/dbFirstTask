@@ -15,11 +15,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="190.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.NewProjectView">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="190.0" prefWidth="327.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.ConnectView">
    <children>
-      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
+      <HBox alignment="TOP_CENTER" maxWidth="310.0" prefHeight="34.0" prefWidth="2300.0">
          <children>
-            <Label maxWidth="100.0" prefWidth="100.0" text="DB URL">
+            <Label alignment="TOP_LEFT" maxWidth="100.0" prefWidth="100.0" text="DB URL">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>
@@ -35,6 +35,14 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </TextField>
+            <ChoiceBox fx:id="choiceBox" maxWidth="50.0" minWidth="50.0" prefWidth="150.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </ChoiceBox>
          </children>
       </HBox>
       <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">

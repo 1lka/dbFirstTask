@@ -1,5 +1,7 @@
 package com.dbbest.kirilenko;
 
+import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
+import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.exceptions.SerializationException;
@@ -28,8 +30,9 @@ public class TestDB {
         attrs.put(MySQLConstants.AttributeName.NAME, schemaName);
         root.setAttrs(attrs);
 
-
-        LoaderManager manager = LoaderManager.getInstance(type, schemaName, url, login, pass);
+        Connect connect = ConnectFactory.getConnect(type);
+        connect.initConnection(url,login,pass);
+        LoaderManager manager = new LoaderManager(connect);
         manager.lazyChildrenLoad(root);
         System.out.println(root + "\n");
         manager.fullLoadElement(root);

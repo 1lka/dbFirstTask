@@ -4,6 +4,8 @@ import com.dbbest.kirilenko.exception.DdlGenerationException;
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
+import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
+import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
@@ -32,70 +34,48 @@ import java.util.Map;
 
 public class OpenedProjectViewModel {
 
-    private BooleanProperty treeIsBeenLoading = new SimpleBooleanProperty();
-
-    public BooleanProperty treeIsBeenLoadingProperty() {
-        return treeIsBeenLoading;
-    }
-
     private String fullDDL;
-
-    private LoaderManager loaderManager;
-
-    private Node settingsNode;
-
-    private PrinterManager printerManager;
-
-    private TreeModel selectedTreeModel;
-
-    private List<TreeItem<TreeModel>> found = new ArrayList<>();
-
-    private BooleanProperty onlineMode = new SimpleBooleanProperty();
-
-    private BooleanProperty needToConnect = new SimpleBooleanProperty();
-
-    private ObjectProperty<TreeItem<TreeModel>> rootItemProperty = new SimpleObjectProperty<>();
-
-    private ObjectProperty<TreeItem<TreeModel>> selectedItem = new SimpleObjectProperty<>();
-
-    private ObjectProperty<TreeItem<TreeModel>> foundItem = new SimpleObjectProperty<>();
-
-    private BooleanProperty elementLoaded = new SimpleBooleanProperty();
-
-    private BooleanProperty lazyLoadedItem = new SimpleBooleanProperty();
-
-    private BooleanProperty fullyLoadedItem = new SimpleBooleanProperty();
-
-    private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
-
-    private BooleanProperty showContext = new SimpleBooleanProperty(true);
-
-    public BooleanProperty needToConnectProperty() {
-        return needToConnect;
-    }
 
     private StringProperty ddl = new SimpleStringProperty();
 
     private TreeItemService service = new TreeItemService();
 
-    public BooleanProperty lazyLoadedItemProperty() {
-        return lazyLoadedItem;
+    private LoaderManager loaderManager;
+
+    private PrinterManager printerManager;
+
+    private Node settingsNode;
+
+    private TreeModel selectedTreeModel;
+
+    private String pathToFolder;
+
+    private BooleanProperty treeIsBeenLoading = new SimpleBooleanProperty();
+
+    private List<TreeItem<TreeModel>> found = new ArrayList<>();
+
+    private BooleanProperty onlineMode = new SimpleBooleanProperty();
+
+    public BooleanProperty onlineModeProperty() {
+        return onlineMode;
     }
 
-    public BooleanProperty elementLoadedProperty() {
-        return elementLoaded;
+    private ObjectProperty<TreeItem<TreeModel>> rootItemProperty = new SimpleObjectProperty<>();
+
+    public BooleanProperty treeIsBeenLoadingProperty() {
+        return treeIsBeenLoading;
     }
 
-    public BooleanProperty fullyLoadedItemProperty() {
-        return fullyLoadedItem;
-    }
+    private ObjectProperty<TreeItem<TreeModel>> selectedItem = new SimpleObjectProperty<>();
+
+    private ObjectProperty<TreeItem<TreeModel>> foundItem = new SimpleObjectProperty<>();
+
+    private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
+
+    private BooleanProperty showContext = new SimpleBooleanProperty(true);
 
     public ObjectProperty<TreeItem<TreeModel>> foundItemProperty() {
         return foundItem;
-    }
-
-    public boolean isShowContext() {
-        return showContext.get();
     }
 
     public StringProperty ddlProperty() {
@@ -114,17 +94,39 @@ public class OpenedProjectViewModel {
         return table;
     }
 
-    public OpenedProjectViewModel(String pathToFolder) throws SerializationException {
+    private String url;
+    private String dbName;
+    private String login;
+    private DBType type;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public DBType getDbType() {
+        return type;
+    }
+
+    public OpenedProjectViewModel(String pathToFolder, Connect connect) throws SerializationException {
         if (pathToFolder == null) {
             onlineMode.set(true);
 
-            loaderManager = LoaderManager.getInstance();
+            loaderManager = new LoaderManager(connect);
             printerManager = new PrinterManager(loaderManager.getType());
             Node rootNode = new Node(MySQLConstants.DBEntity.SCHEMA);
             rootNode.getAttrs().put(MySQLConstants.AttributeName.NAME, loaderManager.getDBName());
             TreeModel root = new TreeModel(rootNode);
             rootItemProperty.set(new TreeItem<>(root));
         } else {
+            this.pathToFolder = pathToFolder;
             SerializationStrategy strategy = new XMLStrategyImpl();
             String project = pathToFolder + "\\tree.xml";
             String projectSettings = pathToFolder + "\\settings.xml";
@@ -137,16 +139,20 @@ public class OpenedProjectViewModel {
             service.restoreExpandedItems(rootTreeItem,settingsNode);
             service.restoreSelectedItem(rootTreeItem, settingsNode,selectedItem);
 
-
-
-
-
-
             rootItemProperty.setValue(rootTreeItem);
 
-            DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
+            this.type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
+
+            loaderManager = new LoaderManager();
+            loaderManager.setType(type);
+            loaderManager.setDBName(settingsNode.getAttrs().get("dbName"));
+            loaderManager.setLogin(settingsNode.getAttrs().get("login"));
+            loaderManager.setUrl(settingsNode.getAttrs().get("url"));
             printerManager = new PrinterManager(type);
         }
+        this.url = loaderManager.getUrl();
+        this.dbName = loaderManager.getDBName();
+        this.login = loaderManager.getLogin();
 
         selectedItem.addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -207,11 +213,11 @@ public class OpenedProjectViewModel {
                 Platform.runLater(()->{treeIsBeenLoading.set(false);});
             }).start();
         } else {
-            needToConnect.set(true);
+            onlineMode.set(true);
         }
     }
 
-    public File getProjectsFolger() {
+    public File getProjectsFolder() {
         return new File(ProgramSettings.getProp().getProperty("project"));
     }
 
@@ -222,23 +228,30 @@ public class OpenedProjectViewModel {
 
     ///////////////////////////////
     public boolean checkFolder() {
+        if (pathToFolder != null) {
+            return true;
+        }
         String path = ProgramSettings.getProp().getProperty("project") + loaderManager.getDBName();
         File file = new File(path);
         return file.exists();
     }
 
-    public void saveCurrent() throws IOException, SerializationException {
-        String path = ProgramSettings.getProp().getProperty("project") + loaderManager.getDBName();
-        File file = new File(path);
-        saveProject(file);
+    public void saveCurrent() throws SerializationException {
+        serializeProject(pathToFolder);
     }
 
     public void saveProject(File folder) throws SerializationException, IOException {
-        SerializationStrategy strategy = new XMLStrategyImpl();
         String pathToFolder = folder.getAbsolutePath() + "\\" + loaderManager.getDBName();
 
         Path path = Paths.get(pathToFolder);
         Files.createDirectories(path);
+
+        serializeProject(pathToFolder);
+        this.pathToFolder = pathToFolder;
+    }
+
+    private void serializeProject(String pathToFolder) throws SerializationException {
+        SerializationStrategy strategy = new XMLStrategyImpl();
 
         File project = new File(pathToFolder + "\\tree.xml");
         strategy.serialize(rootItemProperty.getValue().getValue().getNode(), project.getAbsolutePath());
@@ -316,16 +329,13 @@ public class OpenedProjectViewModel {
     }
 
     public void reconnect(String password) throws WrongCredentialsException {
-        String login = settingsNode.getAttrs().get("login");
-        String url = settingsNode.getAttrs().get("url");
-        String name = settingsNode.getAttrs().get("dbName");
-        DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
+        Connect connect = ConnectFactory.getConnect(type);
         try {
-            loaderManager = LoaderManager.getInstance(type, name, url, login, password);
-            onlineMode.set(true);
+            connect.initConnection(url,login,password);
+            loaderManager = new LoaderManager(connect);
+            loaderManager.setDBName(dbName);
         } catch (SQLException e) {
-            needToConnect.set(false);
-            throw new WrongCredentialsException(e);
+            throw new WrongCredentialsException("wrong password");
         }
     }
 }

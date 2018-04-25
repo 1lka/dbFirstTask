@@ -3,6 +3,7 @@ package com.dbbest.kirilenko.view;
 import com.dbbest.kirilenko.exception.DdlGenerationException;
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
+import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
@@ -70,16 +71,13 @@ public class OpenedProjectView {
     @FXML
     private TreeView<TreeModel> treeView;
 
-    private OpenedProjectViewModel viewModel;
+    private static OpenedProjectViewModel viewModel;
 
     private static Stage openedProjectStage;
     private static Stage mainViewStage;
 
-    private static String filePath;
-
     @FXML
     private void initialize() throws SerializationException {
-        viewModel = new OpenedProjectViewModel(filePath);
 
         mainViewStage.hide();
         openedProjectStage.setOnCloseRequest(event -> {
@@ -102,30 +100,20 @@ public class OpenedProjectView {
 
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
-        viewModel.needToConnectProperty().addListener((observable, oldValue, newValue) -> {
+        viewModel.onlineModeProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                TextInputDialog dialog = new TextInputDialog("password");
-                dialog.setTitle("password required");
-                dialog.setHeaderText("Enter the password and try again");
-                dialog.setContentText("Please enter the password:");
-                Optional<String> result = dialog.showAndWait();
-                result.ifPresent(s -> {
-                    try {
-                        viewModel.reconnect(s);
-                    } catch (WrongCredentialsException e) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error ");
-                        alert.setHeaderText("Wrong password");
-                        alert.setContentText("Ooops, there was an error!");
-                        alert.showAndWait();
-                    }
-                });
-                if (!result.isPresent()) {
-                    viewModel.needToConnectProperty().set(false);
+                ReconnectView reconnectView = new ReconnectView();
+                StringBuilder password = new StringBuilder();
+                try {
+                    reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+                    viewModel.reconnect(password.toString());
+                } catch (IOException | WrongCredentialsException e) {
+                    viewModel.onlineModeProperty().set(false);
+                    //todo ALLERTS HERE!!!!!!
                 }
             }
         });
-        
+
         viewModel.foundItemProperty().addListener((observable, oldValue, newValue) -> {
             treeView.getSelectionModel().select(newValue);
             int index = treeView.getRow(newValue);
@@ -139,8 +127,8 @@ public class OpenedProjectView {
         });
     }
 
-    public void show(Stage main, String path) throws IOException {
-        filePath = path;
+    public void show(Stage main, Connect connect, String path) throws IOException, SerializationException {
+        viewModel = new OpenedProjectViewModel(path, connect);
         mainViewStage = main;
         openedProjectStage = new Stage();
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
@@ -199,7 +187,7 @@ public class OpenedProjectView {
     public void saveProjectAs(ActionEvent actionEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("save");
-        chooser.setInitialDirectory(viewModel.getProjectsFolger());
+        chooser.setInitialDirectory(viewModel.getProjectsFolder());
         try {
             File file = chooser.showDialog(openedProjectStage);
             if (file != null) {

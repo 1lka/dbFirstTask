@@ -1,5 +1,7 @@
 package com.dbbest.kirilenko.interactionWithDB.connections;
 
+import com.dbbest.kirilenko.interactionWithDB.DBType;
+
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -15,6 +17,8 @@ public class MySQLConnect extends Connect {
      */
     @Override
     public void initConnection(String url, String login, String password) throws SQLException {
+        super.initConnection(url, login, password);
+        super.setType(DBType.MYSQL);
         setConnection(DriverManager.getConnection(url, login, password));
     }
 }
