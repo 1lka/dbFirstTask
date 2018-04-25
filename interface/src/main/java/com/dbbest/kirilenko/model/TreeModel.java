@@ -17,6 +17,8 @@ public class TreeModel {
 
     private Node node;
 
+    private TreeModel parent;
+
     private BooleanProperty lazyLoaded = new SimpleBooleanProperty();
 
     private BooleanProperty fullyLoaded = new SimpleBooleanProperty();

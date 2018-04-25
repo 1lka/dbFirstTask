@@ -42,11 +42,11 @@ public class ProgramSettings {
             String logPath = prop.getProperty("log");
 
             if (projectPath == null) {
-                projectPath = System.getProperty("user.home") + "\\dbBest" + System.lineSeparator();
+                projectPath = System.getProperty("user.home") + "\\DbBest";
                 prop.setProperty("project", projectPath);
             }
             if (logPath == null) {
-                logPath = System.getProperty("user.home") + "\\dbBest\\logs";
+                logPath = System.getProperty("user.home") + "\\DbBest\\logs";
                 prop.setProperty("log", logPath);
             }
 

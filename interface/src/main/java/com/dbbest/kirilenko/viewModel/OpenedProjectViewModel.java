@@ -29,7 +29,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 public class OpenedProjectViewModel {
 
@@ -127,15 +126,22 @@ public class OpenedProjectViewModel {
             rootItemProperty.set(new TreeItem<>(root));
         } else {
             SerializationStrategy strategy = new XMLStrategyImpl();
-            String project = pathToFolder + "\\project.xml";
+            String project = pathToFolder + "\\tree.xml";
             String projectSettings = pathToFolder + "\\settings.xml";
 
             Node root = strategy.deserialize(project);
             settingsNode = strategy.deserialize(projectSettings);
 
-            TreeModel rootModel = new TreeModel(root);
-            TreeItem<TreeModel> rootTreeItem = new TreeItem<>(rootModel);
-            service.restoreTreeState(rootTreeItem, selectedItem, settingsNode.getChildren().get(0));
+            TreeItem<TreeModel> rootTreeItem = new TreeItem<>(new TreeModel(root));
+            service.createTreeItems(rootTreeItem);
+            service.restoreExpandedItems(rootTreeItem,settingsNode);
+            service.restoreSelectedItem(rootTreeItem, settingsNode,selectedItem);
+
+
+
+
+
+
             rootItemProperty.setValue(rootTreeItem);
 
             DBType type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
@@ -147,10 +153,6 @@ public class OpenedProjectViewModel {
                 selectedTreeModel = newValue.getValue();
                 Node selectedNode = selectedTreeModel.getNode();
                 table.setValue(newValue.getValue().getTableElements());
-
-//                fullyLoadedItem.bind(selectedTreeModel.fullyLoadedProperty());
-//                lazyLoadedItem.bind(selectedTreeModel.lazyLoadedProperty());
-//                elementLoaded.bind(selectedTreeModel.elementLoadedProperty());
 
                 try {
                     String ddlOfNode = printerManager.printDDL(selectedNode);
@@ -209,6 +211,10 @@ public class OpenedProjectViewModel {
         }
     }
 
+    public File getProjectsFolger() {
+        return new File(ProgramSettings.getProp().getProperty("project"));
+    }
+
     @FunctionalInterface
     private interface LoadInterface {
         void load();
@@ -227,21 +233,27 @@ public class OpenedProjectViewModel {
         saveProject(file);
     }
 
-    public void saveProject(File file) throws SerializationException, IOException {
+    public void saveProject(File folder) throws SerializationException, IOException {
         SerializationStrategy strategy = new XMLStrategyImpl();
-        String pathToFolder = file.getAbsolutePath() + "\\" + loaderManager.getDBName();
+        String pathToFolder = folder.getAbsolutePath() + "\\" + loaderManager.getDBName();
 
         Path path = Paths.get(pathToFolder);
         Files.createDirectories(path);
 
-        File project = new File(pathToFolder + "\\project.xml");
+        File project = new File(pathToFolder + "\\tree.xml");
         strategy.serialize(rootItemProperty.getValue().getValue().getNode(), project.getAbsolutePath());
 
         File settings = new File(pathToFolder + "\\settings.xml");
-        Node state = TreeStateSerialization.convert(rootItemProperty.getValue(), selectedItem.getValue());
+        List<Node> expandedNodes = TreeStateSerialization.chooseExpanded(rootItemProperty.getValue());
+        Node expanded = new Node("expanded");
+        expanded.addChildren(expandedNodes);
+
+        Node selected = TreeStateSerialization.chooseSelected(selectedItem.get());
 
         Node projectSettings = new Node("project");
-        projectSettings.addChild(state);
+        projectSettings.addChild(expanded);
+        projectSettings.addChild(selected);
+
         projectSettings.getAttrs().put("dbType", String.valueOf(loaderManager.getType()));
         projectSettings.getAttrs().put("url", loaderManager.getUrl());
         projectSettings.getAttrs().put("dbName", loaderManager.getDBName());

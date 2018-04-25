@@ -241,7 +241,6 @@ public class Node {
         }
     }
 
-
     @Override
     public String toString() {
         String parentsName = null;

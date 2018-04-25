@@ -2,7 +2,6 @@ package com.dbbest.kirilenko.service;
 
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.tree.Node;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.TreeItem;
 
@@ -22,20 +21,26 @@ public class TreeItemService {
         }
     }
 
-    public void restoreTreeState(TreeItem<TreeModel> item, ObjectProperty<TreeItem<TreeModel>> selected, Node settingsNode) {
-        boolean isExpanded = Boolean.valueOf(settingsNode.getAttrs().get("isExpanded"));
-        boolean isSelected = Boolean.valueOf(settingsNode.getAttrs().get("selected"));
+    public void restoreExpandedItems(TreeItem<TreeModel> root, Node settingsNode) {
+        List<Node> expandedNodeList = settingsNode.wideSearch("expanded").getChildren();
+        List<String> expandedList = new LinkedList<>();
 
-        item.setExpanded(isExpanded);
-        if (isSelected) {
-            selected.setValue(item);
+        for (Node node : expandedNodeList) {
+            String name = node.getAttrs().get("fullName");
+            expandedList.add(name);
         }
+        checkForExpanded(root, expandedList);
+    }
 
-        for (int i = 0; i < item.getValue().getChildren().size(); i++) {
-            TreeItem<TreeModel> treeItem = new TreeItem<>(item.getValue().getChildren().get(i));
-            restoreTreeState(treeItem,selected,settingsNode.getChildren().get(i));
-            item.getChildren().add(treeItem);
+    private void checkForExpanded(TreeItem<TreeModel> root, List<String> expandedList) {
+        String fullName = TreeStateSerialization.obtainFullName(root.getValue().getNode(), new StringBuilder());
+        if (expandedList.contains(fullName)) {
+            root.setExpanded(true);
+            expandedList.remove(fullName);
         }
+        root.getChildren().forEach((item) -> {
+            checkForExpanded(item, expandedList);
+        });
     }
 
     public List<TreeItem<TreeModel>> search(TreeItem<TreeModel> root, String param) {
@@ -52,5 +57,27 @@ public class TreeItemService {
             nodes.addAll(last.getChildren());
         } while (nodes.size() != 0);
         return found;
+    }
+
+    public void restoreSelectedItem(TreeItem<TreeModel> root, Node settingsNode, ObjectProperty<TreeItem<TreeModel>> selectedItem) {
+        Node selected = settingsNode.wideSearch("selected");
+        if (selected != null) {
+            String fullName = selected.getAttrs().get("fullName");
+
+            Queue<TreeItem<TreeModel>> queue = new LinkedList<>();
+            queue.add(root);
+
+            while (queue.size() != 0) {
+                TreeItem<TreeModel> item = queue.remove();
+                Node node = item.getValue().getNode();
+                String nodeFullName = TreeStateSerialization.obtainFullName(node, new StringBuilder());
+                if (nodeFullName.equals(fullName)) {
+                    selectedItem.setValue(item);
+                    return;
+                } else {
+                    queue.addAll(item.getChildren());
+                }
+            }
+        }
     }
 }

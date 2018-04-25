@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.view;
 
+import com.dbbest.kirilenko.service.ProgramSettings;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,13 +32,11 @@ public class MainView {
     }
 
     public void openExistingProject(ActionEvent actionEvent) throws IOException {
-        Node source = (Node) actionEvent.getSource();
-        Window theStage = source.getScene().getWindow();
-
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("load");
-        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        File file = chooser.showDialog(theStage);
+        File folder = new File(ProgramSettings.getProp().getProperty("project"));
+        chooser.setInitialDirectory(folder);
+        File file = chooser.showDialog(stage);
 
         if (file != null) {
             openedProjectView.show(stage, file.getAbsolutePath());
@@ -50,7 +49,6 @@ public class MainView {
 
     public void show(Stage primaryStage) throws IOException {
         stage = primaryStage;
-        System.out.println("mainView " + stage);
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/main.fxml"));
         Parent root = fxmlLoader.load();

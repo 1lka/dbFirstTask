@@ -73,7 +73,7 @@ public class OpenedProjectView {
     private OpenedProjectViewModel viewModel;
 
     private static Stage openedProjectStage;
-    private static Stage mainViewScene;
+    private static Stage mainViewStage;
 
     private static String filePath;
 
@@ -81,9 +81,9 @@ public class OpenedProjectView {
     private void initialize() throws SerializationException {
         viewModel = new OpenedProjectViewModel(filePath);
 
-        mainViewScene.hide();
+        mainViewStage.hide();
         openedProjectStage.setOnCloseRequest(event -> {
-            mainViewScene.show();
+            mainViewStage.show();
         });
 
         treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
@@ -125,7 +125,6 @@ public class OpenedProjectView {
                 }
             }
         });
-
         
         viewModel.foundItemProperty().addListener((observable, oldValue, newValue) -> {
             treeView.getSelectionModel().select(newValue);
@@ -142,7 +141,7 @@ public class OpenedProjectView {
 
     public void show(Stage main, String path) throws IOException {
         filePath = path;
-        mainViewScene = main;
+        mainViewStage = main;
         openedProjectStage = new Stage();
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
 
@@ -154,6 +153,7 @@ public class OpenedProjectView {
     }
 
     /////////////////////loading
+
     public void lazyLoad(ActionEvent actionEvent) {
         viewModel.lazyLoad();
     }
@@ -173,6 +173,7 @@ public class OpenedProjectView {
     public void reloadSelected(ActionEvent actionEvent) {
 
     }
+
     /////////////////////searching
 
     public void searchElement(ActionEvent actionEvent) {
@@ -186,6 +187,7 @@ public class OpenedProjectView {
     public void nextElement(ActionEvent actionEvent) {
         viewModel.nextElement();
     }
+
     /////////////////////menu
 
     public void saveCurrentProject(ActionEvent actionEvent) throws IOException, SerializationException {
@@ -197,16 +199,17 @@ public class OpenedProjectView {
     public void saveProjectAs(ActionEvent actionEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("save");
-        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.setInitialDirectory(viewModel.getProjectsFolger());
         try {
             File file = chooser.showDialog(openedProjectStage);
-            viewModel.saveProject(file);
+            if (file != null) {
+                viewModel.saveProject(file);
+            }
         } catch (SerializationException | IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("problems with saving");
             alert.setHeaderText("Look, an Error Dialog");
             alert.setContentText(e.toString());
-
             alert.showAndWait();
         }
     }

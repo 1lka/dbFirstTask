@@ -34,8 +34,8 @@
                 </Menu>
             <Menu mnemonicParsing="false" text="Options">
               <items>
-                <MenuItem mnemonicParsing="false" onAction="#showProjectOptions" text="project options" />
-                  <MenuItem mnemonicParsing="false" onAction="#showGeneralOptions" text="options" />
+                <MenuItem mnemonicParsing="false" onAction="#showProjectOptions" text="Project options" />
+                  <MenuItem mnemonicParsing="false" onAction="#showGeneralOptions" text="General options" />
               </items>
             </Menu>
             </menus>
