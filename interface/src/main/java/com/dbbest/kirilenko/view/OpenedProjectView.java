@@ -5,8 +5,10 @@ import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.model.TreeModel;
+import com.dbbest.kirilenko.service.ProgramSettings;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -203,47 +206,90 @@ public class OpenedProjectView {
     }
 
     public void closeCurrentProject(ActionEvent actionEvent) {
-
+        openedProjectStage.close();
+        mainViewStage.show();
     }
 
-    public void openProject(ActionEvent actionEvent) {
-    }
+    public void openProject(ActionEvent actionEvent) throws IOException, SerializationException {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("load");
+        File folder = new File(ProgramSettings.getProp().getProperty("project"));
+        chooser.setInitialDirectory(folder);
+        File file = chooser.showDialog(openedProjectStage);
 
-    public void createNewProject(ActionEvent actionEvent) {
-    }
-
-    public void generateFullDDl(ActionEvent actionEvent) {
-        try {
-            viewModel.generateFullDDl();
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save DDL path");
-            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-            FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
-            fileChooser.getExtensionFilters().add(filter);
-            fileChooser.getExtensionFilters().add(filter1);
-            File saveFile = fileChooser.showSaveDialog(openedProjectStage);
-            viewModel.saveFullDdl(saveFile);
-        } catch (DdlGenerationException e) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Something went wrong ...");
-            alert.setHeaderText(null);
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+        if (file != null) {
+            openedProjectStage.close();
+            this.show(mainViewStage, null, file.getAbsolutePath());
         }
     }
 
+    public void createNewProject(ActionEvent actionEvent) throws IOException {
+        ConnectView connectView = new ConnectView();
+        connectView.openConnectWindow(mainViewStage, openedProjectStage);
+    }
+
+    public void generateFullDDl(ActionEvent actionEvent) {
+        boolean loaded = viewModel.isTreeFullyLoaded();
+        viewModel.generateFullDDl();
+        if (loaded) {
+            File saveFile = ddlFileChooser();
+            viewModel.saveFullDdl(saveFile);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation Dialog");
+            alert.setHeaderText("Tree isn't fully loaded.");
+            alert.setContentText("Please choose your option.");
+
+            ButtonType buttonTypeOne = new ButtonType("Generate anyway");
+            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == buttonTypeOne) {
+                File saveFile = ddlFileChooser();
+                viewModel.saveFullDdl(saveFile);
+            } else {
+                alert.close();
+            }
+        }
+    }
+
+    private File ddlFileChooser() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save DDL path");
+        fileChooser.setInitialDirectory(new File(ProgramSettings.getProp().getProperty("project")));
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("SQL files (*.sql)", "*.sql");
+        fileChooser.getExtensionFilters().add(filter);
+        fileChooser.getExtensionFilters().add(filter1);
+        return fileChooser.showSaveDialog(openedProjectStage);
+    }
+
+    // todo create normal HELP view
     public void showHelp(ActionEvent actionEvent) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Help");
         alert.setHeaderText(null);
-        // todo write help text
-        alert.setContentText("there will be text about program");
+        alert.setContentText("there will be a text about the program");
 
         alert.showAndWait();
     }
 
-    public void showProjectOptions(ActionEvent actionEvent) {
+    public void showProjectOptions(ActionEvent actionEvent) throws IOException {
+        ProjectSettingsView projectSettingsView = new ProjectSettingsView();
+        Stage stage = projectSettingsView.show(viewModel.getConnectionTimeout());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(openedProjectStage);
+        stage.showAndWait();
+        try {
+            int t = Integer.parseInt(projectSettingsView.getController().timeout.getText());
+            if (t > 0) {
+                viewModel.setConnectionTimeout(t);
+                viewModel.updateConnectionCloseTimeout();
+            }
+        } catch (NumberFormatException e) {
+        }
     }
 
     public void showGeneralOptions(ActionEvent actionEvent) throws IOException {

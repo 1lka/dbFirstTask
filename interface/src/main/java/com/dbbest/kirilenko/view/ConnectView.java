@@ -39,6 +39,7 @@ public class ConnectView {
     private static ConnectionViewModel connectionViewModel;
 
     private static Stage stage;
+    private static Stage openedProjectStage;
     private static Stage owner;
 
     @FXML
@@ -50,9 +51,6 @@ public class ConnectView {
         connectionViewModel.passwordProperty().bindBidirectional(password.textProperty());
         choiceBox.setItems(connectionViewModel.getChoicesList());
         choiceBox.getSelectionModel().select(0);
-        stage.setOnCloseRequest(event -> {
-            owner.show();
-        });
     }
 
     public void connect(ActionEvent actionEvent) throws IOException {
@@ -61,6 +59,9 @@ public class ConnectView {
             OpenedProjectView openedProject = new OpenedProjectView();
             openedProject.show(owner, connect, null);
             stage.hide();
+            if (openedProjectStage != null) {
+                openedProjectStage.close();
+            }
         } catch (WrongCredentialsException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
@@ -75,6 +76,9 @@ public class ConnectView {
     public void show(ActionEvent actionEvent) throws IOException {
         if (stage == null) {
             stage = new Stage();
+            stage.setOnCloseRequest(event -> {
+                owner.show();
+            });
             stage.setTitle("create new project");
             stage.setResizable(false);
 
@@ -90,6 +94,24 @@ public class ConnectView {
             stage.initOwner(owner);
         }
         owner.hide();
+        stage.showAndWait();
+    }
+
+    public void openConnectWindow(Stage mainViewStage, Stage openedProjectStage) throws IOException {
+        ConnectView.openedProjectStage = openedProjectStage;
+        owner = mainViewStage;
+        stage = new Stage();
+        stage.setTitle("create new project");
+        stage.setResizable(false);
+
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
+        Parent root = fxmlLoader.load();
+
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.WINDOW_MODAL);
+
+        stage.initOwner(openedProjectStage);
         stage.showAndWait();
     }
 }

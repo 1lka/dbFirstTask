@@ -19,6 +19,9 @@ import com.dbbest.kirilenko.tree.Node;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.scene.control.TreeItem;
 
 import java.io.File;
@@ -31,8 +34,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class OpenedProjectViewModel {
+
+    private int connectionTimeout;
 
     private String fullDDL;
 
@@ -94,6 +100,14 @@ public class OpenedProjectViewModel {
         return table;
     }
 
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
     private String url;
     private String dbName;
     private String login;
@@ -136,8 +150,8 @@ public class OpenedProjectViewModel {
 
             TreeItem<TreeModel> rootTreeItem = new TreeItem<>(new TreeModel(root));
             service.createTreeItems(rootTreeItem);
-            service.restoreExpandedItems(rootTreeItem,settingsNode);
-            service.restoreSelectedItem(rootTreeItem, settingsNode,selectedItem);
+            service.restoreExpandedItems(rootTreeItem, settingsNode);
+            service.restoreSelectedItem(rootTreeItem, settingsNode, selectedItem);
 
             rootItemProperty.setValue(rootTreeItem);
 
@@ -210,7 +224,9 @@ public class OpenedProjectViewModel {
             treeIsBeenLoading.set(true);
             new Thread(() -> {
                 lambda.load();
-                Platform.runLater(()->{treeIsBeenLoading.set(false);});
+                Platform.runLater(() -> {
+                    treeIsBeenLoading.set(false);
+                });
             }).start();
         } else {
             onlineMode.set(true);
@@ -220,6 +236,36 @@ public class OpenedProjectViewModel {
     public File getProjectsFolder() {
         return new File(ProgramSettings.getProp().getProperty("project"));
     }
+
+    private Thread closer = new Thread();
+
+    public void updateConnectionCloseTimeout() {
+        closer.interrupt();
+
+        closer = new Thread(() -> {
+            int i = connectionTimeout;
+            while (i >= 0) {
+                System.out.println(i);
+                try {
+                    Thread.sleep(100);
+                    i--;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                loaderManager.getConnection().close();
+                System.out.println("connection closed");
+                Platform.runLater(() -> {
+                    onlineMode.set(false);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+        closer.start();
+    }
+
 
     @FunctionalInterface
     private interface LoadInterface {
@@ -301,29 +347,29 @@ public class OpenedProjectViewModel {
     }
 
     public void saveDDL(File saveFile) {
-        try(FileWriter writer = new FileWriter(saveFile, false))        {
+        try (FileWriter writer = new FileWriter(saveFile, false)) {
             writer.write(ddl.get());
             writer.flush();
-        }
-        catch(IOException ex){
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    public void generateFullDDl() throws DdlGenerationException {
+    public void generateFullDDl() {
         Node root = rootItemProperty.getValue().getValue().getNode();
-        if (!Boolean.valueOf(root.getAttrs().get("fullyLoaded"))) {
-            throw new DdlGenerationException("load all tree to generate DDL");
-        }
         fullDDL = printerManager.printAllNodes(root);
     }
 
+    public boolean isTreeFullyLoaded() {
+        Node root = rootItemProperty.getValue().getValue().getNode();
+        return Boolean.valueOf(root.getAttrs().get("fullyLoaded"));
+    }
+
     public void saveFullDdl(File saveFile) {
-        try(FileWriter writer = new FileWriter(saveFile, false))        {
+        try (FileWriter writer = new FileWriter(saveFile, false)) {
             writer.write(fullDDL);
             writer.flush();
-        }
-        catch(IOException ex){
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -331,7 +377,7 @@ public class OpenedProjectViewModel {
     public void reconnect(String password) throws WrongCredentialsException {
         Connect connect = ConnectFactory.getConnect(type);
         try {
-            connect.initConnection(url,login,password);
+            connect.initConnection(url, login, password);
             loaderManager = new LoaderManager(connect);
             loaderManager.setDBName(dbName);
         } catch (SQLException e) {
