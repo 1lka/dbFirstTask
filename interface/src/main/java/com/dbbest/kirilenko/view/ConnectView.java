@@ -13,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -23,6 +24,9 @@ public class ConnectView {
 
     @FXML
     public ChoiceBox<DBType> choiceBox;
+
+    @FXML
+    public ProgressBar progressBar;
 
     @FXML
     private TextField url;
@@ -49,6 +53,7 @@ public class ConnectView {
         connectionViewModel.dbNameProperty().bindBidirectional(dbName.textProperty());
         connectionViewModel.loginProperty().bindBidirectional(login.textProperty());
         connectionViewModel.passwordProperty().bindBidirectional(password.textProperty());
+        progressBar.visibleProperty().bind(connectionViewModel.isConnectingProperty());
         choiceBox.setItems(connectionViewModel.getChoicesList());
         choiceBox.getSelectionModel().select(0);
     }

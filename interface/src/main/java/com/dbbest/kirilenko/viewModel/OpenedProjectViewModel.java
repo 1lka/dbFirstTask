@@ -1,12 +1,11 @@
 package com.dbbest.kirilenko.viewModel;
 
-import com.dbbest.kirilenko.exception.DdlGenerationException;
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
-import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
+import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.model.TreeModel;
@@ -19,9 +18,6 @@ import com.dbbest.kirilenko.tree.Node;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.scene.control.TreeItem;
 
 import java.io.File;
@@ -34,7 +30,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class OpenedProjectViewModel {
 
@@ -135,8 +130,8 @@ public class OpenedProjectViewModel {
 
             loaderManager = new LoaderManager(connect);
             printerManager = new PrinterManager(loaderManager.getType());
-            Node rootNode = new Node(MySQLConstants.DBEntity.SCHEMA);
-            rootNode.getAttrs().put(MySQLConstants.AttributeName.NAME, loaderManager.getDBName());
+            Node rootNode = new Node(GeneralConstants.SCHEMA);
+            rootNode.getAttrs().put(GeneralConstants.NAME, loaderManager.getDBName());
             TreeModel root = new TreeModel(rootNode);
             rootItemProperty.set(new TreeItem<>(root));
         } else {
@@ -240,30 +235,33 @@ public class OpenedProjectViewModel {
     private Thread closer = new Thread();
 
     public void updateConnectionCloseTimeout() {
-        closer.interrupt();
+        if (onlineMode.get()) {
+            closer.interrupt();
 
-        closer = new Thread(() -> {
-            int i = connectionTimeout;
-            while (i >= 0) {
-                System.out.println(i);
-                try {
-                    Thread.sleep(100);
-                    i--;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            closer = new Thread(() -> {
+                int i = connectionTimeout;
+                while (i > 0) {
+                    System.out.println(i);
+                    try {
+                        Thread.sleep(100);
+                        i--;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-            try {
-                loaderManager.getConnection().close();
-                System.out.println("connection closed");
-                Platform.runLater(() -> {
-                    onlineMode.set(false);
-                });
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-        closer.start();
+                try {
+                    loaderManager.getConnection().close();
+                    System.out.println("connection closed");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }finally {
+                    Platform.runLater(() -> {
+                        onlineMode.set(false);
+                    });
+                }
+            });
+            closer.start();
+        }
     }
 
 
@@ -320,7 +318,6 @@ public class OpenedProjectViewModel {
 
         strategy.serialize(projectSettings, settings.getAbsolutePath());
     }
-
 
     ////////////////////////////
     public void searchElement(String s) {

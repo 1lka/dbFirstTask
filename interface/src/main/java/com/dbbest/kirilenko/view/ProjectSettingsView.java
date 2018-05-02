@@ -24,6 +24,8 @@ public class ProjectSettingsView {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/projectSettings.fxml"));
 
         Stage stage = new Stage();
+        stage.setResizable(false);
+        stage.setTitle("Project settings");
         stage.setScene(new Scene(loader.load()));
 
 

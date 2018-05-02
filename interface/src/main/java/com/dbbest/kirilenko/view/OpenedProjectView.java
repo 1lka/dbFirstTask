@@ -134,6 +134,8 @@ public class OpenedProjectView {
         viewModel = new OpenedProjectViewModel(path, connect);
         mainViewStage = main;
         openedProjectStage = new Stage();
+        openedProjectStage.setMinWidth(400);
+        openedProjectStage.setMinHeight(400);
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
 
         Scene openedProjectScene = new Scene(root);
@@ -233,7 +235,9 @@ public class OpenedProjectView {
         viewModel.generateFullDDl();
         if (loaded) {
             File saveFile = ddlFileChooser();
-            viewModel.saveFullDdl(saveFile);
+            if (saveFile != null) {
+                viewModel.saveFullDdl(saveFile);
+            }
         } else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmation Dialog");
@@ -248,7 +252,9 @@ public class OpenedProjectView {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == buttonTypeOne) {
                 File saveFile = ddlFileChooser();
-                viewModel.saveFullDdl(saveFile);
+                if (saveFile != null) {
+                    viewModel.saveFullDdl(saveFile);
+                }
             } else {
                 alert.close();
             }
@@ -306,6 +312,8 @@ public class OpenedProjectView {
         fileChooser.getExtensionFilters().add(filter);
         fileChooser.getExtensionFilters().add(filter1);
         File saveFile = fileChooser.showSaveDialog(openedProjectStage);
-        viewModel.saveDDL(saveFile);
+        if (saveFile != null) {
+            viewModel.saveDDL(saveFile);
+        }
     }
 }

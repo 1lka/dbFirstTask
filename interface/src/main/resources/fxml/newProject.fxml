@@ -15,37 +15,31 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="190.0" prefWidth="327.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.ConnectView">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="190.0" prefWidth="344.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dbbest.kirilenko.view.ConnectView">
    <children>
-      <HBox alignment="TOP_CENTER" maxWidth="310.0" prefHeight="34.0" prefWidth="2300.0">
+      <AnchorPane maxHeight="37.0" prefHeight="37.0" prefWidth="200.0">
          <children>
-            <Label alignment="TOP_LEFT" maxWidth="100.0" prefWidth="100.0" text="DB URL">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
+            <Label alignment="TOP_LEFT" maxWidth="100.0" prefHeight="27.0" prefWidth="55.0" text="DB URL" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="5.0">
                <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
                </padding>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
             </Label>
-            <TextField fx:id="url" prefWidth="200.0">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
+            <TextField fx:id="url" prefHeight="27.0" prefWidth="165.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="5.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </TextField>
-            <ChoiceBox fx:id="choiceBox" maxWidth="50.0" minWidth="50.0" prefWidth="150.0">
+            <ChoiceBox fx:id="choiceBox" maxWidth="91.0" minWidth="50.0" prefHeight="25.0" prefWidth="91.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="5.0">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
             </ChoiceBox>
          </children>
-      </HBox>
-      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
+      </AnchorPane>
+      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="37.0" prefWidth="250.0">
          <children>
             <Label maxWidth="100.0" prefWidth="100.0" text="DB name">
                <padding>
@@ -65,7 +59,7 @@
             </TextField>
          </children>
       </HBox>
-      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
+      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="37.0" prefWidth="250.0">
          <children>
             <Label maxWidth="100.0" prefWidth="100.0" text="login">
                <padding>
@@ -85,7 +79,7 @@
             </TextField>
          </children>
       </HBox>
-      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
+      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="37.0" prefWidth="250.0">
          <children>
             <Label maxWidth="100.0" prefWidth="100.0" text="password">
                <padding>
@@ -105,11 +99,11 @@
             </TextField>
          </children>
       </HBox>
-      <HBox alignment="TOP_CENTER" maxWidth="250.0" prefHeight="34.0" prefWidth="250.0">
+      <HBox alignment="TOP_CENTER" maxWidth="351.0" prefHeight="37.0" prefWidth="351.0">
          <children>
             <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="btnConnect" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#connect" prefWidth="200.0" text="Connect" AnchorPane.bottomAnchor="4.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0">
+                  <Button fx:id="btnConnect" alignment="CENTER" defaultButton="true" minWidth="300.0" mnemonicParsing="false" onAction="#connect" prefWidth="300.0" text="Connect" AnchorPane.bottomAnchor="4.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
@@ -117,7 +111,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <ProgressBar disable="true" layoutY="11.0" prefWidth="200.0" />
+                  <ProgressBar fx:id="progressBar" disable="true" layoutY="11.0" prefWidth="200.0" />
                </children>
             </AnchorPane>
          </children>

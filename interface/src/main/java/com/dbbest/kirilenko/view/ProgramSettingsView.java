@@ -72,6 +72,7 @@ public class ProgramSettingsView {
     public void show(Stage openedProjectStage) throws IOException {
         logger.debug("opening project settings");
         settingsStage = new Stage();
+        settingsStage.setResizable(false);
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/ProgramSettings.fxml"));
 
         Scene settingsScene = new Scene(root);
