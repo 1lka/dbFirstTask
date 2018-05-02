@@ -1,15 +1,14 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +37,71 @@ public class RoutineParamsLoader extends Loader {
 
     public RoutineParamsLoader(Connection connection) {
         super(connection);
+    }
+
+    private static final String SQL_FUNCTIONS_QUERY = "select * from INFORMATION_SCHEMA.PARAMETERS where SPECIFIC_SCHEMA = ? and ROUTINE_TYPE = 'FUNCTION' order by SPECIFIC_NAME,ORDINAL_POSITION";
+    private static final String SQL_PROCEDURES_QUERY = "select * from INFORMATION_SCHEMA.PARAMETERS where SPECIFIC_SCHEMA = ? and ROUTINE_TYPE = 'PROCEDURE' order by SPECIFIC_NAME,ORDINAL_POSITION";
+
+    private static final String SPECIFIC_NAME = "SPECIFIC_NAME";
+
+    public void loadFunctions(Node functions, Connection connection) throws SQLException {
+        String schema = functions.getParent().getAttrs().get(GeneralConstants.NAME);
+        PreparedStatement ps = connection.prepareStatement(SQL_FUNCTIONS_QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ps.setString(1, schema);
+
+        ResultSet rs = ps.executeQuery();
+
+        for (Node routine : functions.getChildren()) {
+            fillRoutines(routine, rs);
+        }
+    }
+
+    public void loadProcedures(Node procedures, Connection connection) throws SQLException {
+        String schema = procedures.getParent().getAttrs().get(GeneralConstants.NAME);
+        PreparedStatement ps = connection.prepareStatement(SQL_PROCEDURES_QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ps.setString(1, schema);
+
+        ResultSet rs = ps.executeQuery();
+
+
+        for (Node procedure : procedures.getChildren()) {
+            fillRoutines(procedure,rs);
+        }
+    }
+
+    private void fillRoutines(Node routine, ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columnsCount = rsmd.getColumnCount();
+
+        Node parameters = findParams(routine);
+
+        String name = routine.getAttrs().get(GeneralConstants.NAME);
+        while (rs.next()) {
+            String routineName = rs.getString(SPECIFIC_NAME);
+            if (routineName.equals(name)) {
+                Node parameter = new Node(MySQLConstants.DBEntity.PARAMETER);
+                Map<String, String> attrs = parameter.getAttrs();
+                for (int i = 1; i <= columnsCount; i++) {
+                    String key = rsmd.getColumnName(i);
+                    String value = String.valueOf(rs.getObject(i));
+                    if ("null".equals(value) || "".equals(value)) {
+                        continue;
+                    }
+                    attrs.put(key, value);
+                }
+
+
+                String s = attrs.remove(MySQLConstants.AttributeName.PARAMETER_NAME);
+                if (s == null) {
+                    s = "returned";
+                }
+                attrs.put(GeneralConstants.NAME, s);
+                parameters.addChild(parameter);
+            } else {
+                rs.previous();
+                return;
+            }
+        }
     }
 
     @Override

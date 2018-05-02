@@ -1,11 +1,11 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,6 +28,52 @@ public class TableTriggerLoader extends Loader {
 
     public TableTriggerLoader(Connection connection) {
         super(connection);
+    }
+
+    private static final String SQL_QUERY =
+            "select * from INFORMATION_SCHEMA.TRIGGERS where TRIGGER_SCHEMA = ?";
+
+    public void load(Node tables, Connection connection) throws SQLException {
+        String schema = tables.getParent().getAttrs().get(GeneralConstants.NAME);
+        PreparedStatement ps = connection.prepareStatement(SQL_QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ps.setString(1, schema);
+
+        ResultSet rs = ps.executeQuery();
+
+        for (Node table : tables.getChildren()) {
+            fillTableTriggers(table, rs);
+        }
+
+    }
+
+    private void fillTableTriggers(Node table, ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columnsCount = rsmd.getColumnCount();
+
+        Node triggers = findTriggers(table);
+
+        String name = table.getAttrs().get(GeneralConstants.NAME);
+        while (rs.next()) {
+            String tableName = rs.getString("EVENT_OBJECT_TABLE");
+            if (tableName.equals(name)) {
+                Node trigger = new Node(MySQLConstants.DBEntity.TRIGGER);
+                Map<String, String> attrs = trigger.getAttrs();
+                for (int i = 1; i <= columnsCount; i++) {
+                    String key = rsmd.getColumnName(i);
+                    String value = String.valueOf(rs.getObject(i));
+                    if ("null".equals(value) || "".equals(value)) {
+                        continue;
+                    }
+                    attrs.put(key, value);
+                }
+                String constr = attrs.remove(MySQLConstants.AttributeName.TRIGGER_NAME);
+                attrs.put(GeneralConstants.NAME, constr);
+                triggers.addChild(trigger);
+            } else {
+                rs.previous();
+                return;
+            }
+        }
     }
 
     @Override

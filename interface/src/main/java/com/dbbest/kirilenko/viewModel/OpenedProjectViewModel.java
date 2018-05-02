@@ -181,19 +181,26 @@ public class OpenedProjectViewModel {
 
     public void fullLoad() {
         load(() -> {
+            long start = System.currentTimeMillis();
             loaderManager.fullLoadElement(selectedTreeModel.getNode());
             selectedTreeModel.update();
             service.createTreeItems(selectedItem.getValue());
             String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
             ddl.set(ddlOfNode);
+            long stop = System.currentTimeMillis();
+            System.out.println("fullLoad" + (stop - start));
         });
     }
 
     public void lazyLoad() {
         load(() -> {
+            long start = System.currentTimeMillis();
+
             loaderManager.lazyChildrenLoad(selectedTreeModel.getNode());
             selectedTreeModel.update();
             service.createTreeItems(selectedItem.getValue());
+            long stop = System.currentTimeMillis();
+            System.out.println("lazy" + (stop - start));
         });
     }
 
@@ -254,7 +261,7 @@ public class OpenedProjectViewModel {
                     System.out.println("connection closed");
                 } catch (SQLException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     Platform.runLater(() -> {
                         onlineMode.set(false);
                     });

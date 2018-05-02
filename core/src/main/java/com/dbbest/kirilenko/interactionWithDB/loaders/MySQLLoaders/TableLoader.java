@@ -25,10 +25,9 @@ public class TableLoader extends Loader {
             "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES " +
                     "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' ";
 
-
     private static final String FULL_LOAD_CATEGORY_QUERY =
             "SELECT * FROM INFORMATION_SCHEMA.TABLES " +
-                    "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE'";
+                    "where TABLE_SCHEMA = ? and TABLE_TYPE = 'BASE TABLE' order by TABLE_NAME";
 
     public TableLoader() {
     }
@@ -114,9 +113,23 @@ public class TableLoader extends Loader {
         } else {
             Node tables = findTables(node);
             fullLoadCategory(tables);
+            TableColumnLoader tableColumnLoader = new TableColumnLoader();
+            tableColumnLoader.load(tables,getConnection());
+
+            TableForeignKeyLoader tableForeignKeyLoader = new TableForeignKeyLoader();
+            tableForeignKeyLoader.load(tables,getConnection());
+
+            TableIndexLoader tableIndexLoader = new TableIndexLoader();
+            tableIndexLoader.load(tables,getConnection());
+
+            TablePrimaryKeyLoader tablePrimaryKeyLoader = new TablePrimaryKeyLoader();
+            tablePrimaryKeyLoader.load(tables,getConnection());
+
+            TableTriggerLoader tableTriggerLoader = new TableTriggerLoader();
+            tableTriggerLoader.load(tables, getConnection());
+
             for (Node table : tables.getChildren()) {
-                markElementLoaded(table);
-                fullLoadElement(table);
+                markElementFullyLoaded(table);
             }
         }
         return node;

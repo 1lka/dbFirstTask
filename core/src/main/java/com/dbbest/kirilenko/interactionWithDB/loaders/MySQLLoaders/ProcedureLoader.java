@@ -80,14 +80,16 @@ public class ProcedureLoader extends Loader {
         } else {
             Node procedures = findProcedures(node);
             fullLoadCategory(procedures);
-            for (Node procedure : procedures.getChildren()) {
-                markElementLoaded(procedure);
-                fullLoadElement(procedure);
+
+            RoutineParamsLoader routineParamsLoader = new RoutineParamsLoader();
+            routineParamsLoader.loadProcedures(procedures, getConnection());
+
+            for (Node n : procedures.getChildren()) {
+                markElementFullyLoaded(n);
             }
         }
         return node;
     }
-
     @Override
     public Node loadCategory(Node node) throws SQLException {
         Node nodeForLoading = findProcedures(node);

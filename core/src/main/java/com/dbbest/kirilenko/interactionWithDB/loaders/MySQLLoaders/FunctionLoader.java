@@ -79,9 +79,10 @@ public class FunctionLoader extends Loader {
         } else {
             Node functions = findFunctions(node);
             fullLoadCategory(functions);
-            for (Node function : functions.getChildren()) {
-                markElementLoaded(function);
-                fullLoadElement(function);
+            RoutineParamsLoader routineParamsLoader = new RoutineParamsLoader();
+            routineParamsLoader.loadFunctions(functions, getConnection());
+            for (Node n : functions.getChildren()) {
+                markElementFullyLoaded(n);
             }
         }
         return node;

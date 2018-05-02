@@ -1,15 +1,13 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +16,7 @@ import java.util.Map;
 public class TableColumnLoader extends Loader {
 
     private static final String ELEMENT_QUERY =
-            "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? and TABLE_NAME = ? and COLUMN_NAME = ?";
+            "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? and TABLE_NAME = ? and COLUMN_NAME = ? order by TABLE_NAME";
 
     private static final String LOAD_CATEGORY_QUERY =
             "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS " +
@@ -30,9 +28,60 @@ public class TableColumnLoader extends Loader {
     public TableColumnLoader() {
     }
 
-    public TableColumnLoader(Connection connection) {
-        super(connection);
+    public TableColumnLoader(Connection connection) {        super(connection);
     }
+
+    private static final String SQL_QUERY =
+            "SELECT * FROM INFORMATION_SCHEMA.COLUMNS " +
+                    "where TABLE_SCHEMA = ? and TABLE_NAME not in " +
+                    "(SELECT TABLE_NAME FROM INFORMATION_SCHEMA.VIEWS where TABLE_SCHEMA = ?) order by TABLE_NAME";
+
+    public void load(Node tables, Connection connection) throws SQLException {
+        String schema = tables.getParent().getAttrs().get(GeneralConstants.NAME);
+        PreparedStatement ps = connection.prepareStatement(SQL_QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ps.setString(1, schema);
+        ps.setString(2, schema);
+
+        ResultSet rs = ps.executeQuery();
+
+        for (Node table : tables.getChildren()) {
+            fillTableColumns(table, rs);
+        }
+    }
+
+    private void fillTableColumns(Node table, ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columnsCount = rsmd.getColumnCount();
+
+        Node columns = findColumns(table);
+
+        String name = table.getAttrs().get(GeneralConstants.NAME);
+        while (rs.next()) {
+            String tableName = rs.getString(MySQLConstants.AttributeName.TABLE_NAME);
+            if (tableName.equals(name)) {
+                Node column = new Node(MySQLConstants.DBEntity.COLUMN);
+                Map<String, String> attrs = column.getAttrs();
+
+                for (int i = 1; i <= columnsCount; i++) {
+
+                    String key = rsmd.getColumnName(i);
+                    String value = String.valueOf(rs.getObject(i));
+                    if ("null".equals(value) || "".equals(value)) {
+                        continue;
+                    }
+                    attrs.put(key, value);
+
+                }
+                String columnName = attrs.remove(MySQLConstants.AttributeName.COLUMN_NAME);
+                attrs.put(GeneralConstants.NAME, columnName);
+                columns.addChild(column);
+            } else {
+                rs.previous();
+                return;
+            }
+        }
+    }
+
 
     @Override
     public Node loadElement(Node node) throws SQLException {

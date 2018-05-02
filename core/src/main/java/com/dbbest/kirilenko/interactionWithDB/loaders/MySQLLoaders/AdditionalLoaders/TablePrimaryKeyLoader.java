@@ -1,10 +1,11 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,6 +32,55 @@ public class TablePrimaryKeyLoader extends Loader {
 
     public TablePrimaryKeyLoader(Connection connection) {
         super(connection);
+    }
+
+    private static final String SQL_QUERY =
+            "select * from INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
+                    "where CONSTRAINT_SCHEMA = ? and CONSTRAINT_NAME = 'PRIMARY' order by TABLE_NAME";
+
+
+    public void load(Node tables, Connection connection) throws SQLException {
+        String schema = tables.getParent().getAttrs().get(GeneralConstants.NAME);
+        PreparedStatement ps = connection.prepareStatement(SQL_QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ps.setString(1, schema);
+
+        ResultSet rs = ps.executeQuery();
+
+        for (Node table : tables.getChildren()) {
+            fillTablePK(table, rs);
+        }
+
+    }
+
+    private void fillTablePK(Node table, ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columnsCount = rsmd.getColumnCount();
+
+        Node pks = findPrimaries(table);
+
+        String name = table.getAttrs().get(GeneralConstants.NAME);
+
+        while (rs.next()) {
+            String tableName = rs.getString(MySQLConstants.AttributeName.TABLE_NAME);
+            if (tableName.equals(name)) {
+                Node pk = new Node(MySQLConstants.DBEntity.PRIMARY_KEY);
+                Map<String, String> attrs = pk.getAttrs();
+                for (int i = 1; i <= columnsCount; i++) {
+                    String key = rsmd.getColumnName(i);
+                    String value = String.valueOf(rs.getObject(i));
+                    if ("null".equals(value) || "".equals(value)) {
+                        continue;
+                    }
+                    attrs.put(key, value);
+                }
+                String constr = attrs.remove(MySQLConstants.AttributeName.COLUMN_NAME);
+                attrs.put(GeneralConstants.NAME, constr);
+                pks.addChild(pk);
+            } else {
+                rs.previous();
+                return;
+            }
+        }
     }
 
     @Override

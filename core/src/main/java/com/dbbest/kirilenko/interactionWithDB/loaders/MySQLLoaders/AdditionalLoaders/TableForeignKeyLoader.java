@@ -1,15 +1,14 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +42,57 @@ public class TableForeignKeyLoader extends Loader {
 
     public TableForeignKeyLoader(Connection connection) {
         super(connection);
+    }
+
+    private static final String SQL_QUERY =
+            "select A.CONSTRAINT_CATALOG, A.CONSTRAINT_SCHEMA, A.CONSTRAINT_NAME, A.UNIQUE_CONSTRAINT_CATALOG, " +
+                    "A.UNIQUE_CONSTRAINT_NAME, A.MATCH_OPTION, A.UPDATE_RULE, A.DELETE_RULE, A.TABLE_NAME, " +
+                    "A.REFERENCED_TABLE_NAME, B.COLUMN_NAME, B.REFERENCED_COLUMN_NAME, B.ORDINAL_POSITION, B.POSITION_IN_UNIQUE_CONSTRAINT " +
+                    "from INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS as A left join INFORMATION_SCHEMA.KEY_COLUMN_USAGE as B " +
+                    "on A.constraint_name = B.constraint_name where A.CONSTRAINT_SCHEMA = ?";
+
+
+    public void load(Node tables, Connection connection) throws SQLException {
+        String schema = tables.getParent().getAttrs().get(GeneralConstants.NAME);
+        PreparedStatement ps = connection.prepareStatement(SQL_QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ps.setString(1, schema);
+
+        ResultSet rs = ps.executeQuery();
+
+        for (Node table : tables.getChildren()) {
+            fillTableFKeys(table, rs);
+        }
+    }
+
+    private void fillTableFKeys(Node table, ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columnsCount = rsmd.getColumnCount();
+
+        Node foreignKeys = findFKeys(table);
+
+        String name = table.getAttrs().get(GeneralConstants.NAME);
+
+        while (rs.next()) {
+            String tableName = rs.getString(MySQLConstants.AttributeName.TABLE_NAME);
+            if (tableName.equals(name)) {
+                Node fKey = new Node(MySQLConstants.DBEntity.FOREIGN_KEY);
+                Map<String, String> attrs = fKey.getAttrs();
+                for (int i = 1; i <= columnsCount; i++) {
+                    String key = rsmd.getColumnName(i);
+                    String value = String.valueOf(rs.getObject(i));
+                    if ("null".equals(value) || "".equals(value)) {
+                        continue;
+                    }
+                    attrs.put(key, value);
+                }
+                String constr = attrs.remove(MySQLConstants.AttributeName.CONSTRAINT_NAME);
+                attrs.put(GeneralConstants.NAME, constr);
+                foreignKeys.addChild(fKey);
+            } else {
+                rs.previous();
+                return;
+            }
+        }
     }
 
     @Override

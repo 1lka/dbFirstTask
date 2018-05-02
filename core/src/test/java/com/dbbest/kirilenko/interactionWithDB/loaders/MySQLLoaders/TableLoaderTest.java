@@ -36,28 +36,23 @@ public class TableLoaderTest {
 
         table = new Node(MySQLConstants.DBEntity.TABLE);
         tables.addChild(table);
-        table.getAttrs().put("NAME", "film");
+        table.getAttrs().put("NAME", "actor");
     }
 
-    @Test
-    public void loadElement() throws SQLException {
-        System.out.println(loader.loadElement(table));
-    }
-
-    @Test
-    public void lazyChildrenLoad() throws SQLException {
-        System.out.println(loader.lazyChildrenLoad(table));
-    }
-
-    @Test
-    public void fullLoadElement() throws SQLException {
-        System.out.println(loader.fullLoadElement(schema));
-    }
-
-    @Test
-    public void fullLoadElement2() throws SQLException {
-        System.out.println(loader.fullLoadElement(tables));
-    }
+//    @Test
+//    public void loadElement() throws SQLException {
+//        System.out.println(loader.loadElement(table));
+//    }
+//
+//    @Test
+//    public void lazyChildrenLoad() throws SQLException {
+//        System.out.println(loader.lazyChildrenLoad(table));
+//    }
+//
+//    @Test
+//    public void fullLoadElement() throws SQLException {
+//        System.out.println(loader.fullLoadElement(schema));
+//    }
 
     @Test
     public void fullLoadElement3() throws SQLException {
@@ -65,12 +60,17 @@ public class TableLoaderTest {
     }
 
     @Test
-    public void loadCategory() throws SQLException {
-        System.out.println(loader.loadCategory(tables));
+    public void fullLoadElement2() throws SQLException {
+        System.out.println(loader.fullLoadElement(tables));
     }
-
-    @Test
-    public void loadCategory2() throws SQLException {
-        System.out.println(loader.loadCategory(schema));
-    }
+//
+//    @Test
+//    public void loadCategory() throws SQLException {
+//        System.out.println(loader.loadCategory(tables));
+//    }
+//
+//    @Test
+//    public void loadCategory2() throws SQLException {
+//        System.out.println(loader.loadCategory(schema));
+//    }
 }

@@ -1,19 +1,17 @@
 package com.dbbest.kirilenko.interactionWithDB.loaders.MySQLLoaders.AdditionalLoaders;
 
 import com.dbbest.kirilenko.exceptions.LoadingException;
+import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.tree.ChildrenList;
 import com.dbbest.kirilenko.tree.Node;
-import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.AttributeName.TABLE_NAME;
-import static com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants.AttributeName.TABLE_SCHEMA;
 
 @EntityLoader(element = {MySQLConstants.DBEntity.INDEX, MySQLConstants.NodeNames.INDEXES})
 public class TableIndexLoader extends Loader {
@@ -33,12 +31,23 @@ public class TableIndexLoader extends Loader {
                     " from INFORMATION_SCHEMA.STATISTICS where TABLE_SCHEMA = ? and TABLE_NAME = ? and INDEX_NAME != 'PRIMARY' group by INDEX_NAME";
 
 
+
+
     public TableIndexLoader() {
     }
 
     public TableIndexLoader(Connection connection) {
         super(connection);
     }
+
+    public void load(Node tables, Connection connection) throws SQLException {
+        setConnection(connection);
+        for (Node table : tables.getChildren()) {
+            fullLoadCategory(table);
+        }
+    }
+
+
 
     @Override
     public Node loadElement(Node node) throws SQLException {
