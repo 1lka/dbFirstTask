@@ -18,7 +18,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#createNewProject" text="Create new" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Action">
+                <Menu fx:id="actionMenu" mnemonicParsing="false" text="Action">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#generateFullDDl" text="generate full ddl" />
                   <MenuItem mnemonicParsing="false" onAction="#loadElement" text="load element" />
@@ -43,11 +43,11 @@
                 <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
             </padding>
         </MenuBar>
-      <AnchorPane layoutY="24.0" minHeight="300.0" prefHeight="403.0" prefWidth="506.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="27.0">
+      <AnchorPane layoutY="24.0" AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="28.0">
          <children>
               <SplitPane dividerPositions="0.4" minWidth="450.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                   <items>
-                      <AnchorPane minHeight="300.0" minWidth="150.0">
+                      <AnchorPane minWidth="180.0">
                           <children>
                               <TreeView fx:id="treeView" layoutX="59.0" layoutY="76.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                   <contextMenu>
@@ -63,9 +63,9 @@
                         <ProgressIndicator fx:id="progress" layoutX="43.0" layoutY="119.0" prefHeight="100.0" prefWidth="100.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="50.0" />
                           </children>
                       </AnchorPane>
-                      <AnchorPane minHeight="300.0" minWidth="250.0">
+                      <AnchorPane minWidth="300.0">
                           <children>
-                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                   <items>
                                       <TableView fx:id="attrTable" minHeight="140.0">
                                           <columns>
@@ -76,7 +76,7 @@
                                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                           </columnResizePolicy>
                                       </TableView>
-                                      <TextArea fx:id="ddlArea" minHeight="150.0" />
+                                      <TextArea fx:id="ddlArea" minHeight="140.0" />
                                   </items>
                               </SplitPane>
                           </children>
@@ -85,13 +85,13 @@
               </SplitPane>
          </children>
       </AnchorPane>
-      <AnchorPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <AnchorPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button fx:id="saveDDLbtn" layoutX="440.0" layoutY="8.0" mnemonicParsing="false" onAction="#saveDDL" text="save DDL" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
-            <TextField fx:id="searchText" layoutX="39.0" layoutY="5.0" prefWidth="250.0" promptText="input element name" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="5.0" />
+            <Button fx:id="saveDDLbtn" layoutX="390.0" layoutY="5.0" mnemonicParsing="false" onAction="#saveDDL" text="save DDL" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
+            <TextField fx:id="searchText" layoutX="39.0" layoutY="5.0" promptText="input element name" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="5.0" />
             <Button layoutX="-4.0" layoutY="5.0" mnemonicParsing="false" onAction="#searchElement" text="search:" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
-            <Button layoutX="310.0" layoutY="5.0" mnemonicParsing="false" onAction="#previousElement" text="▲" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="312.0" AnchorPane.topAnchor="5.0" />
-            <Button layoutX="339.0" layoutY="5.0" mnemonicParsing="false" onAction="#nextElement" text="▼" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="339.0" AnchorPane.topAnchor="5.0" />
+            <Button layoutX="216.0" layoutY="5.0" mnemonicParsing="false" onAction="#previousElement" text="▲" AnchorPane.bottomAnchor="5.0" AnchorPane.topAnchor="5.0" />
+            <Button layoutX="250.0" layoutY="5.0" mnemonicParsing="false" onAction="#nextElement" text="▼" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="5.0" />
          </children>
       </AnchorPane>
     </children>

@@ -1,6 +1,5 @@
 package com.dbbest.kirilenko.view;
 
-import com.dbbest.kirilenko.exception.DdlGenerationException;
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
@@ -8,7 +7,6 @@ import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.service.ProgramSettings;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -33,6 +32,9 @@ public class OpenedProjectView {
     public ProgressIndicator progress;
 
     @FXML
+    public Menu actionMenu;
+
+    @FXML
     private TableView<Map.Entry<String, String>> attrTable;
 
     @FXML
@@ -43,15 +45,6 @@ public class OpenedProjectView {
 
     @FXML
     public ContextMenu contextMenu;
-
-    @FXML
-    public MenuItem FL;
-
-    @FXML
-    public MenuItem LL;
-
-    @FXML
-    public MenuItem LE;
 
     @FXML
     public Button saveDDLbtn;
@@ -80,40 +73,27 @@ public class OpenedProjectView {
     private static Stage mainViewStage;
 
     @FXML
-    private void initialize() throws SerializationException {
+    public void initialize() {
 
         mainViewStage.hide();
         openedProjectStage.setOnCloseRequest(event -> {
             mainViewStage.show();
         });
 
-        treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
-        if (viewModel.selectedItemProperty().getValue() != null) {
-            treeView.getSelectionModel().select(treeView.getRow(viewModel.selectedItemProperty().getValue()));
-        } else {
-            treeView.getSelectionModel().selectFirst();
-        }
-        viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
-        treeView.disableProperty().bind(viewModel.treeIsBeenLoadingProperty());
-        progress.visibleProperty().bind(treeView.disableProperty());
+
+        projectMenu.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
+        actionMenu.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
 
         attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
 
+
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
         viewModel.onlineModeProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                ReconnectView reconnectView = new ReconnectView();
-                StringBuilder password = new StringBuilder();
-                try {
-                    reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
-                    viewModel.reconnect(password.toString());
-                } catch (IOException | WrongCredentialsException e) {
-                    viewModel.onlineModeProperty().set(false);
-                    //todo ALLERTS HERE!!!!!!
-                }
+
             }
         });
 
@@ -123,19 +103,44 @@ public class OpenedProjectView {
             treeView.scrollTo(index);
         });
 
+        treeViewInitialize();
+    }
+
+    private void treeViewInitialize() {
+        treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
+
         treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
             if (event.getTarget().getClass() != LabeledText.class) {
                 event.consume();
             }
         });
+
+        if (viewModel.selectedItemProperty().getValue() != null) {
+            treeView.getSelectionModel().select(treeView.getRow(viewModel.selectedItemProperty().getValue()));
+        } else {
+            treeView.getSelectionModel().selectFirst();
+        }
+
+        viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
+
+        treeView.disableProperty().bind(viewModel.treeIsBeenLoadingProperty());
+        progress.visibleProperty().bind(treeView.disableProperty());
+
+        treeView.addEventHandler(MouseEvent.MOUSE_CLICKED,(e)->{
+            if (e.getClickCount() == 2) {
+                viewModel.lazyLoad();
+            }
+        });
     }
+
+
 
     public void show(Stage main, Connect connect, String path) throws IOException, SerializationException {
         viewModel = new OpenedProjectViewModel(path, connect);
         mainViewStage = main;
         openedProjectStage = new Stage();
-        openedProjectStage.setMinWidth(400);
-        openedProjectStage.setMinHeight(400);
+        openedProjectStage.setMinWidth(500);
+        openedProjectStage.setMinHeight(500);
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
 
         Scene openedProjectScene = new Scene(root);
@@ -148,23 +153,95 @@ public class OpenedProjectView {
     /////////////////////loading
 
     public void lazyLoad(ActionEvent actionEvent) {
-        viewModel.lazyLoad();
+        if (viewModel.onlineModeProperty().get()) {
+            viewModel.lazyLoad();
+        } else {
+            ReconnectView reconnectView = new ReconnectView();
+            StringBuilder password = new StringBuilder();
+            try {
+                reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+                viewModel.reconnect(password.toString());
+                viewModel.onlineModeProperty().set(true);
+                viewModel.lazyLoad();
+            } catch (IOException | WrongCredentialsException e) {
+                viewModel.onlineModeProperty().set(false);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Wrong credentials");
+                alert.setContentText("wrong credentials");
+                alert.showAndWait();
+            }
+        }
     }
 
     public void loadElement(ActionEvent actionEvent) {
-        viewModel.loadElement();
+        if (viewModel.onlineModeProperty().get()) {
+            viewModel.loadElement();
+        } else {
+            ReconnectView reconnectView = new ReconnectView();
+            StringBuilder password = new StringBuilder();
+            try {
+                reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+                viewModel.reconnect(password.toString());
+                viewModel.onlineModeProperty().set(true);
+                viewModel.loadElement();
+            } catch (IOException | WrongCredentialsException e) {
+                viewModel.onlineModeProperty().set(false);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Wrong credentials");
+                alert.setContentText("wrong credentials");
+                alert.showAndWait();
+            }
+        }
     }
 
     public void fullLoad(ActionEvent actionEvent) {
-        viewModel.fullLoad();
+        if (viewModel.onlineModeProperty().get()) {
+            viewModel.fullLoad();
+        } else {
+            ReconnectView reconnectView = new ReconnectView();
+            StringBuilder password = new StringBuilder();
+            try {
+                reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+                viewModel.reconnect(password.toString());
+                viewModel.onlineModeProperty().set(true);
+                viewModel.fullLoad();
+            } catch (IOException | WrongCredentialsException e) {
+                viewModel.onlineModeProperty().set(false);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Wrong credentials");
+                alert.setContentText("wrong credentials");
+                alert.showAndWait();
+            }
+        }
     }
 
     public void loadAll(ActionEvent actionEvent) {
-        viewModel.loadAll();
+        if (viewModel.onlineModeProperty().get()) {
+            viewModel.loadAll();
+        } else {
+            ReconnectView reconnectView = new ReconnectView();
+            StringBuilder password = new StringBuilder();
+            try {
+                reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+                viewModel.reconnect(password.toString());
+                viewModel.onlineModeProperty().set(true);
+                viewModel.loadAll();
+            } catch (IOException | WrongCredentialsException e) {
+                viewModel.onlineModeProperty().set(false);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Wrong credentials");
+                alert.setContentText("wrong credentials");
+                alert.showAndWait();
+            }
+        }
     }
 
     public void reloadSelected(ActionEvent actionEvent) {
-
+        viewModel.reload();
     }
 
     /////////////////////searching

@@ -1,6 +1,7 @@
 package com.dbbest.kirilenko.viewModel;
 
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
+import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
@@ -177,18 +178,32 @@ public class OpenedProjectViewModel {
                 }
             }
         });
+
+        ddlProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.equals("")) {
+                ddl.set("this node can't be printed");
+            }
+        });
+
+    }
+
+    public void reload() {
+        Node selected = selectedItem.getValue().getValue().getNode();
+        selected.getChildren().clear();
+        String name = selected.getAttrs().get(GeneralConstants.NAME);
+        selected.getAttrs().clear();
+        selected.getAttrs().put(GeneralConstants.NAME, name);
+        fullLoad();
     }
 
     public void fullLoad() {
+        System.out.println();
         load(() -> {
-            long start = System.currentTimeMillis();
-            loaderManager.fullLoadElement(selectedTreeModel.getNode());
+            loaderManager.fullLoadElement(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
             service.createTreeItems(selectedItem.getValue());
-            String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
+            String ddlOfNode = printerManager.printDDL(selectedItem.getValue().getValue().getNode());
             ddl.set(ddlOfNode);
-            long stop = System.currentTimeMillis();
-            System.out.println("fullLoad" + (stop - start));
         });
     }
 
@@ -196,7 +211,7 @@ public class OpenedProjectViewModel {
         load(() -> {
             long start = System.currentTimeMillis();
 
-            loaderManager.lazyChildrenLoad(selectedTreeModel.getNode());
+            loaderManager.lazyChildrenLoad(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
             service.createTreeItems(selectedItem.getValue());
             long stop = System.currentTimeMillis();
@@ -206,15 +221,16 @@ public class OpenedProjectViewModel {
 
     public void loadElement() {
         load(() -> {
-            loaderManager.loadElement(selectedTreeModel.getNode());
+            loaderManager.loadElement(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
-            String ddlOfNode = printerManager.printDDL(selectedTreeModel.getNode());
+            String ddlOfNode = printerManager.printDDL(selectedItem.getValue().getValue().getNode());
             ddl.set(ddlOfNode);
         });
     }
 
     public void loadAll() {
         load(() -> {
+            System.out.println(loaderManager);
             loaderManager.fullLoadElement(rootItemProperty.getValue().getValue().getNode());
             rootItemProperty.getValue().getValue().update();
             service.createTreeItems(rootItemProperty.getValue());
@@ -222,17 +238,16 @@ public class OpenedProjectViewModel {
     }
 
     private void load(LoadInterface lambda) {
-        if (onlineMode.get()) {
             treeIsBeenLoading.set(true);
             new Thread(() -> {
-                lambda.load();
-                Platform.runLater(() -> {
-                    treeIsBeenLoading.set(false);
-                });
+                try {
+                    lambda.load();
+                } finally {
+                    Platform.runLater(() -> {
+                        treeIsBeenLoading.set(false);
+                    });
+                }
             }).start();
-        } else {
-            onlineMode.set(true);
-        }
     }
 
     public File getProjectsFolder() {
@@ -279,12 +294,7 @@ public class OpenedProjectViewModel {
 
     ///////////////////////////////
     public boolean checkFolder() {
-        if (pathToFolder != null) {
-            return true;
-        }
-        String path = ProgramSettings.getProp().getProperty("project") + loaderManager.getDBName();
-        File file = new File(path);
-        return file.exists();
+        return pathToFolder != null;
     }
 
     public void saveCurrent() throws SerializationException {
@@ -292,7 +302,7 @@ public class OpenedProjectViewModel {
     }
 
     public void saveProject(File folder) throws SerializationException, IOException {
-        String pathToFolder = folder.getAbsolutePath() + "\\" + loaderManager.getDBName();
+        String pathToFolder = folder.getAbsolutePath()  ;
 
         Path path = Paths.get(pathToFolder);
         Files.createDirectories(path);
@@ -383,6 +393,7 @@ public class OpenedProjectViewModel {
         try {
             connect.initConnection(url, login, password);
             loaderManager = new LoaderManager(connect);
+            System.out.println("!!!!!!" + loaderManager);
             loaderManager.setDBName(dbName);
         } catch (SQLException e) {
             throw new WrongCredentialsException("wrong password");

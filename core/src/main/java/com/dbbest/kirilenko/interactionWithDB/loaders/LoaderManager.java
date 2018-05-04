@@ -117,7 +117,6 @@ public class LoaderManager {
         if (!Boolean.valueOf(node.getAttrs().get(Loader.FULLY_LOADED))) {
             load((n, l) ->
                     l.fullLoadElement(n), node);
-
         }
         return node;
     }

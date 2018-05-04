@@ -1,5 +1,9 @@
 package com.dbbest.kirilenko.service;
 
+import com.dbbest.kirilenko.exceptions.SerializationException;
+import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
+import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
+import com.dbbest.kirilenko.tree.Node;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -15,15 +19,33 @@ public class ProgramSettings {
 
     private static File config;
 
+    private static File cashConnect;
+
+    private static Node cash;
+
+    public static Node getCash() {
+        return cash;
+    }
+
     public static Properties getProp() {
         return prop;
     }
 
-    public static void initialize() throws IOException {
+    public static void initialize() throws IOException, SerializationException {
 
         File dbDestFolder = new File(System.getProperty("user.home") + "/DbBest");
         if (!dbDestFolder.exists()) {
             dbDestFolder.mkdir();
+        }
+
+        cashConnect = new File(dbDestFolder, "cash.xml");
+        SerializationStrategy strategy = new XMLStrategyImpl();
+        if (cashConnect.exists()) {
+            cash = strategy.deserialize(cashConnect.getAbsolutePath());
+        } else {
+            cashConnect.createNewFile();
+            Node node = new Node("cash");
+            strategy.serialize(node, cashConnect.getAbsolutePath());
         }
 
         config = new File(dbDestFolder, "config.properties");
@@ -40,6 +62,12 @@ public class ProgramSettings {
             prop.load(reader);
             String projectPath = prop.getProperty("project");
             String logPath = prop.getProperty("log");
+            String programDefault = prop.getProperty("root");
+
+            if (programDefault == null) {
+                programDefault = System.getProperty("user.home") + "\\DbBest";
+                prop.setProperty("root", programDefault);
+            }
 
             if (projectPath == null) {
                 projectPath = System.getProperty("user.home") + "\\DbBest";
@@ -53,7 +81,6 @@ public class ProgramSettings {
             updateProperties();
 
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,7 +88,7 @@ public class ProgramSettings {
 
     public static void updateProperties() throws IOException {
         try (FileWriter writer = new FileWriter(config)) {
-            prop.store(writer,null);
+            prop.store(writer, null);
         }
 
         Properties log4jprops = new Properties();
@@ -75,5 +102,33 @@ public class ProgramSettings {
         log4jprops.setProperty("log4j.appender.FILE.File", prop.getProperty("log") + "\\out.log");
         LogManager.resetConfiguration();
         PropertyConfigurator.configure(log4jprops);
+    }
+
+    public static void storeConnect(String url, String db, String login) {
+        Node node = new Node("connect");
+        node.setParent(cash);
+        node.getAttrs().put("url", url);
+        node.getAttrs().put("db", db);
+        node.getAttrs().put("login", login);
+        SerializationStrategy strategy = new XMLStrategyImpl();
+
+        if (cash.getChildren().size() > 9) {
+            cash.getChildren().remove(0);
+        }
+
+        if (!cash.getChildren().contains(node)) {
+            node.setParent(null);
+            cash.addChild(node);
+            try {
+                strategy.serialize(cash, cashConnect.getAbsolutePath());
+            } catch (SerializationException ignored) {
+            }
+        }
+
+        try {
+            cash = strategy.deserialize(cashConnect.getAbsolutePath());
+        } catch (SerializationException ignored) {
+
+        }
     }
 }

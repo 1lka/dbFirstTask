@@ -18,7 +18,7 @@ public class PrinterManager {
         String nodeName = node.getName();
         Printer printer = printers.get(nodeName);
         if (printer == null) {
-            return "can't print this node";
+            return "";
         }
         return printer.printElement(node);
     }

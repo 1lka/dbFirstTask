@@ -17,6 +17,9 @@ public class MySQLConnect extends Connect {
      */
     @Override
     public void initConnection(String url, String login, String password) throws SQLException {
+        if (!url.startsWith("jdbc:mysql://")) {
+            url = "jdbc:mysql://" + url;
+        }
         super.initConnection(url, login, password);
         super.setType(DBType.MYSQL);
         setConnection(DriverManager.getConnection(url, login, password));

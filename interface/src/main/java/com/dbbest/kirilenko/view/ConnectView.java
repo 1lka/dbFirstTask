@@ -4,7 +4,9 @@ import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
+import com.dbbest.kirilenko.model.ConnectModel;
 import com.dbbest.kirilenko.viewModel.ConnectionViewModel;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,6 +31,9 @@ public class ConnectView {
     public ProgressBar progressBar;
 
     @FXML
+    public ChoiceBox<ConnectModel> recentlyUsed;
+
+    @FXML
     private TextField url;
 
     @FXML
@@ -40,7 +45,7 @@ public class ConnectView {
     @FXML
     private TextField password;
 
-    private static ConnectionViewModel connectionViewModel;
+    private ConnectionViewModel connectionViewModel;
 
     private static Stage stage;
     private static Stage openedProjectStage;
@@ -53,13 +58,19 @@ public class ConnectView {
         connectionViewModel.dbNameProperty().bindBidirectional(dbName.textProperty());
         connectionViewModel.loginProperty().bindBidirectional(login.textProperty());
         connectionViewModel.passwordProperty().bindBidirectional(password.textProperty());
-        progressBar.visibleProperty().bind(connectionViewModel.isConnectingProperty());
+
+        recentlyUsed.setItems(connectionViewModel.getRecentlyUsed());
+        connectionViewModel.selectedConnectModelProperty().bind(recentlyUsed.getSelectionModel().selectedItemProperty());
+
+        progressBar.visibleProperty().bindBidirectional(connectionViewModel.isConnectingProperty());
+
         choiceBox.setItems(connectionViewModel.getChoicesList());
         choiceBox.getSelectionModel().select(0);
     }
 
     public void connect(ActionEvent actionEvent) throws IOException {
         try {
+
             Connect connect = connectionViewModel.connect(choiceBox.getSelectionModel().getSelectedItem());
             OpenedProjectView openedProject = new OpenedProjectView();
             openedProject.show(owner, connect, null);
@@ -79,25 +90,24 @@ public class ConnectView {
     }
 
     public void show(ActionEvent actionEvent) throws IOException {
-        if (stage == null) {
-            stage = new Stage();
-            stage.setOnCloseRequest(event -> {
-                owner.show();
-            });
-            stage.setTitle("create new project");
-            stage.setResizable(false);
+        stage = new Stage();
+        stage.setOnCloseRequest(event -> {
+            owner.show();
+        });
+        stage.setTitle("create new project");
+        stage.setResizable(false);
 
-            FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
-            Parent root = fxmlLoader.load();
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
+        Parent root = fxmlLoader.load();
 
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.WINDOW_MODAL);
 
-            Node source = (Node) actionEvent.getSource();
-            owner = (Stage) source.getScene().getWindow();
-            stage.initOwner(owner);
-        }
+        Node source = (Node) actionEvent.getSource();
+        owner = (Stage) source.getScene().getWindow();
+        stage.initOwner(owner);
+
         owner.hide();
         stage.showAndWait();
     }

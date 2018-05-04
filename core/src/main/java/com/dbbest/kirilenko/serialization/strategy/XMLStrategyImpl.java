@@ -57,7 +57,8 @@ public class XMLStrategyImpl implements SerializationStrategy {
         try {
             df = DocumentBuilderFactory.newInstance();
             builder = df.newDocumentBuilder();
-            document = builder.parse(fileName);
+            File file = new File(fileName);
+            document = builder.parse(file);
             document.getDocumentElement().normalize();
             Element rootElement = document.getDocumentElement();
             return nodeCreate(rootElement);
