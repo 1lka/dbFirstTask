@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 
 public class MainView {
 
@@ -33,8 +34,8 @@ public class MainView {
     public void openExistingProject(ActionEvent actionEvent) throws IOException, SerializationException {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("load");
-        File folder = new File(ProgramSettings.getProp().getProperty("project"));
-        chooser.setInitialDirectory(folder);
+//        File directory = new File(URLDecoder.decode(ProgramSettings.getProp().getProperty("project"), "UTF-8"));
+        chooser.setInitialDirectory(new File(ProgramSettings.getProp().getProperty("project")));
         File file = chooser.showDialog(stage);
 
         if (file != null) {

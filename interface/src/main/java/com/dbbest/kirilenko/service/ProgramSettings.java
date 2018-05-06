@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 public class ProgramSettings {
@@ -63,18 +65,20 @@ public class ProgramSettings {
             String projectPath = prop.getProperty("project");
             String logPath = prop.getProperty("log");
             String programDefault = prop.getProperty("root");
-
             if (programDefault == null) {
                 programDefault = System.getProperty("user.home") + "\\DbBest";
+                programDefault = decode(programDefault);
                 prop.setProperty("root", programDefault);
             }
 
             if (projectPath == null) {
                 projectPath = System.getProperty("user.home") + "\\DbBest";
+                projectPath = decode(projectPath);
                 prop.setProperty("project", projectPath);
             }
             if (logPath == null) {
                 logPath = System.getProperty("user.home") + "\\DbBest\\logs";
+                logPath = decode(logPath);
                 prop.setProperty("log", logPath);
             }
 
@@ -84,6 +88,14 @@ public class ProgramSettings {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String decode(String s) {
+        Charset cset = Charset.forName("UTF-8");
+        ByteBuffer buf = cset.encode(s);
+        byte[] b = buf.array();
+        String str = new String(b);
+        return str;
     }
 
     public static void updateProperties() throws IOException {

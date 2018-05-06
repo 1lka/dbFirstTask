@@ -5,6 +5,7 @@ import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.interactionWithDB.printers.NodePrinter;
 import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +18,8 @@ import java.util.*;
 
 public class ReflectionUtil {
 
+    private static Logger logger = Logger.getLogger(ReflectionUtil.class);
+
     private static ArrayList<Class> classes;
 
     private final static String PACKAGE_INFO = "package-info";
@@ -24,6 +27,10 @@ public class ReflectionUtil {
     static {
         try {
             classes = findAllClasses();
+            System.out.println("перечень классов:");
+            for (Class c : classes) {
+                System.out.println(c.getCanonicalName());
+            }
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException("problems with class loading");
         }
@@ -78,6 +85,8 @@ public class ReflectionUtil {
     }
 
     private static ArrayList<Class> findAllClasses() throws ClassNotFoundException, IOException {
+        logger.debug("sarting to search all classes");
+
         String pack = ReflectionUtil.class.getPackage().getName();
         String[] directories = pack.split("\\.");
         String path = directories[0];

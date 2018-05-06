@@ -15,6 +15,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +39,19 @@ public class XMLStrategyImpl implements SerializationStrategy {
             Transformer transformer = transformerFactory.newTransformer();
 
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(new File(fileName));
+            File file = new File(fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            StreamResult result = new StreamResult(file);
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(source, result);
         } catch (ParserConfigurationException | TransformerException e) {
             logger.error("problems with XML serialization occurred", e);
+            throw new SerializationException(e);
+        } catch (IOException e) {
+            logger.error("problems with creating new file", e);
             throw new SerializationException(e);
         }
     }

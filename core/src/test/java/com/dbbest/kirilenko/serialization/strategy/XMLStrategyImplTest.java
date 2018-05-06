@@ -46,7 +46,7 @@ public class XMLStrategyImplTest {
         Node child1 = new Node("first");
         Node child2 = new Node("second");
         Map<String, String> map = new HashMap<>();
-        map.put("a", "A");
+        map.put("a", "com.dbbest.kirilenko.A");
         map.put("b", "B");
         child1.setAttrs(map);
         root.setValue("value");
