@@ -50,8 +50,8 @@ public class ProgramSettingsViewModel {
         String name = properties.getProperty("project");
         File file = new File(name);
         if (!file.exists()) {
-            File root = new File(properties.getProperty("root"));
-            return root;
+            name = properties.getProperty("root");
+            return new File(name);
         }
         return file;
     }

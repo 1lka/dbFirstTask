@@ -65,15 +65,15 @@ public class ProgramSettings {
             String projectPath = prop.getProperty("project");
             String logPath = prop.getProperty("log");
             String programDefault = prop.getProperty("root");
+
             if (programDefault == null) {
-                programDefault = System.getProperty("user.home") + "\\DbBest";
-                programDefault = decode(programDefault);
+                programDefault = dbDestFolder.getAbsolutePath();
+                programDefault = decode(programDefault).trim();
                 prop.setProperty("root", programDefault);
             }
 
             if (projectPath == null) {
-                projectPath = System.getProperty("user.home") + "\\DbBest";
-                projectPath = decode(projectPath);
+                projectPath = programDefault;
                 prop.setProperty("project", projectPath);
             }
             if (logPath == null) {
@@ -85,7 +85,7 @@ public class ProgramSettings {
 
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
