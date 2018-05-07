@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="interface.jnlp">
+  <information>
+    <title>interface</title>
+    <vendor>Unknown</vendor>
+    <description>interface</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="commons-cli-1.4.jar" size="53820" download="eager" />
+    <jar href="core.jar" size="89545" download="eager" />
+    <jar href="interface.jar" size="48580" download="eager" />
+    <jar href="log4j-1.2.17.jar" size="489884" download="eager" />
+    <jar href="mysql-connector-java-5.1.38.jar" size="983911" download="eager" />
+  </resources>
+  <jfx:javafx-desc  width="600" height="400" main-class="com.dbbest.kirilenko.StartWindow"  name="interface" />
+  <update check="background"/>
+</jnlp>
