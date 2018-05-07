@@ -179,7 +179,7 @@ public class OpenedProjectViewModel {
 
     }
 
-    public void reload() {
+    public synchronized void reload() {
         Node selected = selectedItem.getValue().getValue().getNode();
         selected.getChildren().clear();
         String name = selected.getAttrs().get(GeneralConstants.NAME);
@@ -188,7 +188,7 @@ public class OpenedProjectViewModel {
         fullLoad();
     }
 
-    public void fullLoad() {
+    public synchronized void fullLoad() {
         load(() -> {
             loaderManager.fullLoadElement(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
@@ -198,7 +198,7 @@ public class OpenedProjectViewModel {
         });
     }
 
-    public void lazyLoad() {
+    public synchronized void lazyLoad() {
         load(() -> {
             loaderManager.lazyChildrenLoad(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
@@ -206,7 +206,7 @@ public class OpenedProjectViewModel {
         });
     }
 
-    public void loadElement() {
+    public synchronized void loadElement() {
         load(() -> {
             loaderManager.loadElement(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
@@ -215,7 +215,7 @@ public class OpenedProjectViewModel {
         });
     }
 
-    public void loadAll() {
+    public synchronized void loadAll() {
         load(() -> {
             loaderManager.fullLoadElement(rootItemProperty.getValue().getValue().getNode());
             rootItemProperty.getValue().getValue().update();
@@ -225,11 +225,6 @@ public class OpenedProjectViewModel {
 
     private void load(LoadInterface lambda) {
         treeIsBeenLoading.set(true);
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         new Thread(() -> {
             try {
                 lambda.load();
@@ -381,7 +376,6 @@ public class OpenedProjectViewModel {
         try {
             connect.initConnection(url, login, password);
             loaderManager = new LoaderManager(connect);
-            System.out.println("!!!!!!" + loaderManager);
             loaderManager.setDBName(dbName);
         } catch (SQLException e) {
             throw new WrongCredentialsException("wrong password");

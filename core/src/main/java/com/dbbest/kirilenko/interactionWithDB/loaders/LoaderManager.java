@@ -78,7 +78,7 @@ public class LoaderManager {
         return connect;
     }
 
-    public LoaderManager()  {
+    public LoaderManager() {
         logger.debug("created instance of empty LoaderManeger");
     }
 
@@ -117,8 +117,16 @@ public class LoaderManager {
         if (!Boolean.valueOf(node.getAttrs().get(Loader.FULLY_LOADED))) {
             load((n, l) ->
                     l.fullLoadElement(n), node);
+            markAllFullyLoaded(node);
         }
         return node;
+    }
+
+    private void markAllFullyLoaded(Node node) {
+        node.getAttrs().put(Loader.FULLY_LOADED, String.valueOf(true));
+        node.getAttrs().put(Loader.LAZILY_LOADED, String.valueOf(true));
+        node.getAttrs().put(Loader.ELEMENT_LOADED, String.valueOf(true));
+        node.getChildren().forEach(this::markAllFullyLoaded);
     }
 
     /**
@@ -129,8 +137,11 @@ public class LoaderManager {
      */
     public Node lazyChildrenLoad(Node node) {
         if (!Boolean.valueOf(node.getAttrs().get(Loader.LAZILY_LOADED))) {
-            load((n, l) ->
-                    l.lazyChildrenLoad(n), node);
+            load((n, l) -> {
+                l.lazyChildrenLoad(n);
+                return loadElement(node);
+            }, node);
+            node.getAttrs().put(Loader.LAZILY_LOADED, String.valueOf(true));
         }
         return node;
     }

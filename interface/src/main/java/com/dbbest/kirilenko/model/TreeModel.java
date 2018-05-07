@@ -27,7 +27,7 @@ public class TreeModel {
 
     private ObservableMap<String, String> attrs = FXCollections.observableHashMap();
 
-    private ObservableList<Map.Entry<String, String>> tableElements = FXCollections.observableArrayList();
+    private ObservableList<Map.Entry<String, String>> tableElements;
 
     private ObservableList<TreeModel> children = FXCollections.observableArrayList();
 
@@ -57,6 +57,8 @@ public class TreeModel {
 
     public TreeModel(Node node) {
         this.node = node;
+        tableElements = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+
         attrs.addListener((MapChangeListener<? super String, ? super String>) change -> {
             if (change.wasAdded()) {
                 MyEntry entry = new MyEntry(change.getKey(), change.getValueAdded());

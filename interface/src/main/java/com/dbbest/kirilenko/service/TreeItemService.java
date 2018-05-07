@@ -13,10 +13,14 @@ import java.util.Queue;
 public class TreeItemService {
 
     public static synchronized void createTreeItems(TreeItem<TreeModel> item) {
+        create(item);
+    }
+
+    private static void create(TreeItem<TreeModel> item) {
         item.getChildren().clear();
         for (TreeModel child : item.getValue().getChildren()) {
             TreeItem<TreeModel> treeItem = new TreeItem<>(child);
-            createTreeItems(treeItem);
+            create(treeItem);
             item.getChildren().add(treeItem);
         }
     }

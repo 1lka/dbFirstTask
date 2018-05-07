@@ -114,14 +114,14 @@ public class OpenedProjectView {
 
         viewModel.selectedItemProperty().bind(treeView.getSelectionModel().selectedItemProperty());
 
-        treeView.disableProperty().bind(viewModel.treeIsBeenLoadingProperty());
+        treeView.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
         progress.visibleProperty().bind(treeView.disableProperty());
 
         treeView.addEventHandler(MouseEvent.MOUSE_CLICKED,(e)->{
             if (e.getClickCount() == 2) {
-                viewModel.loadElement();
-                viewModel.lazyLoad();
+                lazyLoad(new ActionEvent());
                 treeView.getSelectionModel().getSelectedItem().setExpanded(true);
+                treeView.refresh();
             }
         });
     }
@@ -146,6 +146,7 @@ public class OpenedProjectView {
     /////////////////////loading
 
     public void lazyLoad(ActionEvent actionEvent) {
+        treeView.disableProperty().set(true);
         if (viewModel.onlineModeProperty().get()) {
             viewModel.lazyLoad();
         } else {
@@ -163,6 +164,8 @@ public class OpenedProjectView {
                 alert.setHeaderText("Wrong credentials");
                 alert.setContentText("wrong credentials");
                 alert.showAndWait();
+            }finally {
+                treeView.disableProperty().set(false);
             }
         }
     }
@@ -185,6 +188,8 @@ public class OpenedProjectView {
                 alert.setHeaderText("Wrong credentials");
                 alert.setContentText("wrong credentials");
                 alert.showAndWait();
+            }finally {
+                treeView.disableProperty().set(false);
             }
         }
     }
@@ -207,6 +212,8 @@ public class OpenedProjectView {
                 alert.setHeaderText("Wrong credentials");
                 alert.setContentText("wrong credentials");
                 alert.showAndWait();
+            }finally {
+                treeView.disableProperty().set(false);
             }
         }
     }
@@ -229,6 +236,8 @@ public class OpenedProjectView {
                 alert.setHeaderText("Wrong credentials");
                 alert.setContentText("wrong credentials");
                 alert.showAndWait();
+            }finally {
+                treeView.disableProperty().set(false);
             }
         }
     }
@@ -251,6 +260,8 @@ public class OpenedProjectView {
                 alert.setHeaderText("Wrong credentials");
                 alert.setContentText("wrong credentials");
                 alert.showAndWait();
+            }finally {
+                treeView.disableProperty().set(false);
             }
         }
     }
