@@ -25,7 +25,11 @@ public class ProgramSettingsViewModel {
 
     public File obtainLogFileName() {
         Properties properties = ProgramSettings.getProp();
-        return new File(properties.getProperty("log").substring(0,properties.getProperty("log").lastIndexOf("\\")));
+        File file = new File(properties.getProperty("log").substring(0, properties.getProperty("log").lastIndexOf("\\")));
+        if (!file.exists()) {
+            file = new File(properties.getProperty("root"));
+        }
+        return file;
     }
 
     public ProgramSettingsViewModel() {
@@ -39,5 +43,16 @@ public class ProgramSettingsViewModel {
         properties.setProperty("project", project.getValue());
         properties.setProperty("log", log.getValue());
         ProgramSettings.updateProperties();
+    }
+
+    public File getDefaultFolder() {
+        Properties properties = ProgramSettings.getProp();
+        String name = properties.getProperty("project");
+        File file = new File(name);
+        if (!file.exists()) {
+            File root = new File(properties.getProperty("root"));
+            return root;
+        }
+        return file;
     }
 }

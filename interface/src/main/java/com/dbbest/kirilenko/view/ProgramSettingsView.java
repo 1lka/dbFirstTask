@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.view;
 
+import com.dbbest.kirilenko.service.ProgramSettings;
 import com.dbbest.kirilenko.viewModel.ProgramSettingsViewModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -42,11 +43,12 @@ public class ProgramSettingsView {
     public void chooseProjectFolder(ActionEvent actionEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Default project path");
-        chooser.setInitialDirectory(new File(projPath.getText()));
+        File file = viewModel.getDefaultFolder();
+        chooser.setInitialDirectory(file);
 
-        File file = chooser.showDialog(settingsStage);
-        if (file != null) {
-            projPath.textProperty().set(file.getAbsolutePath());
+        File file2 = chooser.showDialog(settingsStage);
+        if (file2 != null) {
+            projPath.textProperty().set(file2.getAbsolutePath());
         }
     }
 
