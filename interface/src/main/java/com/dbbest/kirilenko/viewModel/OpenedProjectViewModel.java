@@ -71,8 +71,6 @@ public class OpenedProjectViewModel {
 
     private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
 
-    private BooleanProperty showContext = new SimpleBooleanProperty(true);
-
     public ObjectProperty<TreeItem<TreeModel>> foundItemProperty() {
         return foundItem;
     }
@@ -118,10 +116,6 @@ public class OpenedProjectViewModel {
         return login;
     }
 
-    public DBType getDbType() {
-        return type;
-    }
-
     public OpenedProjectViewModel(String pathToFolder, Connect connect) throws SerializationException {
         if (pathToFolder == null) {
             onlineMode.set(true);
@@ -142,7 +136,7 @@ public class OpenedProjectViewModel {
             Node settingsNode = strategy.deserialize(projectSettings);
 
             TreeItem<TreeModel> rootTreeItem = new TreeItem<>(new TreeModel(root));
-            service.createTreeItems(rootTreeItem);
+            TreeItemService.createTreeItems(rootTreeItem);
             service.restoreExpandedItems(rootTreeItem, settingsNode);
             service.restoreSelectedItem(rootTreeItem, settingsNode, selectedItem);
             selectedTreeModel = selectedItem.getValue().getValue();
@@ -198,7 +192,7 @@ public class OpenedProjectViewModel {
         load(() -> {
             loaderManager.fullLoadElement(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
-            service.createTreeItems(selectedItem.getValue());
+            TreeItemService.createTreeItems(selectedItem.getValue());
             String ddlOfNode = printerManager.printDDL(selectedItem.getValue().getValue().getNode());
             ddl.set(ddlOfNode);
         });
@@ -206,13 +200,9 @@ public class OpenedProjectViewModel {
 
     public void lazyLoad() {
         load(() -> {
-            long start = System.currentTimeMillis();
-
             loaderManager.lazyChildrenLoad(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();
-            service.createTreeItems(selectedItem.getValue());
-            long stop = System.currentTimeMillis();
-            System.out.println("lazy" + (stop - start));
+            TreeItemService.createTreeItems(selectedItem.getValue());
         });
     }
 
@@ -227,24 +217,26 @@ public class OpenedProjectViewModel {
 
     public void loadAll() {
         load(() -> {
-            System.out.println(loaderManager);
             loaderManager.fullLoadElement(rootItemProperty.getValue().getValue().getNode());
             rootItemProperty.getValue().getValue().update();
-            service.createTreeItems(rootItemProperty.getValue());
+            TreeItemService.createTreeItems(rootItemProperty.getValue());
         });
     }
 
     private void load(LoadInterface lambda) {
-            treeIsBeenLoading.set(true);
-            new Thread(() -> {
-                try {
-                    lambda.load();
-                } finally {
-                    Platform.runLater(() -> {
-                        treeIsBeenLoading.set(false);
-                    });
-                }
-            }).start();
+        treeIsBeenLoading.set(true);
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        new Thread(() -> {
+            try {
+                lambda.load();
+            } finally {
+                Platform.runLater(() -> treeIsBeenLoading.set(false));
+            }
+        }).start();
     }
 
     public File getProjectsFolder() {
@@ -274,9 +266,7 @@ public class OpenedProjectViewModel {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 } finally {
-                    Platform.runLater(() -> {
-                        onlineMode.set(false);
-                    });
+                    Platform.runLater(() -> onlineMode.set(false));
                 }
             });
             closer.start();
@@ -287,6 +277,7 @@ public class OpenedProjectViewModel {
     @FunctionalInterface
     private interface LoadInterface {
         void load();
+
     }
 
     ///////////////////////////////
@@ -299,7 +290,7 @@ public class OpenedProjectViewModel {
     }
 
     public void saveProject(File folder) throws SerializationException, IOException {
-        String pathToFolder = folder.getAbsolutePath()  ;
+        String pathToFolder = folder.getAbsolutePath();
 
         Path path = Paths.get(pathToFolder);
         Files.createDirectories(path);

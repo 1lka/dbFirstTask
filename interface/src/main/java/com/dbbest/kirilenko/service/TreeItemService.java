@@ -12,7 +12,7 @@ import java.util.Queue;
 
 public class TreeItemService {
 
-    public void createTreeItems(TreeItem<TreeModel> item) {
+    public static synchronized void createTreeItems(TreeItem<TreeModel> item) {
         item.getChildren().clear();
         for (TreeModel child : item.getValue().getChildren()) {
             TreeItem<TreeModel> treeItem = new TreeItem<>(child);
@@ -21,7 +21,7 @@ public class TreeItemService {
         }
     }
 
-    public void restoreExpandedItems(TreeItem<TreeModel> root, Node settingsNode) {
+    public synchronized void restoreExpandedItems(TreeItem<TreeModel> root, Node settingsNode) {
         List<Node> expandedNodeList = settingsNode.wideSearch("expanded").getChildren();
         List<String> expandedList = new LinkedList<>();
 
@@ -43,7 +43,7 @@ public class TreeItemService {
         });
     }
 
-    public List<TreeItem<TreeModel>> search(TreeItem<TreeModel> root, String param) {
+    public synchronized List<TreeItem<TreeModel>> search(TreeItem<TreeModel> root, String param) {
         List<TreeItem<TreeModel>> found = new ArrayList<>();
 
         Queue<TreeItem<TreeModel>> nodes = new LinkedList<>();
@@ -59,7 +59,7 @@ public class TreeItemService {
         return found;
     }
 
-    public void restoreSelectedItem(TreeItem<TreeModel> root, Node settingsNode, ObjectProperty<TreeItem<TreeModel>> selectedItem) {
+    public synchronized void restoreSelectedItem(TreeItem<TreeModel> root, Node settingsNode, ObjectProperty<TreeItem<TreeModel>> selectedItem) {
         Node selected = settingsNode.wideSearch("selected");
         if (selected != null) {
             String fullName = selected.getAttrs().get("fullName");

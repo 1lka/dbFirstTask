@@ -9,6 +9,7 @@ import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import com.sun.javafx.scene.control.skin.LabeledText;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -91,14 +92,7 @@ public class OpenedProjectView {
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
         attrTable.itemsProperty().bindBidirectional(viewModel.tableProperty());
 
-
         ddlArea.textProperty().bind(viewModel.ddlProperty());
-
-        viewModel.onlineModeProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-
-            }
-        });
 
         viewModel.foundItemProperty().addListener((observable, oldValue, newValue) -> {
             treeView.getSelectionModel().select(newValue);
@@ -111,12 +105,6 @@ public class OpenedProjectView {
 
     private void treeViewInitialize() {
         treeView.rootProperty().bindBidirectional(viewModel.rootItemPropertyProperty());
-
-        treeView.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
-            if (event.getTarget().getClass() != LabeledText.class) {
-                event.consume();
-            }
-        });
 
         if (viewModel.selectedItemProperty().getValue() != null) {
             treeView.getSelectionModel().select(treeView.getRow(viewModel.selectedItemProperty().getValue()));
@@ -133,6 +121,7 @@ public class OpenedProjectView {
             if (e.getClickCount() == 2) {
                 viewModel.loadElement();
                 viewModel.lazyLoad();
+                treeView.getSelectionModel().getSelectedItem().setExpanded(true);
             }
         });
     }
