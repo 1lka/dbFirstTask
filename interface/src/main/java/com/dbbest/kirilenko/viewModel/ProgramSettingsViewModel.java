@@ -3,7 +3,9 @@ package com.dbbest.kirilenko.viewModel;
 import com.dbbest.kirilenko.service.ProgramSettings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -19,6 +21,11 @@ public class ProgramSettingsViewModel {
 
     public StringProperty projectProperty() {
         return project;
+    }
+
+    public File obtainLogFileName() {
+        Properties properties = ProgramSettings.getProp();
+        return new File(properties.getProperty("log").substring(0,properties.getProperty("log").lastIndexOf("\\")));
     }
 
     public ProgramSettingsViewModel() {

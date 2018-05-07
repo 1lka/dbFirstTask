@@ -51,10 +51,14 @@ public class ProgramSettingsView {
     }
 
     public void chooseLogsFile(ActionEvent actionEvent) {
-        DirectoryChooser fileChooser = new DirectoryChooser();
+        FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Logs folder...");
-        fileChooser.setInitialDirectory(new File(logPath.getText()));
-        File file = fileChooser.showDialog(settingsStage);
+        fileChooser.setInitialDirectory(viewModel.obtainLogFileName());
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter filter1 = new FileChooser.ExtensionFilter("Log files (*.log)", "*.log");
+        fileChooser.getExtensionFilters().add(filter);
+        fileChooser.getExtensionFilters().add(filter1);
+        File file = fileChooser.showSaveDialog(settingsStage);
         if (file != null) {
             logPath.textProperty().set(file.getAbsolutePath());
         }
@@ -80,7 +84,7 @@ public class ProgramSettingsView {
         settingsStage.setScene(settingsScene);
 
         settingsStage.initOwner(openedProjectStage);
-        settingsStage.initModality(Modality.APPLICATION_MODAL);
+        settingsStage.initModality(Modality.WINDOW_MODAL);
         settingsStage.showAndWait();
     }
 }

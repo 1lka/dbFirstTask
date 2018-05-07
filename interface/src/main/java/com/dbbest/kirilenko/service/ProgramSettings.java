@@ -4,9 +4,7 @@ import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.serialization.strategy.SerializationStrategy;
 import com.dbbest.kirilenko.serialization.strategy.XMLStrategyImpl;
 import com.dbbest.kirilenko.tree.Node;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -46,8 +44,8 @@ public class ProgramSettings {
             cash = strategy.deserialize(cashConnect.getAbsolutePath());
         } else {
             cashConnect.createNewFile();
-            Node node = new Node("cash");
-            strategy.serialize(node, cashConnect.getAbsolutePath());
+            cash = new Node("cash");
+            strategy.serialize(cash, cashConnect.getAbsolutePath());
         }
 
         config = new File(dbDestFolder, "config.properties");
@@ -56,8 +54,10 @@ public class ProgramSettings {
         }
 
         File logsFolder = new File(dbDestFolder, "logs");
+        File logsFile = new File(logsFolder, "log.txt");
         if (!logsFolder.exists()) {
             logsFolder.mkdir();
+            logsFile.createNewFile();
         }
 
         try (FileReader reader = new FileReader(config)) {
@@ -77,8 +77,7 @@ public class ProgramSettings {
                 prop.setProperty("project", projectPath);
             }
             if (logPath == null) {
-                logPath = System.getProperty("user.home") + "\\DbBest\\logs";
-                logPath = decode(logPath);
+                logPath = decode(logsFile.getAbsolutePath());
                 prop.setProperty("log", logPath);
             }
 
@@ -94,27 +93,31 @@ public class ProgramSettings {
         Charset cset = Charset.forName("UTF-8");
         ByteBuffer buf = cset.encode(s);
         byte[] b = buf.array();
-        String str = new String(b);
-        return str;
+        return new String(b);
     }
 
     public static void updateProperties() throws IOException {
         try (FileWriter writer = new FileWriter(config)) {
             prop.store(writer, null);
         }
+        updateLog4jConfiguration(prop.getProperty("log"));
+    }
 
-        Properties log4jprops = new Properties();
+
+    private static void updateLog4jConfiguration(String logFile) {
+        Properties props = new Properties();
         try {
             InputStream configStream = ProgramSettings.class.getResourceAsStream("/log4j.properties");
-            log4jprops.load(configStream);
+            props.load(configStream);
             configStream.close();
         } catch (IOException e) {
-            System.out.println("Error: Cannot load configuration file");
+            System.out.println("Errornot laod configuration file ");
         }
-        log4jprops.setProperty("log4j.appender.FILE.File", prop.getProperty("log") + "\\out.log");
+        props.setProperty("log4j.appender.FILE.file", logFile);
         LogManager.resetConfiguration();
-        PropertyConfigurator.configure(log4jprops);
+        PropertyConfigurator.configure(props);
     }
+
 
     public static void storeConnect(String url, String db, String login) {
         Node node = new Node("connect");
