@@ -1,7 +1,6 @@
 package com.dbbest.kirilenko.viewModel;
 
 import com.dbbest.kirilenko.exception.WrongCredentialsException;
-import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.exceptions.SerializationException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
@@ -45,8 +44,6 @@ public class OpenedProjectViewModel {
     private LoaderManager loaderManager;
 
     private PrinterManager printerManager;
-
-    private Node settingsNode;
 
     private TreeModel selectedTreeModel;
 
@@ -142,12 +139,13 @@ public class OpenedProjectViewModel {
             String projectSettings = pathToFolder + "\\settings.xml";
 
             Node root = strategy.deserialize(project);
-            settingsNode = strategy.deserialize(projectSettings);
+            Node settingsNode = strategy.deserialize(projectSettings);
 
             TreeItem<TreeModel> rootTreeItem = new TreeItem<>(new TreeModel(root));
             service.createTreeItems(rootTreeItem);
             service.restoreExpandedItems(rootTreeItem, settingsNode);
             service.restoreSelectedItem(rootTreeItem, settingsNode, selectedItem);
+            selectedTreeModel = selectedItem.getValue().getValue();
 
             rootItemProperty.setValue(rootTreeItem);
 
@@ -197,7 +195,6 @@ public class OpenedProjectViewModel {
     }
 
     public void fullLoad() {
-        System.out.println();
         load(() -> {
             loaderManager.fullLoadElement(selectedItem.getValue().getValue().getNode());
             selectedTreeModel.update();

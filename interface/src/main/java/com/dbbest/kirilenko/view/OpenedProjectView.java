@@ -33,6 +33,8 @@ public class OpenedProjectView {
 
     @FXML
     public Menu actionMenu;
+    @FXML
+    public Button searchBtn;
 
     @FXML
     private TableView<Map.Entry<String, String>> attrTable;
@@ -83,6 +85,7 @@ public class OpenedProjectView {
 
         projectMenu.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
         actionMenu.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
+        searchBtn.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
 
         attributeColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         valueColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
@@ -128,6 +131,7 @@ public class OpenedProjectView {
 
         treeView.addEventHandler(MouseEvent.MOUSE_CLICKED,(e)->{
             if (e.getClickCount() == 2) {
+                viewModel.loadElement();
                 viewModel.lazyLoad();
             }
         });
@@ -241,7 +245,25 @@ public class OpenedProjectView {
     }
 
     public void reloadSelected(ActionEvent actionEvent) {
-        viewModel.reload();
+        if (viewModel.onlineModeProperty().get()) {
+            viewModel.reload();
+        } else {
+            ReconnectView reconnectView = new ReconnectView();
+            StringBuilder password = new StringBuilder();
+            try {
+                reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+                viewModel.reconnect(password.toString());
+                viewModel.onlineModeProperty().set(true);
+                viewModel.reload();
+            } catch (IOException | WrongCredentialsException e) {
+                viewModel.onlineModeProperty().set(false);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("Wrong credentials");
+                alert.setContentText("wrong credentials");
+                alert.showAndWait();
+            }
+        }
     }
 
     /////////////////////searching
