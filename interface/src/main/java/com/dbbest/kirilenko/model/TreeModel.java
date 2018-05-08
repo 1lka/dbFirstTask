@@ -17,8 +17,6 @@ public class TreeModel {
 
     private Node node;
 
-    private TreeModel parent;
-
     private BooleanProperty lazyLoaded = new SimpleBooleanProperty();
 
     private BooleanProperty fullyLoaded = new SimpleBooleanProperty();
@@ -37,18 +35,6 @@ public class TreeModel {
 
     public ObservableList<TreeModel> getChildren() {
         return children;
-    }
-
-    public BooleanProperty lazyLoadedProperty() {
-        return lazyLoaded;
-    }
-
-    public BooleanProperty elementLoadedProperty() {
-        return elementLoaded;
-    }
-
-    public BooleanProperty fullyLoadedProperty() {
-        return fullyLoaded;
     }
 
     public Node getNode() {

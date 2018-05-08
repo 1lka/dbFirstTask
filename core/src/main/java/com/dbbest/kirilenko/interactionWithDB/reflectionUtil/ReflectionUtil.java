@@ -1,11 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.reflectionUtil;
 
 import com.dbbest.kirilenko.interactionWithDB.DBType;
-import com.dbbest.kirilenko.interactionWithDB.loaders.EntityLoader;
-import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
-import com.dbbest.kirilenko.interactionWithDB.printers.NodePrinter;
-import com.dbbest.kirilenko.interactionWithDB.printers.Printer;
-import javafx.scene.Parent;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -13,14 +8,11 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.jar.JarInputStream;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class ReflectionUtil {
 
@@ -33,21 +25,19 @@ public class ReflectionUtil {
     private static final String ROOT_PACKAGE_NAME = "com/dbbest";
 
     private static final String FILE_PREFIX = "file:";
+
     private static final String JAR_PATH_SEPARATOR = "!\\";
 
 
     static {
         try {
             classes = findAllClasses();
-            for (Class c : classes) {
-                System.out.println(c.getCanonicalName());
-            }
         } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException("problems with class loading");
+            logger.error(e);
         }
     }
 
-    public static Map obtainMap(DBType type, Class clazz) {
+    public static Map obtainAnnotatedClasses(DBType type, Class clazz) {
         for (Class c : classes) {
             if (PACKAGE_INFO.equals(c.getSimpleName())) {
                 Annotation ann = c.getAnnotation(PackageAnnotation.class);

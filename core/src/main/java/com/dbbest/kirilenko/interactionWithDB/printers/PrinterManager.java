@@ -11,7 +11,7 @@ public class PrinterManager {
     private final Map<String, Printer> printers;
 
     public PrinterManager(DBType type) {
-        printers = ReflectionUtil.obtainMap(type, NodePrinter.class);
+        printers = ReflectionUtil.obtainAnnotatedClasses(type, NodePrinter.class);
     }
 
     public String printDDL(Node node) {

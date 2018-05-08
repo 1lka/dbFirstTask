@@ -3,7 +3,6 @@ package com.dbbest.kirilenko.interactionWithDB.loaders;
 import com.dbbest.kirilenko.exceptions.LoadingException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
-import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.reflectionUtil.ReflectionUtil;
 import com.dbbest.kirilenko.tree.Node;
 import org.apache.log4j.Logger;
@@ -79,7 +78,7 @@ public class LoaderManager {
     }
 
     public LoaderManager() {
-        logger.debug("created instance of empty LoaderManeger");
+        logger.debug("created instance of empty LoaderManager");
     }
 
     public LoaderManager(Connect connect) {
@@ -89,7 +88,7 @@ public class LoaderManager {
         this.login = connect.getLogin();
         this.DBName = connect.getDbName();
         this.connection = connect.getConnection();
-        loaders = ReflectionUtil.obtainMap(type, EntityLoader.class);
+        loaders = ReflectionUtil.obtainAnnotatedClasses(type, EntityLoader.class);
     }
 
     /**
@@ -122,13 +121,6 @@ public class LoaderManager {
         return node;
     }
 
-    private void markAllFullyLoaded(Node node) {
-        node.getAttrs().put(Loader.FULLY_LOADED, String.valueOf(true));
-        node.getAttrs().put(Loader.LAZILY_LOADED, String.valueOf(true));
-        node.getAttrs().put(Loader.ELEMENT_LOADED, String.valueOf(true));
-        node.getChildren().forEach(this::markAllFullyLoaded);
-    }
-
     /**
      * Lazy loads children for given node.
      *
@@ -146,11 +138,11 @@ public class LoaderManager {
         return node;
     }
 
-    private Node load(LoadingInterface lambda, Node node) {
+    private void load(LoadingInterface lambda, Node node) {
         try {
             Loader loader = loaders.get(node.getName());
             loader.setConnection(connection);
-            return lambda.load(node, loader);
+            lambda.load(node, loader);
         } catch (NullPointerException e) {
             throw new LoadingException("can't get loader for " + node.getName() + " node");
         } catch (SQLException e) {
@@ -158,17 +150,15 @@ public class LoaderManager {
         }
     }
 
+    private void markAllFullyLoaded(Node node) {
+        node.getAttrs().put(Loader.FULLY_LOADED, String.valueOf(true));
+        node.getAttrs().put(Loader.LAZILY_LOADED, String.valueOf(true));
+        node.getAttrs().put(Loader.ELEMENT_LOADED, String.valueOf(true));
+        node.getChildren().forEach(this::markAllFullyLoaded);
+    }
+
     @FunctionalInterface
     private interface LoadingInterface {
         Node load(Node node, Loader loader) throws SQLException;
-    }
-
-    @Override
-    public String toString() {
-        try {
-            return "manager connected to " + connection.getMetaData().getURL();
-        } catch (SQLException e) {
-            return "no connection";
-        }
     }
 }

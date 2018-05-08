@@ -19,6 +19,7 @@ import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -33,7 +34,11 @@ import java.util.Map;
 
 public class OpenedProjectViewModel {
 
-    private int connectionTimeout;
+    private final static Logger logger = Logger.getLogger(OpenedProjectViewModel.class);
+
+    private Thread connectionCloser = new Thread();
+
+    private int connectionTimeout = 3000;
 
     private String fullDDL;
 
@@ -117,23 +122,28 @@ public class OpenedProjectViewModel {
     }
 
     public OpenedProjectViewModel(String pathToFolder, Connect connect) throws SerializationException {
-        if (pathToFolder == null) {
-            onlineMode.set(true);
+        onlineMode.addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                updateConnectionCloseTimeout();
+            }
+        });
 
+        if (pathToFolder == null) {
             loaderManager = new LoaderManager(connect);
+            type = connect.getType();
+            login = connect.getLogin();
+            url = connect.getUrl();
             printerManager = new PrinterManager(loaderManager.getType());
             Node rootNode = new Node(GeneralConstants.SCHEMA);
             rootNode.getAttrs().put(GeneralConstants.NAME, loaderManager.getDBName());
             TreeModel root = new TreeModel(rootNode);
             rootItemProperty.set(new TreeItem<>(root));
+            onlineMode.set(true);
         } else {
             this.pathToFolder = pathToFolder;
-            SerializationStrategy strategy = new XMLStrategyImpl();
-            String project = pathToFolder + "\\tree.xml";
-            String projectSettings = pathToFolder + "\\settings.xml";
 
-            Node root = strategy.deserialize(project);
-            Node settingsNode = strategy.deserialize(projectSettings);
+            Node root = deserializeTree();
+            Node settingsNode = deserializeSettings();
 
             TreeItem<TreeModel> rootTreeItem = new TreeItem<>(new TreeModel(root));
             TreeItemService.createTreeItems(rootTreeItem);
@@ -179,6 +189,19 @@ public class OpenedProjectViewModel {
 
     }
 
+    private Node deserializeSettings() throws SerializationException {
+        SerializationStrategy strategy = new XMLStrategyImpl();
+        String projectSettings = pathToFolder + "\\settings.xml";
+        return strategy.deserialize(projectSettings);
+    }
+
+    private Node deserializeTree() throws SerializationException {
+        SerializationStrategy strategy = new XMLStrategyImpl();
+        String project = pathToFolder + "\\tree.xml";
+        return strategy.deserialize(project);
+
+    }
+
     public synchronized void reload() {
         Node selected = selectedItem.getValue().getValue().getNode();
         selected.getChildren().clear();
@@ -191,7 +214,7 @@ public class OpenedProjectViewModel {
     public synchronized void fullLoad() {
         load(() -> {
             loaderManager.fullLoadElement(selectedItem.getValue().getValue().getNode());
-            selectedTreeModel.update();
+            selectedItem.getValue().getValue().update();
             TreeItemService.createTreeItems(selectedItem.getValue());
             String ddlOfNode = printerManager.printDDL(selectedItem.getValue().getValue().getNode());
             ddl.set(ddlOfNode);
@@ -201,7 +224,7 @@ public class OpenedProjectViewModel {
     public synchronized void lazyLoad() {
         load(() -> {
             loaderManager.lazyChildrenLoad(selectedItem.getValue().getValue().getNode());
-            selectedTreeModel.update();
+            selectedItem.getValue().getValue().update();
             TreeItemService.createTreeItems(selectedItem.getValue());
         });
     }
@@ -224,47 +247,50 @@ public class OpenedProjectViewModel {
     }
 
     private void load(LoadInterface lambda) {
-        treeIsBeenLoading.set(true);
-        new Thread(() -> {
+        updateConnectionCloseTimeout();
+        Thread loadingThread = new Thread(() -> {
             try {
                 lambda.load();
             } finally {
                 Platform.runLater(() -> treeIsBeenLoading.set(false));
             }
-        }).start();
+        });
+        loadingThread.setDaemon(true);
+        loadingThread.start();
     }
 
     public File getProjectsFolder() {
-        return new File(ProgramSettings.getProp().getProperty("project"));
+        File file = new File(ProgramSettings.getProp().getProperty("project"));
+        if (!file.exists()) {
+            file = new File(ProgramSettings.getProp().getProperty("root"));
+        }
+        return file;
     }
 
-    private Thread closer = new Thread();
 
     public void updateConnectionCloseTimeout() {
-        if (onlineMode.get()) {
-            closer.interrupt();
+        if (onlineMode.get() && connectionTimeout > 0) {
+            connectionCloser.interrupt();
 
-            closer = new Thread(() -> {
+            connectionCloser = new Thread(() -> {
                 int i = connectionTimeout;
-                while (i > 0) {
-                    System.out.println(i);
-                    try {
-                        Thread.sleep(100);
-                        i--;
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
                 try {
-                    loaderManager.getConnection().close();
-                    System.out.println("connection closed");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } finally {
-                    Platform.runLater(() -> onlineMode.set(false));
+                    while (i > 0) {
+                        Thread.sleep(1000);
+                        i--;
+                    }
+                    try {
+                        Platform.runLater(() -> onlineMode.set(false));
+                        loaderManager.getConnection().close();
+                    } catch (SQLException e) {
+                        logger.error(e);
+                    }
+                } catch (InterruptedException e) {
+                    logger.debug(e);
                 }
             });
-            closer.start();
+            connectionCloser.setDaemon(true);
+            connectionCloser.start();
         }
     }
 
@@ -272,7 +298,6 @@ public class OpenedProjectViewModel {
     @FunctionalInterface
     private interface LoadInterface {
         void load();
-
     }
 
     ///////////////////////////////

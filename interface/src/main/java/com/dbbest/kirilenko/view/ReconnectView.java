@@ -37,7 +37,7 @@ public class ReconnectView {
         n.textProperty().set(dbName);
     }
 
-    public void show(Stage openedProjectStage, String url, String dbName, String login, StringBuilder password) throws IOException {
+    public void show(Stage openedProjectStage, String url, String dbName, String login, StringBuilder password) {
         ReconnectView.password = password;
         ReconnectView.url = url;
         ReconnectView.login = login;
@@ -50,7 +50,12 @@ public class ReconnectView {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/reconnect.fxml"));
 
-        Parent root = fxmlLoader.load();
+        Parent root = null;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         stage.setScene(new Scene(root));
         stage.initModality(Modality.WINDOW_MODAL);

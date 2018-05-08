@@ -10,10 +10,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLDecoder;
 
 public class MainView {
 
@@ -21,8 +21,11 @@ public class MainView {
     private OpenedProjectView openedProjectView;
     private static Stage stage;
 
+    private final static Logger logger = Logger.getLogger(MainView.class);
+
     @FXML
     private void initialize() {
+        logger.info("initializing main view");
         newProjectView = new ConnectView();
         openedProjectView = new OpenedProjectView();
     }
@@ -31,15 +34,22 @@ public class MainView {
         newProjectView.show(actionEvent);
     }
 
-    public void openExistingProject(ActionEvent actionEvent) throws IOException, SerializationException {
+    public void openExistingProject(ActionEvent actionEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("load");
 //        File directory = new File(URLDecoder.decode(ProgramSettings.getProp().getProperty("project"), "UTF-8"));
-        chooser.setInitialDirectory(new File(ProgramSettings.getProp().getProperty("project")));
+        File initialFile = new File(ProgramSettings.getProp().getProperty("project"));
+        if (!initialFile.exists()) {
+            initialFile = new File(ProgramSettings.getProp().getProperty("root"));
+        }
+        chooser.setInitialDirectory(initialFile);
         File file = chooser.showDialog(stage);
-
         if (file != null) {
-            openedProjectView.show(stage, null, file.getAbsolutePath());
+            try {
+                openedProjectView.show(stage, null, file.getAbsolutePath());
+            } catch (IOException|SerializationException e) {
+                logger.error("can't open existing project", e);
+            }
         }
     }
 

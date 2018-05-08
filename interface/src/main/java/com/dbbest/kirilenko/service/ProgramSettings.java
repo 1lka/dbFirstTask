@@ -111,7 +111,7 @@ public class ProgramSettings {
             props.load(configStream);
             configStream.close();
         } catch (IOException e) {
-            System.out.println("Errornot laod configuration file ");
+            System.out.println("Erornot laod configuration file ");
         }
         props.setProperty("log4j.appender.FILE.File", logFile);
         LogManager.resetConfiguration();
