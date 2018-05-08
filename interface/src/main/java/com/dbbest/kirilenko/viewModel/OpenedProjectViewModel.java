@@ -142,6 +142,7 @@ public class OpenedProjectViewModel {
         } else {
             this.pathToFolder = pathToFolder;
 
+
             Node root = deserializeTree();
             Node settingsNode = deserializeSettings();
 

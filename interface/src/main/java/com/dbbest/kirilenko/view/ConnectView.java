@@ -62,15 +62,15 @@ public class ConnectView {
         recentlyUsed.setItems(connectionViewModel.getRecentlyUsed());
         connectionViewModel.selectedConnectModelProperty().bind(recentlyUsed.getSelectionModel().selectedItemProperty());
 
-        progressBar.visibleProperty().bindBidirectional(connectionViewModel.isConnectingProperty());
-
+//        progressBar.visibleProperty().bindBidirectional(connectionViewModel.isConnectingProperty());
+        progressBar.setVisible(false);
         choiceBox.setItems(connectionViewModel.getChoicesList());
         choiceBox.getSelectionModel().select(0);
+
     }
 
     public void connect(ActionEvent actionEvent) throws IOException {
         try {
-
             Connect connect = connectionViewModel.connect(choiceBox.getSelectionModel().getSelectedItem());
             OpenedProjectView openedProject = new OpenedProjectView();
             openedProject.show(owner, connect, null);

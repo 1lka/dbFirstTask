@@ -118,13 +118,18 @@ public class OpenedProjectView {
 
         treeView.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
 
+        viewModel.treeIsBeenLoadingProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                treeView.refresh();
+            }
+        });
+
         progress.visibleProperty().bind(treeView.disableProperty());
 
         treeView.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
             if (e.getClickCount() == 2) {
                 lazyLoad(new ActionEvent());
                 treeView.getSelectionModel().getSelectedItem().setExpanded(true);
-                treeView.refresh();
             }
         });
     }
@@ -188,9 +193,10 @@ public class OpenedProjectView {
                 reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
                 viewModel.reconnect(password.toString());
                 viewModel.onlineModeProperty().set(true);
+                logger.info("reconnected successfully");
                 runnable.run();
             } catch (WrongCredentialsException e) {
-                logger.debug("wrong credentials", e);
+                logger.debug("wrong credentials");
                 viewModel.onlineModeProperty().set(false);
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Warning");
@@ -317,13 +323,9 @@ public class OpenedProjectView {
     }
 
     // todo create normal HELP view
-    public void showHelp(ActionEvent actionEvent) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Help");
-        alert.setHeaderText(null);
-        alert.setContentText("there will be a text about the program");
-
-        alert.showAndWait();
+    public void showHelp(ActionEvent actionEvent) throws IOException {
+        HelpView helpView = new HelpView();
+        helpView.show(openedProjectStage);
     }
 
     public void showProjectOptions(ActionEvent actionEvent) throws IOException {
@@ -339,7 +341,7 @@ public class OpenedProjectView {
                 viewModel.updateConnectionCloseTimeout();
             }
         } catch (NumberFormatException e) {
-
+            logger.info("wrong timeout value", e);
         }
     }
 

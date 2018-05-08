@@ -33,7 +33,8 @@ public class ReflectionUtil {
         try {
             classes = findAllClasses();
         } catch (ClassNotFoundException | IOException e) {
-            logger.error(e);
+            logger.error("classes not found", e);
+            throw new RuntimeException("classes not found", e);
         }
     }
 
