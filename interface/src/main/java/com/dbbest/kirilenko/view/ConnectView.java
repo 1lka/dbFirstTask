@@ -13,16 +13,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 public class ConnectView {
+
+    private final static Logger logger = Logger.getLogger(ConnectView.class);
 
     @FXML
     public ChoiceBox<DBType> choiceBox;
@@ -32,6 +32,9 @@ public class ConnectView {
 
     @FXML
     public ChoiceBox<ConnectModel> recentlyUsed;
+
+    @FXML
+    public Button btnConnect;
 
     @FXML
     private TextField url;
@@ -53,6 +56,7 @@ public class ConnectView {
 
     @FXML
     private void initialize() {
+        logger.info("initializing connection window");
         connectionViewModel = new ConnectionViewModel();
         connectionViewModel.urlProperty().bindBidirectional(url.textProperty());
         connectionViewModel.dbNameProperty().bindBidirectional(dbName.textProperty());
@@ -62,31 +66,52 @@ public class ConnectView {
         recentlyUsed.setItems(connectionViewModel.getRecentlyUsed());
         connectionViewModel.selectedConnectModelProperty().bind(recentlyUsed.getSelectionModel().selectedItemProperty());
 
-//        progressBar.visibleProperty().bindBidirectional(connectionViewModel.isConnectingProperty());
         progressBar.setVisible(false);
         choiceBox.setItems(connectionViewModel.getChoicesList());
         choiceBox.getSelectionModel().select(0);
 
+        logger.info("connection window initialized");
     }
 
-    public void connect(ActionEvent actionEvent) throws IOException {
-        try {
-            Connect connect = connectionViewModel.connect(choiceBox.getSelectionModel().getSelectedItem());
-            OpenedProjectView openedProject = new OpenedProjectView();
-            openedProject.show(owner, connect, null);
-            stage.hide();
-            if (openedProjectStage != null) {
-                openedProjectStage.close();
+    public void connect(ActionEvent actionEvent) {
+        logger.info("trying to connect ...");
+        Thread connectionThread = new Thread(() -> {
+            try {
+                Connect connect = connectionViewModel.connect(choiceBox.getSelectionModel().getSelectedItem());
+                logger.info("connected");
+                OpenedProjectView openedProject = new OpenedProjectView();
+                Platform.runLater(() -> {
+                    try {
+                        logger.info("opening project window");
+                        openedProject.show(owner, connect, null);
+                        stage.hide();
+                        if (openedProjectStage != null) {
+                            openedProjectStage.close();
+                        }
+                    } catch (IOException | SerializationException e) {
+                        logger.info("problems with opening project window", e);
+                    } finally {
+                        progressBar.setVisible(false);
+                        btnConnect.setDisable(false);
+                    }
+                });
+            } catch (WrongCredentialsException e) {
+                Platform.runLater(() -> {
+                    progressBar.setVisible(false);
+                    btnConnect.setDisable(false);
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setHeaderText("Wrong credentials");
+                    alert.setContentText("wrong credentials");
+                    alert.showAndWait();
+                });
             }
-        } catch (WrongCredentialsException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText("Wrong credentials");
-            alert.setContentText("wrong credentials");
-            alert.showAndWait();
-        } catch (SerializationException e) {
-            e.printStackTrace();
-        }
+        });
+        progressBar.setVisible(true);
+        btnConnect.setDisable(true);
+
+        logger.info("starting connection thread");
+        connectionThread.start();
     }
 
     public void show(ActionEvent actionEvent) throws IOException {

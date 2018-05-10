@@ -13,11 +13,14 @@ import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 
 public class ConnectionViewModel {
+
+    private final static Logger logger = Logger.getLogger(ConnectionViewModel.class);
 
     private StringProperty url = new SimpleStringProperty();
     private BooleanProperty isConnecting = new SimpleBooleanProperty();
@@ -97,16 +100,13 @@ public class ConnectionViewModel {
 
     public Connect connect(DBType selectedItem) throws WrongCredentialsException {
         Connect connect = ConnectFactory.getConnect(selectedItem);
-        isConnecting.set(true);
-
         try {
             connect.initConnection(url.get(), login.get(), password.get());
             connect.setDbName(dbName.get());
             ProgramSettings.storeConnect(url.get(), dbName.get(), login.get());
         } catch (SQLException e) {
+            logger.info("error while trying to connect to " + url.get(), e);
             throw new WrongCredentialsException("wrong pass");
-        } finally {
-            isConnecting.set(false);
         }
         return connect;
     }

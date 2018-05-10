@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -17,6 +19,10 @@ public class ReconnectView {
 
     @FXML
     public TextField pass;
+    @FXML
+    public ProgressBar progress;
+    @FXML
+    public Button reconnectBtn;
     @FXML
     private TextField u;
     @FXML

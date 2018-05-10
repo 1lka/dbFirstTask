@@ -295,7 +295,6 @@ public class OpenedProjectViewModel {
         }
     }
 
-
     @FunctionalInterface
     private interface LoadInterface {
         void load();

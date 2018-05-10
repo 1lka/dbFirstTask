@@ -6,6 +6,7 @@ import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.model.TreeModel;
 import com.dbbest.kirilenko.service.ProgramSettings;
 import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -189,23 +190,34 @@ public class OpenedProjectView {
             logger.info("reconnect is needed");
             ReconnectView reconnectView = new ReconnectView();
             StringBuilder password = new StringBuilder();
-            try {
-                reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
-                viewModel.reconnect(password.toString());
-                viewModel.onlineModeProperty().set(true);
-                logger.info("reconnected successfully");
-                runnable.run();
-            } catch (WrongCredentialsException e) {
-                logger.debug("wrong credentials");
-                viewModel.onlineModeProperty().set(false);
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Warning");
-                alert.setHeaderText("Wrong credentials");
-                alert.setContentText("wrong credentials");
-                alert.showAndWait();
-            } finally {
-                treeView.disableProperty().set(false);
-            }
+
+            reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+            logger.info("reconnect view is closed");
+            Thread thread = new Thread(() -> {
+                try {
+                    viewModel.reconnect(password.toString());
+                    viewModel.onlineModeProperty().set(true);
+                    runnable.run();
+                    logger.info("reconnected successfully");
+                } catch (WrongCredentialsException e) {
+                    Platform.runLater(() -> {
+                        logger.debug("wrong credentials");
+                        viewModel.onlineModeProperty().set(false);
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Warning");
+                        alert.setHeaderText("Wrong credentials");
+                        alert.setContentText("wrong credentials");
+                        alert.showAndWait();
+                    });
+                } finally {
+                    Platform.runLater(()->{
+                        treeView.disableProperty().set(false);
+                    });
+                }
+            });
+            thread.start();
+
+
         }
     }
 
@@ -266,10 +278,10 @@ public class OpenedProjectView {
 
         if (file != null) {
             try {
-                OpenedProjectViewModel vm = new OpenedProjectViewModel(file.getAbsolutePath(),null);
+                OpenedProjectViewModel vm = new OpenedProjectViewModel(file.getAbsolutePath(), null);
                 openedProjectStage.close();
                 this.show(mainViewStage, null, file.getAbsolutePath());
-            } catch (IOException|SerializationException e) {
+            } catch (IOException | SerializationException e) {
                 logger.error("problem with saved project opening:", e);
             }
         }
