@@ -6,6 +6,7 @@ import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
 import com.dbbest.kirilenko.model.TreeModel;

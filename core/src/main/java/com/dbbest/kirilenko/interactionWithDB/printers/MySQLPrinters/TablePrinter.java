@@ -40,7 +40,9 @@ public class TablePrinter extends Printer {
                     .append(pKeys)
                     .append(System.lineSeparator())
                     .append(indexes)
-                    .append(fKeys);
+                    .append(fKeys)
+                    .append(System.lineSeparator())
+                    .append(triggers);
         }
 
         int last = sb.lastIndexOf(",");
@@ -53,9 +55,7 @@ public class TablePrinter extends Printer {
                     .append(attrs.get(MySQLConstants.AttributeName.ENGINE))
                     .append(" DEFAULT COLLATE=")
                     .append(attrs.get(MySQLConstants.AttributeName.TABLE_COLLATION))
-                    .append(MySQLConstants.Delimiters.SEMICOLON)
-                    .append(System.lineSeparator())
-                    .append(triggers);
+                    .append(MySQLConstants.Delimiters.SEMICOLON);
         } else {
             sb.append(");");
         }
