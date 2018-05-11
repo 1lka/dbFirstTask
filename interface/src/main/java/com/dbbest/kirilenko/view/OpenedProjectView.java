@@ -95,6 +95,16 @@ public class OpenedProjectView {
         logger.info("initializing opened project View");
         mainViewStage.hide();
         openedProjectStage.setOnCloseRequest(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Save project Dialog");
+            alert.setHeaderText("You didn't save your project");
+            alert.setContentText("Do you want to save it?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                saveCurrentProject(null);
+            } else {
+            }
             mainViewStage.show();
         });
 
@@ -282,11 +292,31 @@ public class OpenedProjectView {
     }
 
     public void closeCurrentProject(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Save project Dialog");
+        alert.setHeaderText("You didn't save your project");
+        alert.setContentText("Do you want to save it?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            saveCurrentProject(null);
+        } else {
+        }
         openedProjectStage.close();
         mainViewStage.show();
     }
 
     public void openProject(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Save project Dialog");
+        alert.setHeaderText("You didn't save your project");
+        alert.setContentText("Do you want to save it?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            saveCurrentProject(null);
+        } else {
+        }
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("load");
         File folder = viewModel.getProjectsFolder();
@@ -306,6 +336,16 @@ public class OpenedProjectView {
     }
 
     public void createNewProject(ActionEvent actionEvent) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Save project Dialog");
+        alert.setHeaderText("You didn't save your project");
+        alert.setContentText("Do you want to save it?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            saveCurrentProject(null);
+        } else {
+        }
         ConnectView connectView = new ConnectView();
         connectView.openConnectWindow(mainViewStage, openedProjectStage);
     }
