@@ -15,9 +15,18 @@ public abstract class Connect {
     private DBType type;
 
     private String dbName;
+    private String port;
     private String url;
     private String login;
     private String password;
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
 
     public DBType getType() {
         return type;
@@ -75,8 +84,9 @@ public abstract class Connect {
      * @param password DB password
      * @throws SQLException if credentials are invalid
      */
-    public void initConnection(String dbURL, String login, String password) throws SQLException {
+    public void initConnection(String dbURL, String port, String login, String password) throws SQLException {
         this.url = dbURL;
+        this.port = port;
         this.login = login;
         this.password = password;
     }

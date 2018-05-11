@@ -32,6 +32,7 @@ public class ReflectionUtil {
     static {
         try {
             classes = findAllClasses();
+            logger.debug("found " + classes.size() + " classes");
         } catch (ClassNotFoundException | IOException e) {
             logger.error("classes not found", e);
             throw new RuntimeException("classes not found", e);
@@ -112,8 +113,6 @@ public class ReflectionUtil {
 
     private static boolean isJar(File file) {
         String directory = file.getPath();
-        boolean f = directory.startsWith(FILE_PREFIX);
-        boolean s = directory.contains(JAR_PATH_SEPARATOR);
         return directory.startsWith(FILE_PREFIX) && directory.contains(JAR_PATH_SEPARATOR);
     }
 

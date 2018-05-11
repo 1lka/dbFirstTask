@@ -37,6 +37,9 @@ public class ConnectView {
     public Button btnConnect;
 
     @FXML
+    public TextField port;
+
+    @FXML
     private TextField url;
 
     @FXML
@@ -62,6 +65,8 @@ public class ConnectView {
         connectionViewModel.dbNameProperty().bindBidirectional(dbName.textProperty());
         connectionViewModel.loginProperty().bindBidirectional(login.textProperty());
         connectionViewModel.passwordProperty().bindBidirectional(password.textProperty());
+        connectionViewModel.portProperty().bindBidirectional(port.textProperty());
+
 
         recentlyUsed.setItems(connectionViewModel.getRecentlyUsed());
         connectionViewModel.selectedConnectModelProperty().bind(recentlyUsed.getSelectionModel().selectedItemProperty());
@@ -75,6 +80,15 @@ public class ConnectView {
 
     public void connect(ActionEvent actionEvent) {
         logger.info("trying to connect ...");
+
+        try {
+            int portInt = Integer.parseInt(port.textProperty().get());
+            port.getStyleClass().remove("error");
+        } catch (Exception e) {
+            port.getStyleClass().add("error");
+            return;
+        }
+
         Thread connectionThread = new Thread(() -> {
             try {
                 Connect connect = connectionViewModel.connect(choiceBox.getSelectionModel().getSelectedItem());
@@ -126,7 +140,11 @@ public class ConnectView {
         fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
         Parent root = fxmlLoader.load();
 
-        stage.setScene(new Scene(root));
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getClassLoader().getResource("css/error.css").toString());
+
+        stage.setScene(scene);
         stage.initModality(Modality.WINDOW_MODAL);
 
         Node source = (Node) actionEvent.getSource();
@@ -148,7 +166,11 @@ public class ConnectView {
         fxmlLoader.setLocation(getClass().getClassLoader().getResource("fxml/newProject.fxml"));
         Parent root = fxmlLoader.load();
 
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getClassLoader().getResource("css/error.css").toString());
+
+
+        stage.setScene(scene);
         stage.initModality(Modality.WINDOW_MODAL);
 
         stage.initOwner(openedProjectStage);

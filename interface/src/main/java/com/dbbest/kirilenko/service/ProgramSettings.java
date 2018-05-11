@@ -111,7 +111,7 @@ public class ProgramSettings {
             props.load(configStream);
             configStream.close();
         } catch (IOException e) {
-            System.out.println("Erornot laod configuration file ");
+            System.out.println("Errornot laod configuration file ");
         }
         props.setProperty("log4j.appender.FILE.File", logFile);
         LogManager.resetConfiguration();
@@ -119,10 +119,11 @@ public class ProgramSettings {
     }
 
 
-    public static void storeConnect(String url, String db, String login) {
+    public static void storeConnect(String url,String port, String db, String login) {
         Node node = new Node("connect");
         node.setParent(cash);
         node.getAttrs().put("url", url);
+        node.getAttrs().put("port", port);
         node.getAttrs().put("db", db);
         node.getAttrs().put("login", login);
         SerializationStrategy strategy = new XMLStrategyImpl();

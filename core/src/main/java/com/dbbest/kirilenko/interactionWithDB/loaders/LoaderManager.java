@@ -21,6 +21,8 @@ public class LoaderManager {
 
     private String url;
 
+    private String port;
+
     private String login;
 
     private Connection connection;
@@ -28,6 +30,14 @@ public class LoaderManager {
     private Map<String, Loader> loaders;
 
     private Connect connect;
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
 
     public String getUrl() {
         return url;
@@ -85,6 +95,7 @@ public class LoaderManager {
         this.connect = connect;
         this.type = connect.getType();
         this.url = connect.getUrl();
+        this.port = connect.getPort();
         this.login = connect.getLogin();
         this.DBName = connect.getDbName();
         this.connection = connect.getConnection();

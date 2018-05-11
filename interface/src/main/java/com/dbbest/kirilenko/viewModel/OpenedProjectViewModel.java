@@ -105,9 +105,14 @@ public class OpenedProjectViewModel {
     }
 
     private String url;
+    private String port;
     private String dbName;
     private String login;
     private DBType type;
+
+    public String getPort() {
+        return port;
+    }
 
     public String getUrl() {
         return url;
@@ -133,6 +138,7 @@ public class OpenedProjectViewModel {
             type = connect.getType();
             login = connect.getLogin();
             url = connect.getUrl();
+            port = connect.getPort();
             printerManager = new PrinterManager(loaderManager.getType());
             Node rootNode = new Node(GeneralConstants.SCHEMA);
             rootNode.getAttrs().put(GeneralConstants.NAME, loaderManager.getDBName());
@@ -161,9 +167,11 @@ public class OpenedProjectViewModel {
             loaderManager.setDBName(settingsNode.getAttrs().get("dbName"));
             loaderManager.setLogin(settingsNode.getAttrs().get("login"));
             loaderManager.setUrl(settingsNode.getAttrs().get("url"));
+            loaderManager.setPort(settingsNode.getAttrs().get("port"));
             printerManager = new PrinterManager(type);
         }
         this.url = loaderManager.getUrl();
+        this.port = loaderManager.getPort();
         this.dbName = loaderManager.getDBName();
         this.login = loaderManager.getLogin();
 
@@ -338,6 +346,7 @@ public class OpenedProjectViewModel {
 
         projectSettings.getAttrs().put("dbType", String.valueOf(loaderManager.getType()));
         projectSettings.getAttrs().put("url", loaderManager.getUrl());
+        projectSettings.getAttrs().put("port", loaderManager.getPort());
         projectSettings.getAttrs().put("dbName", loaderManager.getDBName());
         projectSettings.getAttrs().put("login", loaderManager.getLogin());
 
@@ -399,7 +408,7 @@ public class OpenedProjectViewModel {
     public void reconnect(String password) throws WrongCredentialsException {
         Connect connect = ConnectFactory.getConnect(type);
         try {
-            connect.initConnection(url, login, password);
+            connect.initConnection(url, port, login, password);
             loaderManager = new LoaderManager(connect);
             loaderManager.setDBName(dbName);
         } catch (SQLException e) {

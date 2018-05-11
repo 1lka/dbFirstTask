@@ -23,11 +23,16 @@ public class ConnectionViewModel {
     private final static Logger logger = Logger.getLogger(ConnectionViewModel.class);
 
     private StringProperty url = new SimpleStringProperty();
+    private StringProperty port = new SimpleStringProperty();
     private BooleanProperty isConnecting = new SimpleBooleanProperty();
     private StringProperty dbName = new SimpleStringProperty();
     private StringProperty login = new SimpleStringProperty();
     private StringProperty password = new SimpleStringProperty();
     private ObservableList<DBType> choicesList = FXCollections.observableList(Arrays.asList(DBType.values()));
+
+    public StringProperty portProperty() {
+        return port;
+    }
 
     private ObservableList<ConnectModel> recentlyUsed = FXCollections.observableArrayList();
 
@@ -35,36 +40,16 @@ public class ConnectionViewModel {
         return recentlyUsed;
     }
 
-    public BooleanProperty isConnectingProperty() {
-        return isConnecting;
-    }
-
-    public String getUrl() {
-        return url.get();
-    }
-
     public StringProperty urlProperty() {
         return url;
-    }
-
-    public String getLogin() {
-        return login.get();
     }
 
     public StringProperty loginProperty() {
         return login;
     }
 
-    public String getPassword() {
-        return password.get();
-    }
-
     public StringProperty passwordProperty() {
         return password;
-    }
-
-    public String getDbName() {
-        return dbName.get();
     }
 
     public ObservableList<DBType> getChoicesList() {
@@ -81,13 +66,14 @@ public class ConnectionViewModel {
         Node cash = ProgramSettings.getCash();
         try {
             for (Node n : cash.getChildren()) {
-                recentlyUsed.add(new ConnectModel(n.getAttrs().get("url"), n.getAttrs().get("db"), n.getAttrs().get("login")));
+                recentlyUsed.add(new ConnectModel(n.getAttrs().get("url"),n.getAttrs().get("port"), n.getAttrs().get("db"), n.getAttrs().get("login")));
             }
         } catch (NullPointerException ignored) {
         }
 
         selectedConnectModel.addListener((observable, oldValue, newValue) -> {
             url.set(newValue.getUrl());
+            port.set(newValue.getPort());
             dbName.set(newValue.getDb());
             login.set(newValue.getLogin());
         });
@@ -101,9 +87,9 @@ public class ConnectionViewModel {
     public Connect connect(DBType selectedItem) throws WrongCredentialsException {
         Connect connect = ConnectFactory.getConnect(selectedItem);
         try {
-            connect.initConnection(url.get(), login.get(), password.get());
+            connect.initConnection(url.get(), port.get(), login.get(), password.get());
             connect.setDbName(dbName.get());
-            ProgramSettings.storeConnect(url.get(), dbName.get(), login.get());
+            ProgramSettings.storeConnect(url.get(), port.get(), dbName.get(), login.get());
         } catch (SQLException e) {
             logger.info("error while trying to connect to " + url.get(), e);
             throw new WrongCredentialsException("wrong pass");

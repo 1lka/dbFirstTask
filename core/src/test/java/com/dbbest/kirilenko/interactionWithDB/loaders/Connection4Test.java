@@ -15,14 +15,14 @@ public class Connection4Test {
         return connection;
     }
 
-    private final static String url = "jdbc:mysql://localhost/?useSSL=false";
+    private final static String url = "jdbc:mysql://localhost";
     private final static String login = "root";
     private final static String pass = "root";
 
     static {
         Connect connect = new MySQLConnect();
         try {
-            connect.initConnection(url, login, pass);
+            connect.initConnection(url,"3306", login, pass);
         } catch (SQLException e) {
             throw new RuntimeException();
         }

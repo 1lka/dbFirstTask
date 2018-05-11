@@ -191,12 +191,13 @@ public class OpenedProjectView {
             ReconnectView reconnectView = new ReconnectView();
             StringBuilder password = new StringBuilder();
 
-            reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getDbName(), viewModel.getLogin(), password);
+            reconnectView.show(openedProjectStage, viewModel.getUrl(),viewModel.getPort(), viewModel.getDbName(), viewModel.getLogin(), password);
             logger.info("reconnect view is closed");
             Thread thread = new Thread(() -> {
                 try {
                     viewModel.reconnect(password.toString());
                     viewModel.onlineModeProperty().set(true);
+                    runnable.run();
                     runnable.run();
                     logger.info("reconnected successfully");
                 } catch (WrongCredentialsException e) {

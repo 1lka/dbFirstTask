@@ -18,9 +18,10 @@ import java.util.Map;
 
 public class TestDB {
 
-    public static void main(String[] args) throws SerializationException, SQLException {
+    public static void main(String[] args) throws SQLException {
         DBType type = DBType.MYSQL;
-        String url = "jdbc:mysql://localhost/?useSSL=false";
+        String url = "jdbc:mysql://localhost";
+        String port = "3306";
         String login = "root";
         String pass = "root";
 
@@ -31,7 +32,7 @@ public class TestDB {
         root.setAttrs(attrs);
 
         Connect connect = ConnectFactory.getConnect(type);
-        connect.initConnection(url,login,pass);
+        connect.initConnection(url,port,login,pass);
         LoaderManager manager = new LoaderManager(connect);
         manager.lazyChildrenLoad(root);
         System.out.println(root + "\n");

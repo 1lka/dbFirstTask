@@ -26,11 +26,14 @@ public class ReconnectView {
     @FXML
     private TextField u;
     @FXML
+    private TextField p;
+    @FXML
     private TextField n;
     @FXML
     private TextField l;
 
     private static String url;
+    private static String port;
     private static String login;
     private static String dbName;
     private static StringBuilder password;
@@ -39,13 +42,15 @@ public class ReconnectView {
     @FXML
     private void initialize() {
         u.textProperty().set(url);
+        p.textProperty().set(port);
         l.textProperty().set(login);
         n.textProperty().set(dbName);
     }
 
-    public void show(Stage openedProjectStage, String url, String dbName, String login, StringBuilder password) {
+    public void show(Stage openedProjectStage, String url,String port, String dbName, String login, StringBuilder password) {
         ReconnectView.password = password;
         ReconnectView.url = url;
+        ReconnectView.port = port;
         ReconnectView.login = login;
         ReconnectView.dbName = dbName;
 
