@@ -12,7 +12,7 @@ public class HelpView {
 
     public void show(Stage owner) throws IOException {
         Stage stage = new Stage();
-        stage.setTitle("HELP");
+        stage.setTitle("About");
         stage.setResizable(false);
 
         FXMLLoader fxmlLoader = new FXMLLoader();

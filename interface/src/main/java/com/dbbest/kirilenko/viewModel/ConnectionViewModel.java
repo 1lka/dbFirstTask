@@ -4,13 +4,12 @@ import com.dbbest.kirilenko.exception.WrongCredentialsException;
 import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
-import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.model.ConnectModel;
 import com.dbbest.kirilenko.service.ProgramSettings;
 import com.dbbest.kirilenko.tree.Node;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.log4j.Logger;
@@ -22,9 +21,10 @@ public class ConnectionViewModel {
 
     private final static Logger logger = Logger.getLogger(ConnectionViewModel.class);
 
+    private BooleanProperty showButton = new SimpleBooleanProperty();
+
     private StringProperty url = new SimpleStringProperty();
     private StringProperty port = new SimpleStringProperty();
-    private BooleanProperty isConnecting = new SimpleBooleanProperty();
     private StringProperty dbName = new SimpleStringProperty();
     private StringProperty login = new SimpleStringProperty();
     private StringProperty password = new SimpleStringProperty();
@@ -77,6 +77,12 @@ public class ConnectionViewModel {
             dbName.set(newValue.getDb());
             login.set(newValue.getLogin());
         });
+        BooleanProperty u = new SimpleBooleanProperty();
+        url.addListener((observable, oldValue, newValue) -> {
+
+        });
+//        BooleanBinding binding =
+
 
     }
 

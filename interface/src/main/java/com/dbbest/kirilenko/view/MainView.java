@@ -37,7 +37,6 @@ public class MainView {
     public void openExistingProject(ActionEvent actionEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("load");
-//        File directory = new File(URLDecoder.decode(ProgramSettings.getProp().getProperty("project"), "UTF-8"));
         File initialFile = new File(ProgramSettings.getProp().getProperty("project"));
         if (!initialFile.exists()) {
             initialFile = new File(ProgramSettings.getProp().getProperty("root"));

@@ -67,7 +67,7 @@
             </HBox>
             <HBox prefHeight="30.0" prefWidth="200.0">
                <children>
-                  <Label prefWidth="100.0" text="login:">
+                  <Label prefWidth="100.0" text="Login:">
                      <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
@@ -84,7 +84,7 @@
             </HBox>
             <HBox prefHeight="30.0" prefWidth="200.0">
                <children>
-                  <Label prefWidth="100.0" text="password:">
+                  <Label prefWidth="100.0" text="Password:">
                      <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
@@ -101,7 +101,7 @@
             </HBox>
             <AnchorPane prefHeight="30.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="reconnectBtn" layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#reconnect" prefHeight="27.0" prefWidth="260.0" text="reconnect" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                  <Button fx:id="reconnectBtn" layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#reconnect" prefHeight="27.0" prefWidth="260.0" text="Connect" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>

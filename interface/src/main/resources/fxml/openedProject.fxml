@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
@@ -9,34 +10,38 @@
     <children>
         <MenuBar fx:id="menuBar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <menus>
-                <Menu fx:id="projectMenu" mnemonicParsing="false" text="Project">
+                <Menu fx:id="projectMenu" mnemonicParsing="false" text="File">
                     <items>
+                  <MenuItem fx:id="reconnectMenuItem" mnemonicParsing="false" onAction="#reconnect" text="Reconnect" />
+                        <MenuItem mnemonicParsing="false" onAction="#createNewProject" text="New project">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open" />
                         <MenuItem mnemonicParsing="false" onAction="#saveCurrentProject" text="Save" />
                         <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#saveProjectAs" text="Save As ..." />
-                        <MenuItem mnemonicParsing="false" onAction="#closeCurrentProject" text="Close" />
-                        <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open" />
-                        <MenuItem mnemonicParsing="false" onAction="#createNewProject" text="Create new" />
+                        <MenuItem mnemonicParsing="false" onAction="#closeCurrentProject" text="Close project" />
                   <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit" />
                     </items>
                 </Menu>
                 <Menu fx:id="actionMenu" mnemonicParsing="false" text="Action">
                     <items>
-                        <MenuItem fx:id="generateFullddlMenu" mnemonicParsing="false" onAction="#generateFullDDl" text="generate full ddl" />
-                        <MenuItem fx:id="fullLoadMenu" mnemonicParsing="false" onAction="#fullLoad" text="full load" />
-                        <MenuItem mnemonicParsing="false" onAction="#loadElement" text="load element" />
-                        <MenuItem mnemonicParsing="false" onAction="#fullLoad" text="load all subtree" />
-                        <MenuItem mnemonicParsing="false" onAction="#reloadSelected" text="reload item" />
+                        <MenuItem fx:id="generateFullddlMenu" mnemonicParsing="false" onAction="#generateFullDDl" text="Generate full ddl" />
+                        <MenuItem fx:id="fullLoadMenu" mnemonicParsing="false" onAction="#fullLoad" text="Full load" />
+                        <MenuItem mnemonicParsing="false" onAction="#loadElement" text="Load element" />
+                        <MenuItem mnemonicParsing="false" onAction="#fullLoad" text="Load all subtree" />
+                        <MenuItem mnemonicParsing="false" onAction="#reloadSelected" text="Reload item" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Settings">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#showProjectOptions" text="Project settings" />
+                        <MenuItem mnemonicParsing="false" onAction="#showGeneralOptions" text="General settings" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#showHelp" text="About" />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Options">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#showProjectOptions" text="Project options" />
-                        <MenuItem mnemonicParsing="false" onAction="#showGeneralOptions" text="General options" />
                     </items>
                 </Menu>
             </menus>
@@ -54,11 +59,11 @@
                                     <contextMenu>
                                         <ContextMenu fx:id="contextMenu">
                                             <items>
-                                                <MenuItem fx:id="generateFullddlMenu2" mnemonicParsing="false" onAction="#generateFullDDl" text="generate full ddl" />
-                                                <MenuItem fx:id="fullLoadMenu2" mnemonicParsing="false" onAction="#fullLoad" text="full load" />
-                                                <MenuItem mnemonicParsing="false" onAction="#loadElement" text="load element" />
-                                                <MenuItem mnemonicParsing="false" onAction="#fullLoad" text="load all subtree" />
-                                                <MenuItem mnemonicParsing="false" onAction="#reloadSelected" text="reload item" />
+                                                <MenuItem fx:id="generateFullddlMenu2" mnemonicParsing="false" onAction="#generateFullDDl" text="Generate full ddl" />
+                                                <MenuItem fx:id="fullLoadMenu2" mnemonicParsing="false" onAction="#fullLoad" text="Full load" />
+                                                <MenuItem mnemonicParsing="false" onAction="#loadElement" text="Load element" />
+                                                <MenuItem mnemonicParsing="false" onAction="#fullLoad" text="Load all subtree" />
+                                                <MenuItem mnemonicParsing="false" onAction="#reloadSelected" text="Reload item" />
                                             </items>
                                         </ContextMenu>
                                     </contextMenu>
@@ -90,9 +95,9 @@
         </AnchorPane>
         <AnchorPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
-                <Button fx:id="saveDDLbtn" layoutX="390.0" layoutY="5.0" mnemonicParsing="false" onAction="#saveDDL" text="save DDL" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
+                <Button fx:id="saveDDLbtn" layoutX="390.0" layoutY="5.0" mnemonicParsing="false" onAction="#saveDDL" text="save as SQL" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
                 <TextField fx:id="searchText" layoutX="39.0" layoutY="5.0" promptText="input element name" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="5.0" />
-                <Button fx:id="searchBtn" layoutX="-4.0" layoutY="5.0" mnemonicParsing="false" onAction="#searchElement" text="search:" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                <Button fx:id="searchBtn" layoutX="-4.0" layoutY="5.0" mnemonicParsing="false" onAction="#searchElement" text="Search:" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
                 <Button layoutX="216.0" layoutY="5.0" mnemonicParsing="false" onAction="#previousElement" text="▲" AnchorPane.bottomAnchor="5.0" AnchorPane.topAnchor="5.0" />
                 <Button layoutX="250.0" layoutY="5.0" mnemonicParsing="false" onAction="#nextElement" text="▼" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="5.0" />
             </children>

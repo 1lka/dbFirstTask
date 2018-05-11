@@ -7,6 +7,8 @@ import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.model.ConnectModel;
 import com.dbbest.kirilenko.viewModel.ConnectionViewModel;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +21,7 @@ import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Collections;
 
 public class ConnectView {
 
@@ -67,6 +70,11 @@ public class ConnectView {
         connectionViewModel.passwordProperty().bindBidirectional(password.textProperty());
         connectionViewModel.portProperty().bindBidirectional(port.textProperty());
 
+        btnConnect.disableProperty().bind(Bindings.createBooleanBinding(this::disableBtn,
+                port.textProperty(), url.textProperty(),
+                login.textProperty(), dbName.textProperty(),
+                password.textProperty()));
+
 
         recentlyUsed.setItems(connectionViewModel.getRecentlyUsed());
         connectionViewModel.selectedConnectModelProperty().bind(recentlyUsed.getSelectionModel().selectedItemProperty());
@@ -75,19 +83,42 @@ public class ConnectView {
         choiceBox.setItems(connectionViewModel.getChoicesList());
         choiceBox.getSelectionModel().select(0);
 
+        port.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            ObservableList<String> styleClass = port.getStyleClass();
+            try {
+                Integer.parseInt(port.textProperty().get().trim());
+                port.getStyleClass().remove("error");
+            } catch (Exception e) {
+                if (!styleClass.contains("error")) {
+                    styleClass.add("error");
+                }
+            }
+        });
+
+
         logger.info("connection window initialized");
+    }
+
+    private boolean disableBtn() {
+        return checkPort() || (url == null || url.textProperty().get().isEmpty())
+                || (port == null || port.textProperty().get().isEmpty())
+                || (dbName == null || dbName.textProperty().get().isEmpty())
+                || (password == null || password.textProperty().get().isEmpty())
+                || (login == null || login.textProperty().get().isEmpty());
+    }
+
+    private boolean checkPort() {
+        try {
+            Integer.parseInt(port.textProperty().get());
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public void connect(ActionEvent actionEvent) {
         logger.info("trying to connect ...");
-
-        try {
-            int portInt = Integer.parseInt(port.textProperty().get());
-            port.getStyleClass().remove("error");
-        } catch (Exception e) {
-            port.getStyleClass().add("error");
-            return;
-        }
 
         Thread connectionThread = new Thread(() -> {
             try {
@@ -106,7 +137,6 @@ public class ConnectView {
                         logger.info("problems with opening project window", e);
                     } finally {
                         progressBar.setVisible(false);
-                        btnConnect.setDisable(false);
                     }
                 });
             } catch (WrongCredentialsException e) {
@@ -122,7 +152,6 @@ public class ConnectView {
             }
         });
         progressBar.setVisible(true);
-        btnConnect.setDisable(true);
 
         logger.info("starting connection thread");
         connectionThread.start();

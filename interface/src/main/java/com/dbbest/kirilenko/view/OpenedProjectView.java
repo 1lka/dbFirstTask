@@ -9,12 +9,13 @@ import com.dbbest.kirilenko.viewModel.OpenedProjectViewModel;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -48,6 +49,9 @@ public class OpenedProjectView {
 
     @FXML
     public MenuItem fullLoadMenu;
+
+    @FXML
+    public MenuItem reconnectMenuItem;
 
     @FXML
     private TableView<Map.Entry<String, String>> attrTable;
@@ -94,6 +98,7 @@ public class OpenedProjectView {
     public void initialize() {
         logger.info("initializing opened project View");
         mainViewStage.hide();
+
         openedProjectStage.setOnCloseRequest(event -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Save project Dialog");
@@ -108,6 +113,7 @@ public class OpenedProjectView {
             mainViewStage.show();
         });
 
+        reconnectMenuItem.disableProperty().bind(viewModel.onlineModeProperty());
         generateFullddlMenu.visibleProperty().bind(viewModel.selectedRootProperty());
         generateFullddlMenu2.visibleProperty().bind(viewModel.selectedRootProperty());
         fullLoadMenu.visibleProperty().bind(viewModel.selectedRootProperty());
@@ -124,6 +130,7 @@ public class OpenedProjectView {
         ddlArea.textProperty().bind(viewModel.ddlProperty());
 
         treeViewInitialize();
+
         logger.info("opened project View was initialized correctly");
     }
 
@@ -173,9 +180,10 @@ public class OpenedProjectView {
         openedProjectStage.setMinHeight(500);
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
 
-        Scene openedProjectScene = new Scene(root);
+        Scene scene = new Scene(root);
+
         openedProjectStage.setTitle("DBBest");
-        openedProjectStage.setScene(openedProjectScene);
+        openedProjectStage.setScene(scene);
 
         openedProjectStage.show();
         logger.info("view opened");
@@ -218,7 +226,7 @@ public class OpenedProjectView {
             ReconnectView reconnectView = new ReconnectView();
             StringBuilder password = new StringBuilder();
 
-            reconnectView.show(openedProjectStage, viewModel.getUrl(),viewModel.getPort(), viewModel.getDbName(), viewModel.getLogin(), password);
+            reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getPort(), viewModel.getDbName(), viewModel.getLogin(), password);
             logger.info("reconnect view is closed");
             Thread thread = new Thread(() -> {
                 try {
@@ -238,7 +246,7 @@ public class OpenedProjectView {
                         alert.showAndWait();
                     });
                 } finally {
-                    Platform.runLater(()->{
+                    Platform.runLater(() -> {
                         treeView.disableProperty().set(false);
                     });
                 }
@@ -446,5 +454,35 @@ public class OpenedProjectView {
         } else {
         }
         Platform.exit();
+    }
+
+    public void reconnect(ActionEvent actionEvent) {
+        ReconnectView reconnectView = new ReconnectView();
+        StringBuilder password = new StringBuilder();
+
+        reconnectView.show(openedProjectStage, viewModel.getUrl(), viewModel.getPort(), viewModel.getDbName(), viewModel.getLogin(), password);
+        logger.info("reconnect view is closed");
+        Thread thread = new Thread(() -> {
+            try {
+                viewModel.reconnect(password.toString());
+                viewModel.onlineModeProperty().set(true);
+                logger.info("reconnected successfully");
+            } catch (WrongCredentialsException e) {
+                Platform.runLater(() -> {
+                    logger.debug("wrong credentials");
+                    viewModel.onlineModeProperty().set(false);
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setHeaderText("Wrong credentials");
+                    alert.setContentText("wrong credentials");
+                    alert.showAndWait();
+                });
+            } finally {
+                Platform.runLater(() -> {
+                    treeView.disableProperty().set(false);
+                });
+            }
+        });
+        thread.start();
     }
 }

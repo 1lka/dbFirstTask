@@ -22,13 +22,13 @@ public class TablePrinter extends Printer {
         Printer pKeyPrinter = new PrimaryKeyPrinter();
         Printer indexPrinter = new IndexPrinter();
         Printer fKeyPrinter = new ForeignKeyPrinter();
-        Printer triggerPrinter = new TriggerPrinter();
+
 
         String columns = columnsPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.COLUMNS));
         String pKeys = pKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.PRIMARY_KEYS));
         String indexes = indexPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.INDEXES));
         String fKeys = fKeyPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.FOREIGN_KEYS));
-        String triggers = triggerPrinter.printElement(node.wideSearch(MySQLConstants.NodeNames.TRIGGERS));
+
 
         sb.append("CREATE TABLE ")
                 .append(attrs.get(MySQLConstants.AttributeName.NAME))
@@ -41,8 +41,7 @@ public class TablePrinter extends Printer {
                     .append(System.lineSeparator())
                     .append(indexes)
                     .append(fKeys)
-                    .append(System.lineSeparator())
-                    .append(triggers);
+                    .append(System.lineSeparator());
         }
 
         int last = sb.lastIndexOf(",");
