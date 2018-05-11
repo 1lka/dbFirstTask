@@ -16,6 +16,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#closeCurrentProject" text="Close" />
                         <MenuItem mnemonicParsing="false" onAction="#openProject" text="Open" />
                         <MenuItem mnemonicParsing="false" onAction="#createNewProject" text="Create new" />
+                  <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit" />
                     </items>
                 </Menu>
                 <Menu fx:id="actionMenu" mnemonicParsing="false" text="Action">

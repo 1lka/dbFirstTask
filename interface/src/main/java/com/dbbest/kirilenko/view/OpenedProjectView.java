@@ -433,4 +433,18 @@ public class OpenedProjectView {
             viewModel.saveDDL(saveFile);
         }
     }
+
+    public void exit(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Save project Dialog");
+        alert.setHeaderText("You didn't save your project");
+        alert.setContentText("Do you want to save it?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            saveCurrentProject(null);
+        } else {
+        }
+        Platform.exit();
+    }
 }
