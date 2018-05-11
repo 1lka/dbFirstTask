@@ -54,7 +54,8 @@ public class TreeItemService {
         nodes.add(root);
         do {
             TreeItem<TreeModel> last = nodes.remove();
-            String name = last.getValue().getNode().getAttrs().get("NAME");
+            String name = last.getValue().getNode().getAttrs().get("NAME").toLowerCase();
+            param = param.toLowerCase();
             if (name != null && name.contains(param)) {
                 found.add(last);
             }
