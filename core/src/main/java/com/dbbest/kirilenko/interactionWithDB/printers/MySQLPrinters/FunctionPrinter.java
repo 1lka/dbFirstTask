@@ -13,18 +13,21 @@ public class FunctionPrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
-        if (Boolean.valueOf(node.getAttrs().get("fullyLoaded"))) {
 
-            Map<String, String> attrs = node.getAttrs();
+        Map<String, String> attrs = node.getAttrs();
 
-            Node paramsNode = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
+        Node paramsNode = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
+
+        sb.append(MySQLConstants.Delimiters.NEW_DELIMITER)
+                .append(System.lineSeparator())
+                .append("CREATE FUNCTION ")
+                .append(attrs.get(MySQLConstants.AttributeName.NAME));
+
+        if (paramsNode != null) {
             List<Node> params = paramsNode.getChildren();
 
-            sb.append(MySQLConstants.Delimiters.NEW_DELIMITER)
-                    .append(System.lineSeparator())
-                    .append("CREATE FUNCTION ")
-                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
-                    .append("(");
+
+            sb.append("(");
             for (int i = 1; i < params.size(); i++) {
                 sb.append(params.get(i).getAttrs().get(MySQLConstants.AttributeName.NAME))
                         .append(" ")
@@ -47,8 +50,10 @@ public class FunctionPrinter extends Printer {
                     .append(System.lineSeparator())
                     .append(MySQLConstants.Delimiters.OLD_DELIMITER);
         } else {
-            sb.append("Fully load the node to see its DLL");
+            sb.append(System.lineSeparator());
+            sb.append(MySQLConstants.Delimiters.OLD_DELIMITER);
         }
+
         return sb.toString();
     }
 }

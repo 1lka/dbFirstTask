@@ -185,7 +185,7 @@ public class OpenedProjectViewModel {
                     String ddlOfNode = printerManager.printDDL(selectedNode);
                     ddl.set(ddlOfNode);
                 } catch (NullPointerException e) {
-                    ddl.setValue("nothing to showNew");
+                    ddl.setValue("nothing to show");
                 }
             }
         });
@@ -235,6 +235,8 @@ public class OpenedProjectViewModel {
             loaderManager.lazyChildrenLoad(selectedItem.getValue().getValue().getNode());
             selectedItem.getValue().getValue().update();
             TreeItemService.createTreeItems(selectedItem.getValue());
+            String ddlOfNode = printerManager.printDDL(selectedItem.getValue().getValue().getNode());
+            ddl.set(ddlOfNode);
         });
     }
 

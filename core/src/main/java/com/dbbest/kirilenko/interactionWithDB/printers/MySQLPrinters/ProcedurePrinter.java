@@ -1,5 +1,6 @@
 package com.dbbest.kirilenko.interactionWithDB.printers.MySQLPrinters;
 
+import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.tree.Node;
 import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.printers.NodePrinter;
@@ -14,16 +15,17 @@ public class ProcedurePrinter extends Printer {
     @Override
     public String printElement(Node node) {
         StringBuilder sb = new StringBuilder();
-        if (Boolean.valueOf(node.getAttrs().get("fullyLoaded"))) {
+
 
             Map<String, String> attrs = node.getAttrs();
 
             sb.append(MySQLConstants.Delimiters.NEW_DELIMITER)
                     .append(System.lineSeparator())
                     .append("CREATE PROCEDURE ")
-                    .append(attrs.get(MySQLConstants.AttributeName.NAME))
-                    .append(" (");
+                    .append(attrs.get(MySQLConstants.AttributeName.NAME));
 
+        if (Boolean.valueOf(node.getAttrs().get(Loader.FULLY_LOADED))) {
+            sb.append(" (");
             Node paramsNode = node.wideSearch(MySQLConstants.NodeNames.PARAMETERS);
             List<Node> params = paramsNode.getChildren();
 
@@ -58,10 +60,12 @@ public class ProcedurePrinter extends Printer {
                     .append(MySQLConstants.Delimiters.DELIMITER)
                     .append(System.lineSeparator())
                     .append(MySQLConstants.Delimiters.OLD_DELIMITER);
-
         } else {
-            sb.append("Fully load the node to see its DLL");
+            sb.append(System.lineSeparator());
+            sb.append(MySQLConstants.Delimiters.OLD_DELIMITER);
         }
+
+
         return sb.toString();
     }
 }
