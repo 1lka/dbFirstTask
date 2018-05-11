@@ -6,6 +6,7 @@ import com.dbbest.kirilenko.interactionWithDB.DBType;
 import com.dbbest.kirilenko.interactionWithDB.connections.Connect;
 import com.dbbest.kirilenko.interactionWithDB.connections.ConnectFactory;
 import com.dbbest.kirilenko.interactionWithDB.constants.GeneralConstants;
+import com.dbbest.kirilenko.interactionWithDB.constants.MySQLConstants;
 import com.dbbest.kirilenko.interactionWithDB.loaders.Loader;
 import com.dbbest.kirilenko.interactionWithDB.loaders.LoaderManager;
 import com.dbbest.kirilenko.interactionWithDB.printers.PrinterManager;
@@ -80,6 +81,12 @@ public class OpenedProjectViewModel {
     private ObjectProperty<TreeItem<TreeModel>> selectedItem = new SimpleObjectProperty<>();
 
     private ObjectProperty<TreeItem<TreeModel>> foundItem = new SimpleObjectProperty<>();
+
+    private BooleanProperty showSubtreeMenuItem = new SimpleBooleanProperty(true);
+
+    public BooleanProperty showSubtreeMenuItemProperty() {
+        return showSubtreeMenuItem;
+    }
 
     private ObjectProperty<ObservableList<Map.Entry<String, String>>> table = new SimpleObjectProperty<>();
 
@@ -169,8 +176,7 @@ public class OpenedProjectViewModel {
 
             this.type = DBType.valueOf(settingsNode.getAttrs().get("dbType"));
 
-            loaderManager = new LoaderManager();
-            loaderManager.setType(type);
+            loaderManager = new LoaderManager(type);
             loaderManager.setDBName(settingsNode.getAttrs().get("dbName"));
             loaderManager.setLogin(settingsNode.getAttrs().get("login"));
             loaderManager.setUrl(settingsNode.getAttrs().get("url"));
@@ -182,11 +188,28 @@ public class OpenedProjectViewModel {
         this.dbName = loaderManager.getDBName();
         this.login = loaderManager.getLogin();
 
+        //todo ref this shit
+        List<String> showSubtree = new ArrayList<>();
+        showSubtree.add(MySQLConstants.DBEntity.SCHEMA);
+        showSubtree.add(MySQLConstants.DBEntity.TABLE);
+        showSubtree.add(MySQLConstants.NodeNames.TABLES);
+        showSubtree.add(MySQLConstants.DBEntity.FUNCTION);
+        showSubtree.add(MySQLConstants.NodeNames.FUNCTIONS);
+        showSubtree.add(MySQLConstants.DBEntity.PROCEDURE);
+        showSubtree.add(MySQLConstants.NodeNames.PROCEDURES);
+        showSubtree.add(MySQLConstants.NodeNames.VIEWS);
+
         selectedItem.addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 selectedTreeModel = newValue.getValue();
                 Node selectedNode = selectedTreeModel.getNode();
                 table.setValue(newValue.getValue().getTableElements());
+
+                if (showSubtree.contains(newValue.getValue().getNode().getName())) {
+                    showSubtreeMenuItem.set(true);
+                } else {
+                    showSubtreeMenuItem.set(false);
+                }
 
                 try {
                     String ddlOfNode = printerManager.printDDL(selectedNode);

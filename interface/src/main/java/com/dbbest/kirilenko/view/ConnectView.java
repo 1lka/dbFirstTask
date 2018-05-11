@@ -157,7 +157,8 @@ public class ConnectView {
         connectionThread.start();
     }
 
-    public void show(ActionEvent actionEvent) throws IOException {
+    public void show(Stage owner) throws IOException {
+        ConnectView.owner = owner;
         stage = new Stage();
         stage.setOnCloseRequest(event -> {
             owner.show();
@@ -174,21 +175,16 @@ public class ConnectView {
         scene.getStylesheets().add(getClass().getClassLoader().getResource("css/error.css").toString());
 
         stage.setScene(scene);
-        stage.initModality(Modality.WINDOW_MODAL);
-
-        Node source = (Node) actionEvent.getSource();
-        owner = (Stage) source.getScene().getWindow();
-        stage.initOwner(owner);
 
         owner.hide();
-        stage.showAndWait();
+        stage.show();
     }
 
     public void openConnectWindow(Stage mainViewStage, Stage openedProjectStage) throws IOException {
         ConnectView.openedProjectStage = openedProjectStage;
         owner = mainViewStage;
         stage = new Stage();
-        stage.setTitle("create new project");
+        stage.setTitle("Create new project");
         stage.setResizable(false);
 
         FXMLLoader fxmlLoader = new FXMLLoader();

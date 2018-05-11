@@ -87,7 +87,9 @@ public class LoaderManager {
         return connect;
     }
 
-    public LoaderManager() {
+    public LoaderManager(DBType type) {
+        this.type = type;
+        loaders = ReflectionUtil.obtainAnnotatedClasses(type, EntityLoader.class);
         logger.debug("created instance of empty LoaderManager");
     }
 
@@ -100,6 +102,10 @@ public class LoaderManager {
         this.DBName = connect.getDbName();
         this.connection = connect.getConnection();
         loaders = ReflectionUtil.obtainAnnotatedClasses(type, EntityLoader.class);
+    }
+
+    public boolean isLoaderPresent(Node node) {
+        return loaders.get(node.getName()) != null;
     }
 
     /**

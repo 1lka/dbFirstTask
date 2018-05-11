@@ -54,6 +54,11 @@ public class OpenedProjectView {
     public MenuItem reconnectMenuItem;
 
     @FXML
+    public MenuItem subTreeMenu;
+    @FXML
+    public MenuItem subTreeMenu2;
+
+    @FXML
     private TableView<Map.Entry<String, String>> attrTable;
 
     @FXML
@@ -113,6 +118,8 @@ public class OpenedProjectView {
             mainViewStage.show();
         });
 
+        subTreeMenu.visibleProperty().bind(viewModel.showSubtreeMenuItemProperty());
+        subTreeMenu2.visibleProperty().bind(viewModel.showSubtreeMenuItemProperty());
         reconnectMenuItem.disableProperty().bind(viewModel.onlineModeProperty());
         generateFullddlMenu.visibleProperty().bind(viewModel.selectedRootProperty());
         generateFullddlMenu2.visibleProperty().bind(viewModel.selectedRootProperty());
@@ -181,6 +188,14 @@ public class OpenedProjectView {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/openedProject.fxml"));
 
         Scene scene = new Scene(root);
+
+        scene.setOnKeyPressed(event -> {
+            if (event.isControlDown()) {
+                if (event.getCode() == KeyCode.F4) {
+                    closeCurrentProject(null);
+                }
+            }
+        });
 
         openedProjectStage.setTitle("DBBest");
         openedProjectStage.setScene(scene);
