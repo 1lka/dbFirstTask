@@ -55,6 +55,12 @@ public class OpenedProjectViewModel {
 
     private String pathToFolder;
 
+    private BooleanProperty selectedRoot = new SimpleBooleanProperty();
+
+    public BooleanProperty selectedRootProperty() {
+        return selectedRoot;
+    }
+
     private BooleanProperty treeIsBeenLoading = new SimpleBooleanProperty();
 
     private List<TreeItem<TreeModel>> found = new ArrayList<>();
@@ -187,6 +193,11 @@ public class OpenedProjectViewModel {
                     ddl.set(ddlOfNode);
                 } catch (NullPointerException e) {
                     ddl.setValue("nothing to show");
+                }
+                if (newValue == rootItemProperty.get()) {
+                    selectedRoot.set(true);
+                } else {
+                    selectedRoot.set(false);
                 }
             }
         });

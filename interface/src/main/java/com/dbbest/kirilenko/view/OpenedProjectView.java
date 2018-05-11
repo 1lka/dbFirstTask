@@ -38,6 +38,18 @@ public class OpenedProjectView {
     public Button searchBtn;
 
     @FXML
+    public MenuItem generateFullddlMenu2;
+
+    @FXML
+    public MenuItem fullLoadMenu2;
+
+    @FXML
+    public MenuItem generateFullddlMenu;
+
+    @FXML
+    public MenuItem fullLoadMenu;
+
+    @FXML
     private TableView<Map.Entry<String, String>> attrTable;
 
     @FXML
@@ -85,6 +97,11 @@ public class OpenedProjectView {
         openedProjectStage.setOnCloseRequest(event -> {
             mainViewStage.show();
         });
+
+        generateFullddlMenu.visibleProperty().bind(viewModel.selectedRootProperty());
+        generateFullddlMenu2.visibleProperty().bind(viewModel.selectedRootProperty());
+        fullLoadMenu.visibleProperty().bind(viewModel.selectedRootProperty());
+        fullLoadMenu2.visibleProperty().bind(viewModel.selectedRootProperty());
 
         projectMenu.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
         actionMenu.disableProperty().bindBidirectional(viewModel.treeIsBeenLoadingProperty());
