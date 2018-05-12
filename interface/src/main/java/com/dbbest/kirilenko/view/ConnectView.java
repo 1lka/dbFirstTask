@@ -142,7 +142,6 @@ public class ConnectView {
             } catch (WrongCredentialsException e) {
                 Platform.runLater(() -> {
                     progressBar.setVisible(false);
-                    btnConnect.setDisable(false);
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     alert.setTitle("Warning");
                     alert.setHeaderText("Wrong credentials");
