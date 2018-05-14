@@ -105,17 +105,10 @@ public class OpenedProjectView {
         mainViewStage.hide();
 
         openedProjectStage.setOnCloseRequest(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Save project Dialog");
-            alert.setHeaderText("You didn't save your project");
-            alert.setContentText("Do you want to save it?");
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) {
-                saveCurrentProject(null);
-            } else {
+            boolean close = saveOnCloseConfirmation();
+            if (!close) {
+                event.consume();
             }
-            mainViewStage.show();
         });
 
         subTreeMenu.visibleProperty().bind(viewModel.showSubtreeMenuItemProperty());
@@ -245,6 +238,9 @@ public class OpenedProjectView {
             logger.info("reconnect view is closed");
             Thread thread = new Thread(() -> {
                 try {
+                    if (password.toString().equals("")) {
+                        return;
+                    }
                     viewModel.reconnect(password.toString());
                     viewModel.onlineModeProperty().set(true);
                     runnable.run();
@@ -315,62 +311,62 @@ public class OpenedProjectView {
     }
 
     public void closeCurrentProject(ActionEvent actionEvent) {
+        saveOnCloseConfirmation();
+    }
+
+    private boolean saveOnCloseConfirmation() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Save project Dialog");
         alert.setHeaderText("You didn't save your project");
         alert.setContentText("Do you want to save it?");
 
+        ButtonType yesBtn = new ButtonType("Yes");
+        ButtonType noBtn = new ButtonType("No");
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(yesBtn, noBtn, buttonTypeCancel);
+
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
+        if (result.get() == yesBtn) {
             saveCurrentProject(null);
+            openedProjectStage.close();
+            mainViewStage.show();
+            return true;
+        } else if (result.get() == noBtn) {
+            openedProjectStage.close();
+            mainViewStage.show();
+            return true;
         } else {
+            return false;
         }
-        openedProjectStage.close();
-        mainViewStage.show();
     }
 
     public void openProject(ActionEvent actionEvent) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Save project Dialog");
-        alert.setHeaderText("You didn't save your project");
-        alert.setContentText("Do you want to save it?");
+        if (saveOnCloseConfirmation()) {
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Load");
+            File folder = viewModel.getProjectsFolder();
+            chooser.setInitialDirectory(folder);
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            saveCurrentProject(null);
-        } else {
-        }
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("load");
-        File folder = viewModel.getProjectsFolder();
-        chooser.setInitialDirectory(folder);
+            File file = chooser.showDialog(openedProjectStage);
 
-        File file = chooser.showDialog(openedProjectStage);
-
-        if (file != null) {
-            try {
-                OpenedProjectViewModel vm = new OpenedProjectViewModel(file.getAbsolutePath(), null);
-                openedProjectStage.close();
-                this.show(mainViewStage, null, file.getAbsolutePath());
-            } catch (IOException | SerializationException e) {
-                logger.error("problem with saved project opening:", e);
+            if (file != null) {
+                try {
+                    OpenedProjectViewModel vm = new OpenedProjectViewModel(file.getAbsolutePath(), null);
+                    openedProjectStage.close();
+                    this.show(mainViewStage, null, file.getAbsolutePath());
+                } catch (IOException | SerializationException e) {
+                    logger.error("problem with saved project opening:", e);
+                }
             }
         }
     }
 
     public void createNewProject(ActionEvent actionEvent) throws IOException {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Save project Dialog");
-        alert.setHeaderText("You didn't save your project");
-        alert.setContentText("Do you want to save it?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            saveCurrentProject(null);
-        } else {
+        if (saveOnCloseConfirmation()) {
+            ConnectView connectView = new ConnectView();
+            connectView.openConnectWindow(mainViewStage, openedProjectStage);
         }
-        ConnectView connectView = new ConnectView();
-        connectView.openConnectWindow(mainViewStage, openedProjectStage);
     }
 
     public void generateFullDDl(ActionEvent actionEvent) {
@@ -458,17 +454,9 @@ public class OpenedProjectView {
     }
 
     public void exit(ActionEvent actionEvent) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Save project Dialog");
-        alert.setHeaderText("You didn't save your project");
-        alert.setContentText("Do you want to save it?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            saveCurrentProject(null);
-        } else {
+        if (saveOnCloseConfirmation()) {
+            Platform.exit();
         }
-        Platform.exit();
     }
 
     public void reconnect(ActionEvent actionEvent) {
@@ -479,6 +467,9 @@ public class OpenedProjectView {
         logger.info("reconnect view is closed");
         Thread thread = new Thread(() -> {
             try {
+                if (password.toString().equals("")) {
+                    return;
+                }
                 viewModel.reconnect(password.toString());
                 viewModel.onlineModeProperty().set(true);
                 logger.info("reconnected successfully");

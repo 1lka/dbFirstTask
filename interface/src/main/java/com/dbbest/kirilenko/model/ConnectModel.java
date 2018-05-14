@@ -33,6 +33,6 @@ public class ConnectModel {
 
     @Override
     public String toString() {
-        return db;
+        return url + " " + db;
     }
 }

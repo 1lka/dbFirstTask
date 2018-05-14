@@ -17,7 +17,7 @@
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding></TextField>
-      <Button defaultButton="true" layoutX="74.0" layoutY="55.0" mnemonicParsing="false" onAction="#confirm" prefWidth="55.0" text="Ok" textAlignment="CENTER">
+      <Button fx:id="okBtn" defaultButton="true" layoutX="74.0" layoutY="55.0" mnemonicParsing="false" onAction="#confirm" prefWidth="55.0" text="Ok" textAlignment="CENTER">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>

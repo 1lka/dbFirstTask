@@ -170,8 +170,8 @@ public class ConnectView {
         Parent root = fxmlLoader.load();
 
 
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getClassLoader().getResource("css/error.css").toString());
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getClassLoader().getResource("css/error.css").toString());
 
         stage.setScene(scene);
 

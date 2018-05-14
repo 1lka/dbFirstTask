@@ -19,7 +19,7 @@
    <children>
       <HBox prefHeight="37.0">
          <children>
-            <Label prefHeight="27.0" text="Resently used: ">
+            <Label prefHeight="27.0" text="Recently used: ">
                <HBox.margin>
                   <Insets />
                </HBox.margin>

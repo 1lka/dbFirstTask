@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.script.Bindings;
 import java.io.IOException;
 
 public class ReconnectView {
@@ -44,6 +45,13 @@ public class ReconnectView {
         p.textProperty().set(port);
         l.textProperty().set(login);
         n.textProperty().set(dbName);
+
+        reconnectBtn.disableProperty().bind(javafx.beans.binding.Bindings.createBooleanBinding(this::disableBtn,
+                pass.textProperty()));
+    }
+
+    private boolean disableBtn() {
+        return !(pass.textProperty() != null && !pass.textProperty().get().isEmpty());
     }
 
     public void show(Stage openedProjectStage, String url,String port, String dbName, String login, StringBuilder password) {
@@ -54,7 +62,7 @@ public class ReconnectView {
         ReconnectView.dbName = dbName;
 
         stage = new Stage();
-        stage.setTitle("password required");
+        stage.setTitle("Reconnect");
         stage.setResizable(false);
 
         FXMLLoader fxmlLoader = new FXMLLoader();

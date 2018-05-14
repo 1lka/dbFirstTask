@@ -1,9 +1,12 @@
 package com.dbbest.kirilenko.view;
 
+import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -14,10 +17,28 @@ public class ProjectSettingsView {
     @FXML
     public TextField timeout;
 
+    @FXML
+    public Button okBtn;
+
     private ProjectSettingsView controller;
 
     public ProjectSettingsView getController() {
         return controller;
+    }
+
+    @FXML
+    private void initialize() {
+        timeout.textProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<String> styleClass = timeout.getStyleClass();
+            try {
+                Integer.parseInt(timeout.textProperty().get().trim());
+                timeout.getStyleClass().remove("error");
+            } catch (Exception e) {
+                if (!styleClass.contains("error")) {
+                    styleClass.add("error");
+                }
+            }
+        });
     }
 
     public Stage show(long currentTimeout) throws IOException {
@@ -26,7 +47,12 @@ public class ProjectSettingsView {
         Stage stage = new Stage();
         stage.setResizable(false);
         stage.setTitle("Project settings");
-        stage.setScene(new Scene(loader.load()));
+
+
+        Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(getClass().getClassLoader().getResource("css/error.css").toString());
+
+        stage.setScene(scene);
 
 
         controller = loader.getController();
