@@ -89,6 +89,10 @@ public class ProgramSettings {
         }
     }
 
+    public static void resetToDefault() {
+
+    }
+
     private static String decode(String s) {
         Charset cset = Charset.forName("UTF-8");
         ByteBuffer buf = cset.encode(s);

@@ -182,13 +182,6 @@ public class OpenedProjectView {
 
         Scene scene = new Scene(root);
 
-        scene.setOnKeyPressed(event -> {
-            if (event.isControlDown()) {
-                if (event.getCode() == KeyCode.F4) {
-                    closeCurrentProject(null);
-                }
-            }
-        });
 
         openedProjectStage.setTitle("DBBest");
         openedProjectStage.setScene(scene);

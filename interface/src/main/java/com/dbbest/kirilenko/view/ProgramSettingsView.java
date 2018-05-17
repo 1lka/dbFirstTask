@@ -89,4 +89,8 @@ public class ProgramSettingsView {
         settingsStage.initModality(Modality.WINDOW_MODAL);
         settingsStage.showAndWait();
     }
+
+    public void resetToDefault(ActionEvent actionEvent) {
+
+    }
 }

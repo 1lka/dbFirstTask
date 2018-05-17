@@ -33,7 +33,7 @@
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding></Button>
-      <Button layoutX="253.0" layoutY="100.0" mnemonicParsing="false" onAction="#saveChanges" text="Save">
+      <Button layoutX="145.0" layoutY="100.0" mnemonicParsing="false" onAction="#saveChanges" text="Save">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding></Button>
@@ -41,5 +41,6 @@
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding></Button>
+      <Button layoutX="190.0" layoutY="101.0" mnemonicParsing="false" onAction="#resetToDefault" text="Reset to default" />
    </children>
 </AnchorPane>
